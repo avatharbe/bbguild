@@ -159,13 +159,13 @@ class classes
 		$this->bb_classes_table = $bb_classes_table;
 
 		$this->armortypes = array (
-		'CLOTH' => $user->lang['CLOTH'],
-		'ROBE' => $user->lang['ROBE'],
-		'LEATHER' => $user->lang['LEATHER'],
-		'AUGMENTED' => $user->lang['AUGMENTED'],
-		'MAIL' => $user->lang['MAIL'],
-		'HEAVY' => $user->lang['HEAVY'],
-		'PLATE' => $user->lang['PLATE'] );
+		'CLOTH' => $user->lang['CLOTH'] ?? 'Cloth',
+		'ROBE' => $user->lang['ROBE'] ?? 'Robes',
+		'LEATHER' => $user->lang['LEATHER'] ?? 'Leather',
+		'AUGMENTED' => $user->lang['AUGMENTED'] ?? 'Augmented',
+		'MAIL' => $user->lang['MAIL'] ?? 'Mail',
+		'HEAVY' => $user->lang['HEAVY'] ?? 'Heavy',
+		'PLATE' => $user->lang['PLATE'] ?? 'Plate' );
 
 		$this->game_id = '';
 		$this->c_index = 0;

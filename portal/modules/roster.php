@@ -11,11 +11,12 @@
 
 namespace avathar\bbguild\portal\modules;
 
-use avathar\bbguild\model\player\player;
+use avathar\bbguild\model\admin\asset_url_resolver;
 use avathar\bbguild\model\admin\constants;
 use avathar\bbguild\model\admin\log;
 use avathar\bbguild\model\admin\util;
 use avathar\bbguild\model\games\game_registry;
+use avathar\bbguild\model\player\player;
 use phpbb\cache\driver\driver_interface as cache_interface;
 use phpbb\config\config;
 use phpbb\controller\helper;
@@ -46,6 +47,7 @@ class roster extends module_base
 	protected path_helper $path_helper;
 	protected helper $helper;
 	protected game_registry $game_registry;
+	protected asset_url_resolver $asset_resolver;
 	protected string $players_table;
 	protected string $ranks_table;
 	protected string $classes_table;
@@ -69,6 +71,7 @@ class roster extends module_base
 		path_helper $path_helper,
 		helper $helper,
 		game_registry $game_registry,
+		asset_url_resolver $asset_resolver,
 		string $players_table,
 		string $ranks_table,
 		string $classes_table,
@@ -92,6 +95,7 @@ class roster extends module_base
 		$this->path_helper = $path_helper;
 		$this->helper = $helper;
 		$this->game_registry = $game_registry;
+		$this->asset_resolver = $asset_resolver;
 		$this->players_table = $players_table;
 		$this->ranks_table = $ranks_table;
 		$this->classes_table = $classes_table;
@@ -359,28 +363,6 @@ class roster extends module_base
 	}
 
 	/**
-	 * Get game-specific images web path.
-	 */
-	/**
-	 * Resolve a portrait URL for template use.
-	 * Local paths (files/...) get the web root prefix. External URLs pass through.
-	 */
-	protected function resolve_portrait_url(string $url): string
-	{
-		if (empty($url) || $url === 'N/A')
-		{
-			return '';
-		}
-		// External URL — use as-is
-		if (strpos($url, 'http://') === 0 || strpos($url, 'https://') === 0)
-		{
-			return $url;
-		}
-		// Local path — prepend web root
-		return $this->path_helper->get_web_root_path() . $url;
-	}
-
-	/**
 	 * Resolve portrait URL with race/gender/class fallback.
 	 *
 	 * If the player has no API portrait, falls back to a static
@@ -392,7 +374,8 @@ class roster extends module_base
 	 */
 	protected function resolve_portrait_with_fallback(array $char, string $ext_path_images): string
 	{
-		$url = $this->resolve_portrait_url($char['player_portrait_url'] ?? '');
+		$player_id = isset($char['player_id']) ? (int) $char['player_id'] : 0;
+		$url = $this->asset_resolver->resolve_portrait_url($char['player_portrait_url'] ?? '', $player_id);
 		if (!empty($url))
 		{
 			return $url;

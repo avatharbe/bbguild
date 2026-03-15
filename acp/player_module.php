@@ -161,6 +161,7 @@ class player_module
 		$this->bbguild_ext_manager = $phpbb_container->get('ext.manager');
 		$this->bbguild_game_registry = $phpbb_container->get('avathar.bbguild.game_registry');
 		$this->path_helper = $phpbb_container->get('path_helper');
+		$this->asset_resolver = $phpbb_container->get('avathar.bbguild.asset_url_resolver');
 
 		// Resolve table names from container parameters
 		$this->bb_players_table = $phpbb_container->getParameter('avathar.bbguild.tables.bb_players');
@@ -889,7 +890,7 @@ class player_module
 				'LISTPLAYERS_FOOTCOUNT' => $footcount_text,
 				'U_VIEW_GUILD'          => append_sid("{$phpbb_admin_path}index.$phpEx", 'i=-avathar-bbguild-acp-guild_module&amp;mode=editguild&amp;action=editguild&amp;' . constants::URI_GUILD . '=' . $this->guild->getGuildid()),
 				'PAGE_NUMBER'           => $playerpagination->on_page($player_count, $config['bbguild_user_llimit'], $start),
-				'GUILD_EMBLEM'          => $this->resolve_emblem_url((string) $this->guild->getEmblempath()),
+				'GUILD_EMBLEM'          => $this->asset_resolver->resolve_emblem_url((string) $this->guild->getEmblempath(), (int) $this->guild->getGuildid()),
 				'GUILD_NAME'            => $this->guild->getName(),
 			)
 		);
@@ -1199,7 +1200,7 @@ class player_module
 				'PLAYER_COMMENT'           => $editplayer->getPlayerComment(),
 				'S_CAN_HAVE_ARMORY'        => $this->game_has_api($editplayer->game_id),
 				'PLAYER_URL'               => $editplayer->getPlayerArmoryUrl(),
-				'PLAYER_PORTRAIT'          => $this->resolve_portrait_url($editplayer->getPlayerPortraitUrl()),
+				'PLAYER_PORTRAIT'          => $this->asset_resolver->resolve_portrait_url((string) $editplayer->getPlayerPortraitUrl(), (int) $editplayer->getPlayerId()),
 				'S_PLAYER_PORTRAIT_EXISTS' => (strlen($editplayer->getPlayerPortraitUrl()) > 1) ? true : false,
 				'S_CAN_GENERATE_ARMORY'    => $this->game_has_api($editplayer->game_id),
 				'COLORCODE'                => ($editplayer->getColorcode() == '') ? '#254689' : $editplayer->getColorcode(),
@@ -1225,47 +1226,4 @@ class player_module
 		);
 	}
 
-	/**
-	 * Resolve a portrait URL for template use.
-	 */
-	private function resolve_portrait_url(string $url): string
-	{
-		if (empty($url) || strpos($url, 'http') === 0)
-		{
-			return $url;
-		}
-		return $this->path_helper->get_web_root_path() . $url;
-	}
-
-	/**
-	 * Resolve an emblem path to a web URL usable from the ACP.
-	 *
-	 * @param string $emblempath Stored emblem path
-	 * @return string Web-accessible URL, or empty if not found
-	 */
-	private function resolve_emblem_url(string $emblempath): string
-	{
-		if (empty($emblempath))
-		{
-			return '';
-		}
-
-		// New format: relative path (files/bbguild_wow/emblems/...)
-		if (strpos($emblempath, 'bbguild_wow/emblems/') !== false)
-		{
-			global $phpbb_root_path;
-			if (file_exists($phpbb_root_path . $emblempath))
-			{
-				return $this->path_helper->get_web_root_path() . $emblempath;
-			}
-			return '';
-		}
-
-		// Legacy format
-		if (@file_exists($emblempath))
-		{
-			return $emblempath;
-		}
-		return '';
-	}
 }

@@ -189,6 +189,7 @@ class bbguild_module
 		$this->bbguild_util = $phpbb_container->get('avathar.bbguild.util');
 		$this->bbguild_ext_manager = $phpbb_container->get('ext.manager');
 		$this->bbguild_game_registry = $phpbb_container->get('avathar.bbguild.game_registry');
+		$this->asset_resolver = $phpbb_container->get('avathar.bbguild.asset_url_resolver');
 
 		// Resolve table names from container parameters
 		$this->bb_players_table = $phpbb_container->getParameter('avathar.bbguild.tables.bb_players');
@@ -889,7 +890,7 @@ class bbguild_module
 				'REALM'                 => $players->getPlayerRealm(),
 				'S_CAN_HAVE_ARMORY'        => $this->game_has_api($players->game_id),
 				'PLAYER_URL'            =>  $players->getPlayerArmoryUrl(),
-				'PLAYER_PORTRAIT'        =>  $this->resolve_portrait_url($players->getPlayerPortraitUrl()),
+				'PLAYER_PORTRAIT'        =>  $this->asset_resolver->resolve_portrait_url((string) $players->getPlayerPortraitUrl(), (int) $players->getPlayerId()),
 				'S_PLAYER_PORTRAIT_EXISTS'  => strlen((string) $players->getPlayerPortraitUrl()) > 1 ? true : false,
 				'S_CAN_GENERATE_ARMORY'        => $this->game_has_api($players->game_id),
 				'COLORCODE'             => $players->getColorcode() == '' ? '#254689' : $players->getColorcode(),
@@ -945,7 +946,7 @@ class bbguild_module
 					'LEVEL'            => $char['player_level'],
 					'ARMORY'        => $char['player_armory_url'],
 					'PHPBBUID'        => $char['username'],
-					'PORTRAIT'        => $this->resolve_portrait_url($char['player_portrait_url']),
+					'PORTRAIT'        => $this->asset_resolver->resolve_portrait_url((string) ($char['player_portrait_url'] ?? ''), (int) $char['player_id']),
 					'ACHIEVPTS'        => $char['player_achiev'],
 					'CLASS_IMAGE'     => $this->resolve_image_url($char['class_image']),
 					'RACE_IMAGE'     => $this->resolve_image_url($char['race_image']),
@@ -1001,23 +1002,6 @@ class bbguild_module
 			)
 		);
 
-	}
-
-	/**
-	 * Resolve a portrait URL for template use.
-	 */
-	private function resolve_portrait_url(?string $url): string
-	{
-		if (empty($url))
-		{
-			return '';
-		}
-		if (strpos($url, 'http') === 0)
-		{
-			return $url;
-		}
-		global $phpbb_container;
-		return $phpbb_container->get('path_helper')->get_web_root_path() . $url;
 	}
 
 	/**

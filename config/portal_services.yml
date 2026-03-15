@@ -116,6 +116,7 @@ services:
             - '@path_helper'
             - '@controller.helper'
             - '@avathar.bbguild.game_registry'
+            - '@avathar.bbguild.asset_url_resolver'
             - '%avathar.bbguild.tables.bb_players%'
             - '%avathar.bbguild.tables.bb_ranks%'
             - '%avathar.bbguild.tables.bb_classes%'

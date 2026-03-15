@@ -16,6 +16,7 @@ services:
             - '@avathar.bbguild.log'
             - '@path_helper'
             - '@ext.manager'
+            - '@avathar.bbguild.asset_url_resolver'
             - '%avathar.bbguild.tables.bb_players%'
             - '%avathar.bbguild.tables.bb_ranks%'
             - '%avathar.bbguild.tables.bb_classes%'
@@ -34,7 +35,7 @@ services:
             - '@avathar.bbguild.log'
             - '@avathar.bbguild.util'
             - '@avathar.bbguild.game_registry'
-            - '@path_helper'
+            - '@avathar.bbguild.asset_url_resolver'
             - '%avathar.bbguild.tables.bb_players%'
             - '%avathar.bbguild.tables.bb_ranks%'
             - '%avathar.bbguild.tables.bb_classes%'
@@ -66,6 +67,12 @@ services:
             - '%avathar.bbguild.tables.bb_races%'
             - '%avathar.bbguild.tables.bb_factions%'
             - '%avathar.bbguild.tables.bb_language%'
+    avathar.bbguild.asset_url_resolver:
+        class: avathar\bbguild\model\admin\asset_url_resolver
+        arguments:
+            - '@controller.helper'
+            - '@path_helper'
+            - '@ext.manager'
     avathar.bbguild.curl:
         class: avathar\bbguild\model\admin\curl
     avathar.bbguild.log:
@@ -180,6 +187,7 @@ services:
             - '@dispatcher'
             - '@avathar.bbguild.portal.modules.database_handler'
             - '@avathar.bbguild.admin.portal'
+            - '@avathar.bbguild.asset_url_resolver'
             - '%avathar.bbguild.tables.bb_games%'
             - '%avathar.bbguild.tables.bb_logs%'
             - '%avathar.bbguild.tables.bb_ranks%'

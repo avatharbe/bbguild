@@ -20,6 +20,7 @@ use phpbb\template\template;
 use phpbb\event\dispatcher_interface;
 use phpbb\user;
 
+use avathar\bbguild\model\admin\asset_url_resolver;
 use avathar\bbguild\model\admin\constants;
 use avathar\bbguild\model\games\game;
 use avathar\bbguild\model\games\game_registry;
@@ -81,6 +82,8 @@ class admin_guild
 	protected $portal_db_handler;
 	/** @var admin_portal */
 	protected $admin_portal;
+	/** @var asset_url_resolver */
+	protected $asset_resolver;
 
 	/* @var string */
 	public $u_action;
@@ -180,6 +183,7 @@ class admin_guild
 		dispatcher_interface $dispatcher,
 		portal_database_handler $portal_db_handler,
 		admin_portal $admin_portal,
+		asset_url_resolver $asset_resolver,
 		$bb_games_table,
 		$bb_logs_table,
 		$bb_ranks_table,
@@ -222,6 +226,7 @@ class admin_guild
 		$this->dispatcher = $dispatcher;
 		$this->portal_db_handler = $portal_db_handler;
 		$this->admin_portal = $admin_portal;
+		$this->asset_resolver = $asset_resolver;
 
 		$this->bb_games_table = $bb_games_table;
 		$this->bb_logs_table = $bb_logs_table;
@@ -1223,7 +1228,7 @@ class admin_guild
 			'L_EXPLAIN'              => $this->user->lang['ACP_EDITGUILD_EXPLAIN'],
 			'L_EDIT_GUILD_TITLE'     => $this->user->lang['EDIT_GUILD'],
 			'MSG_NAME_EMPTY'         => $this->user->lang['FV_REQUIRED_NAME'],
-			'EMBLEM'                 => $this->resolve_emblem_url((string) $updateguild->getEmblempath()),
+			'EMBLEM'                 => $this->asset_resolver->resolve_emblem_url((string) $updateguild->getEmblempath(), (int) $updateguild->getGuildid()),
 			'EMBLEMFILE'             => basename((string) $updateguild->getEmblempath()),
 			'S_EMBLEM_EXISTS'        => !empty($updateguild->getEmblempath()) && file_exists($this->root_path . $updateguild->getEmblempath()),
 			'WELCOME_MESSAGE'        => $textarr['text'],
@@ -1284,7 +1289,7 @@ class admin_guild
 			'L_EXPLAIN'              => $this->user->lang['ACP_EDITGUILD_EXPLAIN'],
 			'L_ADD_GUILD_TITLE'      => $this->user->lang['EDIT_GUILD'],
 			'MSG_NAME_EMPTY'         => $this->user->lang['FV_REQUIRED_NAME'],
-			'EMBLEM'                 => $this->resolve_emblem_url((string) $updateguild->getEmblempath()),
+			'EMBLEM'                 => $this->asset_resolver->resolve_emblem_url((string) $updateguild->getEmblempath(), (int) $updateguild->getGuildid()),
 			'EMBLEMFILE'             => basename((string) $updateguild->getEmblempath()),
 			'S_EMBLEM_EXISTS'        => !empty($updateguild->getEmblempath()) && file_exists($this->root_path . $updateguild->getEmblempath()),
 			'U_EDIT_GUILD'           => $this->acp_url('i=-avathar-bbguild-acp-guild_module&amp;mode=editguild&amp;action=editguild&amp;' . constants::URI_GUILD . '=' . $updateguild->getGuildid()),
@@ -1296,26 +1301,4 @@ class admin_guild
 		$this->page_title = $this->user->lang['ACP_EDITGUILD'];
 	}
 
-	/**
-	 * Resolve an emblem path to a web URL usable from the ACP.
-	 *
-	 * @param string $emblempath Stored emblem path
-	 * @return string Web-accessible URL
-	 */
-	private function resolve_emblem_url(string $emblempath): string
-	{
-		if (empty($emblempath))
-		{
-			return '';
-		}
-
-		// New format: relative path (files/bbguild_wow/emblems/...)
-		if (strpos($emblempath, 'bbguild_wow/emblems/') !== false)
-		{
-			return $this->path_helper->get_web_root_path() . $emblempath;
-		}
-
-		// Legacy format: full path or filename — use ext images path
-		return $this->ext_path_web . 'images/guildemblem/' . basename($emblempath);
-	}
 }

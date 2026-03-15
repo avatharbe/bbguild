@@ -10,6 +10,7 @@
 
 namespace avathar\bbguild\portal;
 
+use avathar\bbguild\model\admin\asset_url_resolver;
 use avathar\bbguild\model\admin\constants;
 use avathar\bbguild\model\admin\log;
 use avathar\bbguild\model\player\guilds;
@@ -50,6 +51,9 @@ class guild_context
 
 	/** @var manager */
 	protected $ext_manager;
+
+	/** @var asset_url_resolver */
+	protected $asset_resolver;
 
 	/** @var string */
 	protected $players_table;
@@ -94,6 +98,7 @@ class guild_context
 		log $log,
 		path_helper $path_helper,
 		manager $ext_manager,
+		asset_url_resolver $asset_resolver,
 		string $players_table,
 		string $ranks_table,
 		string $classes_table,
@@ -112,6 +117,7 @@ class guild_context
 		$this->log = $log;
 		$this->path_helper = $path_helper;
 		$this->ext_manager = $ext_manager;
+		$this->asset_resolver = $asset_resolver;
 		$this->players_table = $players_table;
 		$this->ranks_table = $ranks_table;
 		$this->classes_table = $classes_table;
@@ -223,38 +229,12 @@ class guild_context
 			'ARMORY_URL'      => '',
 			'MIN_ARMORYLEVEL' => $this->guild->getMinArmory(),
 			'SHOW_ROSTER'     => $this->guild->getShowroster(),
-			'EMBLEM'          => $this->resolve_emblem_url((string) $this->guild->getEmblempath()),
+			'EMBLEM'          => $this->asset_resolver->resolve_emblem_url((string) $this->guild->getEmblempath(), $this->guild_id),
 			'EMBLEMFILE'      => basename((string) $this->guild->getEmblempath()),
 			'S_EMBLEM_EXISTS' => $this->emblem_exists((string) $this->guild->getEmblempath()),
 			'ARMORY'          => '',
 			'ACHIEV'          => '',
 		]);
-	}
-
-	/**
-	 * Resolve an emblem path to a web URL.
-	 *
-	 * Handles both new relative paths (files/bbguild_wow/emblems/...)
-	 * and legacy extension paths (ext/avathar/bbguild/images/guildemblem/...).
-	 *
-	 * @param string $emblempath Stored emblem path
-	 * @return string Web-accessible URL
-	 */
-	private function resolve_emblem_url(string $emblempath): string
-	{
-		if (empty($emblempath))
-		{
-			return '';
-		}
-
-		// New format: relative path starting with upload dir (e.g. files/bbguild_wow/emblems/...)
-		if (strpos($emblempath, 'bbguild_wow/emblems/') !== false)
-		{
-			return $this->path_helper->get_web_root_path() . $emblempath;
-		}
-
-		// Legacy format: full filesystem path or just a filename — resolve via ext images
-		return $this->ext_path_images . 'guildemblem/' . basename($emblempath);
 	}
 
 	/**

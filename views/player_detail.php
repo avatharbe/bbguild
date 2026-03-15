@@ -10,6 +10,7 @@
 
 namespace avathar\bbguild\views;
 
+use avathar\bbguild\model\admin\asset_url_resolver;
 use avathar\bbguild\model\admin\log;
 use avathar\bbguild\model\admin\util;
 use avathar\bbguild\model\games\game_registry;
@@ -18,7 +19,6 @@ use phpbb\cache\driver\driver_interface as cache_interface;
 use phpbb\config\config;
 use phpbb\db\driver\driver_interface;
 use phpbb\extension\manager;
-use phpbb\path_helper;
 use phpbb\template\template;
 use phpbb\user;
 
@@ -48,8 +48,8 @@ class player_detail
 	/** @var game_registry */
 	protected $game_registry;
 
-	/** @var path_helper */
-	protected $path_helper;
+	/** @var asset_url_resolver */
+	protected $asset_resolver;
 
 	/** @var string */
 	protected $bb_players_table;
@@ -80,7 +80,7 @@ class player_detail
 		log $log,
 		util $util,
 		game_registry $game_registry,
-		path_helper $path_helper,
+		asset_url_resolver $asset_resolver,
 		string $bb_players_table,
 		string $bb_ranks_table,
 		string $bb_classes_table,
@@ -99,7 +99,7 @@ class player_detail
 		$this->log = $log;
 		$this->util = $util;
 		$this->game_registry = $game_registry;
-		$this->path_helper = $path_helper;
+		$this->asset_resolver = $asset_resolver;
 		$this->bb_players_table = $bb_players_table;
 		$this->bb_ranks_table = $bb_ranks_table;
 		$this->bb_classes_table = $bb_classes_table;
@@ -221,7 +221,7 @@ class player_detail
 			'PLAYER_ACHIEV'      => $p->getPlayerAchiev(),
 			'PLAYER_COMMENT'     => $p->getPlayerComment(),
 			'PLAYER_ARMORY_URL'  => $p->getPlayerArmoryUrl(),
-			'PLAYER_PORTRAIT'    => $this->resolve_portrait_url($p->getPlayerPortraitUrl()),
+			'PLAYER_PORTRAIT'    => $this->asset_resolver->resolve_portrait_url((string) $p->getPlayerPortraitUrl(), $player_id),
 			'PLAYER_CLASS_IMAGE' => $class_image,
 			'PLAYER_RACE_IMAGE'  => $race_image,
 			'PLAYER_PHPBB_USER'  => $phpbb_username,
@@ -234,18 +234,6 @@ class player_detail
 		]);
 
 		return true;
-	}
-
-	/**
-	 * Resolve a portrait URL for template use.
-	 */
-	private function resolve_portrait_url(string $url): string
-	{
-		if (empty($url) || strpos($url, 'http') === 0)
-		{
-			return $url;
-		}
-		return $this->path_helper->get_web_root_path() . $url;
 	}
 
 	/**
