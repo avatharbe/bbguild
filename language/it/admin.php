@@ -577,7 +577,7 @@ $lang = array_merge(
 	'IERROTH' => 'Other error',
 	'CURL_NOT_AVAILABLE' => 'Curl is not available on your server. :< ',
 	'WARNING_NORECRUITMENTS'   =>  'Nessun Assunzioni trovato. ',
-	
+
 
 	// Submission Success Messages
 	'ADMIN_RAID_ATTENDEE_DELETED_FAILED' => 'L’iscritto %s non può essere rimosso dall’incursione %s',

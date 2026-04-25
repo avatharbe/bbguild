@@ -35,21 +35,21 @@ class admin_guild
 	public $auth;
 	/** @var \phpbb\cache\driver\driver_interface */
 	protected $cache;
-	/** @var \phpbb\config\config */
+	/** @var config */
 	protected $config;
 	/** @var \phpbb\db\driver\driver_interface */
 	protected $db;
-	/** @var \phpbb\language\language */
+	/** @var language */
 	protected $language;
-	/** @var \phpbb\log\log */
+	/** @var log */
 	protected $log;
-	/** @var \phpbb\pagination */
+	/** @var pagination */
 	protected $pagination;
-	/** @var \phpbb\request\request */
+	/** @var request */
 	protected $request;
-	/** @var \phpbb\template\template */
+	/** @var template */
 	protected $template;
-	/** @var \phpbb\user */
+	/** @var user */
 	protected $user;
 	/** @var \phpbb\path_helper */
 	protected $path_helper;
@@ -994,7 +994,7 @@ class admin_guild
 				$success_message = sprintf($this->user->lang['ADMIN_ADD_RECRUITMENT_SUCCESS'], $new_id);
 				trigger_error($success_message . $this->link, E_USER_NOTICE);
 			}
-			elseif ($update)
+			else if ($update)
 			{
 				$recruit_id = $this->request->variable('hidden_recruit_id', 0);
 				$recruit_data['applicants'] = $this->request->variable('applicants', 0);

@@ -28,8 +28,6 @@ use avathar\bbguild\model\games\rpg\faction;
 use avathar\bbguild\model\games\rpg\races;
 use avathar\bbguild\model\games\rpg\roles;
 
-use avathar\bbguild\model\admin;
-
 /**
  * Class admin_controller
  */
@@ -41,20 +39,20 @@ class admin_games
 	public $auth;
 	/** @var \phpbb\cache\driver\driver_interface */
 	protected $cache;
-	/** @var \phpbb\config\config */
+	/** @var config */
 	protected $config;
 	/** @var \phpbb\db\driver\driver_interface */
 	protected $db;
-	/** @var \phpbb\language\language */
+	/** @var language */
 	protected $language;
-	/** @var \phpbb\log\log */
+	/** @var log */
 	protected $log;
 	protected $pagination;
-	/** @var \phpbb\request\request */
+	/** @var request */
 	protected $request;
-	/** @var \phpbb\template\template */
+	/** @var template */
 	protected $template;
-	/** @var \phpbb\user */
+	/** @var user */
 	protected $user;
 	/**
 	 * @var \phpbb\extension\manager
@@ -251,8 +249,6 @@ class admin_games
 			'it' => $this->language->lang('LANG_IT'),
 		);
 
-
-
 		//get number of games
 		$listgames = new \avathar\bbguild\model\games\game($this->db, $this->cache, $this->config, $this->user, $this->phpbb_extension_manager, $this->bb_classes_table, $this->bb_races_table, $this->bb_language_table, $this->bb_factions_table, $this->bb_games_table);
 		//list installed games
@@ -271,7 +267,6 @@ class admin_games
 		{
 			$installed[$game['game_id']] = $game['name'];
 		}
-
 
 	}
 

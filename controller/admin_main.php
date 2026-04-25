@@ -31,20 +31,20 @@ class admin_main
 	public $auth;
 	/** @var \phpbb\cache\driver\driver_interface */
 	protected $cache;
-	/** @var \phpbb\config\config */
+	/** @var config */
 	protected $config;
 	/** @var \phpbb\db\driver\driver_interface */
 	protected $db;
-	/** @var \phpbb\language\language */
+	/** @var language */
 	protected $language;
-	/** @var \phpbb\log\log */
+	/** @var log */
 	protected $log;
 	protected $pagination;
-	/** @var \phpbb\request\request */
+	/** @var request */
 	protected $request;
-	/** @var \phpbb\template\template */
+	/** @var template */
 	protected $template;
-	/** @var \phpbb\user */
+	/** @var user */
 	protected $user;
 	/** @var \phpbb\path_helper */
 	protected $path_helper;
@@ -293,7 +293,6 @@ class admin_main
 		//get number of games
 		$listgames = new \avathar\bbguild\model\games\game($this->db, $this->cache, $this->config, $this->user, $this->phpbb_extension_manager, $this->bb_classes_table, $this->bb_races_table, $this->bb_language_table, $this->bb_factions_table, $this->bb_games_table);
 
-
 		$sql = 'SELECT count(*) as recruitments_count FROM ' . $this->bb_recruit_table;
 		$result = $this->db->sql_query($sql);
 		$recruitments_count = (int) $this->db->sql_fetchfield('recruitments_count');
@@ -361,7 +360,6 @@ class admin_main
 				);
 			}
 		}
-
 
 		$games = $listgames->games;
 		unset($listgames);
@@ -668,7 +666,6 @@ class admin_main
 				$this->language->lang('RETURN_LOG') . '</a><br />' . sprintf($this->language->lang('ADMIN_LOG_DELETE_FAIL'), implode(', ', $marked));
 			trigger_error($message, E_USER_WARNING);
 		}
-
 
 	}
 
