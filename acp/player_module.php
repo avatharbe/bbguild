@@ -61,6 +61,33 @@ class player_module
 
 	protected $factionroute;
 
+	/** @var \phpbb\config\config */
+	protected $config;
+	/** @var \phpbb\cache\driver\driver_interface */
+	protected $bbguild_cache;
+	/** @var \avathar\bbguild\model\admin\log */
+	protected $bbguild_log;
+	/** @var \avathar\bbguild\model\admin\util */
+	protected $bbguild_util;
+	/** @var \phpbb\extension\manager */
+	protected $bbguild_ext_manager;
+	/** @var \avathar\bbguild\model\games\game_registry */
+	protected $bbguild_game_registry;
+	/** @var \phpbb\path_helper */
+	protected $path_helper;
+	/** @var \avathar\bbguild\model\admin\asset_url_resolver */
+	protected $asset_resolver;
+
+	protected $bb_players_table;
+	protected $bb_ranks_table;
+	protected $bb_classes_table;
+	protected $bb_races_table;
+	protected $bb_language_table;
+	protected $bb_guild_table;
+	protected $bb_factions_table;
+	protected $bb_games_table;
+	protected $bb_gameroles_table;
+
 	/**
 	* @var \phpbb\controller\helper
 	*/
