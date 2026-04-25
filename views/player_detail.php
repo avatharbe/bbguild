@@ -51,6 +51,9 @@ class player_detail
 	/** @var asset_url_resolver */
 	protected $asset_resolver;
 
+	/** @var \phpbb\path_helper */
+	protected $path_helper;
+
 	/** @var string */
 	protected $bb_players_table;
 	/** @var string */
@@ -81,6 +84,7 @@ class player_detail
 		util $util,
 		game_registry $game_registry,
 		asset_url_resolver $asset_resolver,
+		\phpbb\path_helper $path_helper,
 		string $bb_players_table,
 		string $bb_ranks_table,
 		string $bb_classes_table,
@@ -100,6 +104,7 @@ class player_detail
 		$this->util = $util;
 		$this->game_registry = $game_registry;
 		$this->asset_resolver = $asset_resolver;
+		$this->path_helper = $path_helper;
 		$this->bb_players_table = $bb_players_table;
 		$this->bb_ranks_table = $bb_ranks_table;
 		$this->bb_classes_table = $bb_classes_table;
