@@ -9,9 +9,12 @@
          bootstrap="../../../tests/bootstrap.php"
 >
 	<testsuites>
-		<testsuite name="bbGuild Unit Tests">
+		<testsuite name="Extension Test Suite">
 			<directory suffix="_test.php">./tests</directory>
 			<exclude>./tests/functional</exclude>
+		</testsuite>
+		<testsuite name="Extension Functional Tests">
+			<directory suffix="_test.php">./tests/functional/</directory>
 		</testsuite>
 	</testsuites>
 
