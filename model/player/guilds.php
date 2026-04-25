@@ -142,27 +142,27 @@ class guilds
 	 *
 	 * @var boolean
 	 */
-	protected $armory_enabled;
+	protected $armory_enabled = false;
 
 	/**
 	 * rank to which raidtracker should add new attendees
 	 *
 	 * @var int
 	 */
-	protected $raidtrackerrank;
+	protected $raidtrackerrank = 0;
 
 	/**
 	 * rank to which apply should add new recruits
 	 *
 	 * @var int
 	 */
-	protected $applyrank;
+	protected $applyrank = 0;
 	/**
 	 * search result Battle.NET
 	 *
 	 * @var string
 	 */
-	protected $armoryresult;
+	protected $armoryresult = '';
 
 	/**
 	 * default recruitment forum. this is the forum linked to in the recruitment block
@@ -170,12 +170,12 @@ class guilds
 	 *
 	 * @var int
 	 */
-	protected $recruitforum;
+	protected $recruitforum = 0;
 
 	/**
 	 * @type string
 	 */
-	protected $factionname;
+	protected $factionname = '';
 
 	/**
 	 * Game edition (e.g. 'retail', 'classic_era', 'classic_prog', 'classic_ann')
