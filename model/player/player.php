@@ -11,7 +11,6 @@
 
 namespace avathar\bbguild\model\player;
 
-use avathar\bbguild\model\admin\admin;
 use avathar\bbguild\model\games\game;
 use avathar\bbguild\model\games\game_provider_interface;
 

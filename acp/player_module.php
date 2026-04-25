@@ -11,7 +11,6 @@
 
 namespace avathar\bbguild\acp;
 
-use avathar\bbguild\model\admin\admin;
 use avathar\bbguild\model\admin\constants;
 use avathar\bbguild\model\player\player;
 use avathar\bbguild\model\player\guilds;
@@ -200,8 +199,6 @@ class player_module
 		$this->bb_factions_table = $phpbb_container->getParameter('avathar.bbguild.tables.bb_factions');
 		$this->bb_games_table = $phpbb_container->getParameter('avathar.bbguild.tables.bb_games');
 		$this->bb_gameroles_table = $phpbb_container->getParameter('avathar.bbguild.tables.bb_gameroles');
-
-
 
 		$form_key = 'avathar/bbguild';
 		add_form_key($form_key);
@@ -455,7 +452,6 @@ class player_module
 	{
 		global $phpbb_admin_path, $phpEx;
 
-
 		$newplayer = new player($this->db, $this->config, $this->bbguild_cache, $this->user, $this->bbguild_ext_manager, $this->bbguild_log, $this->bbguild_util, $this->bb_players_table, $this->bb_ranks_table, $this->bb_classes_table, $this->bb_races_table, $this->bb_language_table, $this->bb_guild_table, $this->bb_factions_table, $this->bb_games_table, $this->bbguild_game_registry);
 		$newplayer->game_id = $this->request->variable('game_id', '');
 		$newplayer->setPlayerName($this->request->variable('player_name', '', true));
@@ -524,7 +520,6 @@ class player_module
 	private function UpdatePlayer()
 	{
 		global $phpbb_admin_path, $phpEx;
-
 
 		$updateplayer = new player($this->db, $this->config, $this->bbguild_cache, $this->user, $this->bbguild_ext_manager, $this->bbguild_log, $this->bbguild_util, $this->bb_players_table, $this->bb_ranks_table, $this->bb_classes_table, $this->bb_races_table, $this->bb_language_table, $this->bb_guild_table, $this->bb_factions_table, $this->bb_games_table, $this->bbguild_game_registry);
 		$updateplayer->player_id = $this->request->variable('hidden_player_id', 0);
@@ -954,7 +949,6 @@ class player_module
 	private function BuildTemplateAddEditplayers($mode)
 	{
 		global $config, $phpbb_admin_path, $phpEx;
-
 
 		$player_id  = $this->request->variable('hidden_player_id', $this->request->variable(constants::URI_NAMEID, 0));
 		$editplayer = new player($this->db, $this->config, $this->bbguild_cache, $this->user, $this->bbguild_ext_manager, $this->bbguild_log, $this->bbguild_util, $this->bb_players_table, $this->bb_ranks_table, $this->bb_classes_table, $this->bb_races_table, $this->bb_language_table, $this->bb_guild_table, $this->bb_factions_table, $this->bb_games_table, $this->bbguild_game_registry, $player_id);

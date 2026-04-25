@@ -12,7 +12,6 @@
 namespace avathar\bbguild\model\player;
 
 use avathar\bbguild\model\games\game;
-use avathar\bbguild\model\games\game_api_interface;
 use avathar\bbguild\model\games\game_provider_interface;
 
 /**
@@ -610,7 +609,7 @@ class guilds
 	 * the legacy Battle.net client.
 	 *
 	 * @param array $params
-	 * @param \avathar\bbguild\model\games\game $game
+	 * @param game $game
 	 * @param game_provider_interface|null $provider Optional game provider with API
 	 * @return bool|array
 	 */

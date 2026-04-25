@@ -10,7 +10,6 @@
 
 namespace avathar\bbguild\ucp;
 
-use avathar\bbguild\model\admin\admin;
 use avathar\bbguild\model\admin\constants;
 use avathar\bbguild\model\player\guilds;
 use avathar\bbguild\model\player\ranks;
@@ -167,8 +166,6 @@ class bbguild_module
 		$this->auth  = $auth;
 
 		$this->pagination = $phpbb_container->get('pagination');
-
-
 	}
 
 	/**
