@@ -1,42 +1,36 @@
 <?php
 /**
- *
  * @package bbGuild Extension
  * @copyright (c) 2018 avathar.be
  * @license GNU General Public License, version 2 (GPL-2.0)
- *
  */
 
 namespace avathar\bbguild\tests\system;
 
-class simple_test extends \phpbb_test_case
+use PHPUnit\Framework\TestCase;
+
+class simple_test extends TestCase
 {
-	/** @var \PHPUnit_Framework_MockObject_MockObject|\Symfony\Component\DependencyInjection\ContainerInterface */
+	/** @var \PHPUnit\Framework\MockObject\MockObject|\Symfony\Component\DependencyInjection\ContainerInterface */
 	protected $container;
 
-	/** @var \PHPUnit_Framework_MockObject_MockObject|\phpbb\finder */
+	/** @var \PHPUnit\Framework\MockObject\MockObject|\phpbb\finder */
 	protected $extension_finder;
 
-	/** @var \PHPUnit_Framework_MockObject_MockObject|\phpbb\db\migrator */
+	/** @var \PHPUnit\Framework\MockObject\MockObject|\phpbb\db\migrator */
 	protected $migrator;
 
-	/**
-	 * @inheritdoc
-	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		parent::setUp();
 
-		// Stub the container
-		$this->container = $this->getMock('\Symfony\Component\DependencyInjection\ContainerInterface');
+		$this->container = $this->createMock(\Symfony\Component\DependencyInjection\ContainerInterface::class);
 
-		// Stub the ext finder and disable its constructor
-		$this->extension_finder = $this->getMockBuilder('\phpbb\finder')
+		$this->extension_finder = $this->getMockBuilder(\phpbb\finder::class)
 			->disableOriginalConstructor()
 			->getMock();
 
-		// Stub the migrator and disable its constructor
-		$this->migrator = $this->getMockBuilder('\phpbb\db\migrator')
+		$this->migrator = $this->getMockBuilder(\phpbb\db\migrator::class)
 			->disableOriginalConstructor()
 			->getMock();
 	}
@@ -45,7 +39,7 @@ class simple_test extends \phpbb_test_case
 	 * Test the extension can only be enabled when the minimum
 	 * phpBB version requirement is satisfied.
 	 */
-	public function test_ext()
+	public function test_ext(): void
 	{
 		$ext = new \avathar\bbguild\ext($this->container, $this->extension_finder, $this->migrator, 'avathar/bbguild', '');
 

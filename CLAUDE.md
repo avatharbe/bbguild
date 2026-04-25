@@ -20,7 +20,7 @@
 ## Requirements
 
 - phpBB >= 3.3.0
-- PHP >= 7.4.0
+- PHP >= 8.1.0
 - GD extension
 - cURL extension
 

@@ -16,48 +16,43 @@ use phpbb\extension\base;
 /**
  * Class ext
  *
-* @package avathar\bbguild
+ * @package avathar\bbguild
  */
 class ext extends base
 {
-
-	private $result;
+	const MIN_PHP_VERSION = '8.1.0';
+	const MIN_PHPBB_VERSION = '3.3.0';
 
 	/**
 	 * Check whether or not the extension can be enabled.
 	 *
-	 * @return bool
-	 * @access public
+	 * @return bool|array True if enableable, or an array of error messages otherwise
 	 */
 	public function is_enableable()
 	{
-		$condition = array();
-		$config = $this->container->get('config');
-		$log = $this->container->get('log');
-		$user = $this->container->get('user');
-		$condition['phpbb'][0] = phpbb_version_compare($config['version'], '3.3.0', '>=');
-		$condition['phpbb'][1] ='phpbb >= 3.3.0';
-		$condition['php'][0] = version_compare(PHP_VERSION , '7.4.0', '>=') ? 1: 0;
-		$condition['php'][1] ='php >= 7.4.0';
-		$condition['gd'][0] = extension_loaded('gd');
-		$condition['gd'][1] ='gd extension is loaded';
-		$condition['curl'][0] = extension_loaded('curl');
-		$condition['curl'][1] ='curl extension is loaded';
-		$output= '';
-		if($this->result == 0)
+		$errors = [];
+
+		if (version_compare(PHP_VERSION, self::MIN_PHP_VERSION, '<'))
 		{
-			foreach ($condition as $key => $val)
-			{
-				$this->result += (int) $val;
-				$output = $key . ' ' . (($val == true) ? ': OK' : ': KO') . '<br />';
-				$log->add('admin', $user->data['user_id'], $user->ip, $this->result . ' ' . $output, time(), [$key[1]]);
-			}
-			if ($this->result < 4)
-			{
-				trigger_error($output,  E_USER_WARNING);
-			}
+			$errors[] = 'This extension requires PHP ' . self::MIN_PHP_VERSION . ' or higher. You are running PHP ' . PHP_VERSION . '.';
 		}
-		return true;
+
+		if (phpbb_version_compare(PHPBB_VERSION, self::MIN_PHPBB_VERSION, '<'))
+		{
+			$errors[] = 'This extension requires phpBB ' . self::MIN_PHPBB_VERSION . ' or higher. You are running phpBB ' . PHPBB_VERSION . '.';
+		}
+
+		if (!extension_loaded('gd'))
+		{
+			$errors[] = 'This extension requires the GD PHP extension to be loaded.';
+		}
+
+		if (!extension_loaded('curl'))
+		{
+			$errors[] = 'This extension requires the cURL PHP extension to be loaded.';
+		}
+
+		return empty($errors) ? true : $errors;
 	}
 
 
