@@ -844,16 +844,17 @@ class admin_games
 			$c_index = $editclass->c_index;
 		}
 
-		// Armor type dropdown
+		// Armor type dropdown — prefer game provider, fall back to core defaults
+		$provider = $this->game_registry->get($game_id);
+		$armor_types = ($provider !== null) ? $provider->get_armor_types() : $editclass->armortypes;
 		$armor_options = '';
-		foreach ($editclass->armortypes as $key => $name)
+		foreach ($armor_types as $key => $name)
 		{
 			$selected = ($key == $armor_type) ? ' selected="selected"' : '';
 			$armor_options .= '<option value="' . $key . '"' . $selected . '>' . $name . '</option>';
 		}
 
 		// Image path - use game plugin's own path if provider exists
-		$provider = $this->game_registry->get($game_id);
 		if ($provider)
 		{
 			$img_path = $provider->get_images_path();

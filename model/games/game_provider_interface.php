@@ -88,4 +88,11 @@ interface game_provider_interface
 	 * @return array associative array of region_code => array of locale strings
 	 */
 	public function get_api_locales(): array;
+
+	/**
+	 * Get the armor types available in this game
+	 *
+	 * @return array associative array of ARMOR_KEY => display name
+	 */
+	public function get_armor_types(): array;
 }
