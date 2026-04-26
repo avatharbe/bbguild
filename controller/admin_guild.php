@@ -469,6 +469,8 @@ class admin_guild
 		$updateguild->setRecruitforum($this->request->variable('recruitforum', 0));
 		$updateguild->setEmblempath($this->ext_path . 'images/guildemblem/' . $this->request->variable('guild_emblem', '', true));
 
+		$game_id = $updateguild->getGameId();
+
 		/**
 		 * Event dispatched after form values are read, before guild is saved.
 		 * Allows game plugins to set edition or other game-specific fields.
@@ -476,8 +478,8 @@ class admin_guild
 		 * @event avathar.bbguild.acp_editguild_submit
 		 * @var guilds updateguild The guild object being updated
 		 * @var string game_id     The game identifier from the form
+		 * @since 2.0.0-b2
 		 */
-		$game_id = $updateguild->getGameId();
 		$vars = array('updateguild', 'game_id');
 		extract($this->dispatcher->trigger_event('avathar.bbguild.acp_editguild_submit', compact($vars)));
 
@@ -830,13 +832,18 @@ class admin_guild
 			'HAS_API'         => $has_api,
 		));
 
+		$updateguild = $addguild;
+
 		/**
+		 * Event dispatched when the add-guild template is being built.
+		 * Allows game plugins to inject their own template variables.
+		 *
 		 * @event avathar.bbguild.acp_editguild_display
 		 * @var guilds updateguild The guild object being displayed
 		 * @var string game_id     The game identifier
 		 * @var bool   has_api     Whether this game has API support
+		 * @since 2.0.0-b2
 		 */
-		$updateguild = $addguild;
 		$vars = array('updateguild', 'game_id', 'has_api');
 		extract($this->dispatcher->trigger_event('avathar.bbguild.acp_editguild_display', compact($vars)));
 
@@ -1251,6 +1258,7 @@ class admin_guild
 		 * @var guilds updateguild The guild object being displayed
 		 * @var string game_id     The game identifier
 		 * @var bool   has_api     Whether this game has API support
+		 * @since 2.0.0-b2
 		 */
 		$vars = array('updateguild', 'game_id', 'has_api');
 		extract($this->dispatcher->trigger_event('avathar.bbguild.acp_editguild_display', compact($vars)));
