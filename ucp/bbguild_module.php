@@ -428,6 +428,7 @@ class bbguild_module
 						$newplayer->setPlayerRegion($this->request->variable('region_id', ''));
 						$newplayer->setPlayerName($this->request->variable('player_name', '', true));
 						$newplayer->setPlayerClassId($this->request->variable('player_class_id', 1));
+						$newplayer->setPlayerSpecId($this->request->variable('player_spec_id', 0));
 						$newplayer->setPlayerRaceId($this->request->variable('player_race_id', 1));
 						$newplayer->setPlayerRole($this->request->variable('player_role', ''));
 						$newplayer->setPlayerRegion($this->request->variable('region_id', ''));
@@ -524,6 +525,7 @@ class bbguild_module
 		$updateplayer->game_id          = $this->request->variable('game_id', '');
 		$updateplayer->setPlayerRaceId($this->request->variable('player_race_id', 0));
 		$updateplayer->setPlayerClassId($this->request->variable('player_class_id', 0));
+		$updateplayer->setPlayerSpecId($this->request->variable('player_spec_id', 0));
 		$updateplayer->setPlayerRole($this->request->variable('player_role', ''));
 		$updateplayer->setPlayerRealm($this->request->variable('realm', '', true));
 		$updateplayer->setPlayerRegion($this->request->variable('region_id', ''));
@@ -562,7 +564,7 @@ class bbguild_module
 	 */
 	private function fill_addplayer($player_id, $guildlist)
 	{
-		global $phpbb_root_path;
+		global $phpbb_root_path, $phpbb_container;
 
 		$players = new player($this->db, $this->config, $this->bbguild_cache, $this->user, $this->bbguild_ext_manager, $this->bbguild_log, $this->bbguild_util, $this->bb_players_table, $this->bb_ranks_table, $this->bb_classes_table, $this->bb_races_table, $this->bb_language_table, $this->bb_guild_table, $this->bb_factions_table, $this->bb_games_table, $this->bbguild_game_registry);
 
@@ -772,6 +774,20 @@ class bbguild_module
 			);
 		}
 
+		// Specializations dropdown — issue #331. Empty list = inert for this game.
+		$bb_specializations_table = $phpbb_container->getParameter('avathar.bbguild.tables.bb_specializations');
+		$spec_model = new \avathar\bbguild\model\games\rpg\specialization($this->db, $this->bbguild_cache, $bb_specializations_table);
+		$current_spec_id = $player_id > 0 ? $players->getPlayerSpecId() : 0;
+		foreach ($spec_model->get_for_class($guilds->game_id) as $sp)
+		{
+			$this->template->assign_block_vars('spec_option', [
+				'SPEC_ID'    => $sp['spec_id'],
+				'CLASS_ID'   => $sp['class_id'],
+				'SPEC_NAME'  => $sp['spec_name'],
+				'S_SELECTED' => ($sp['spec_id'] === $current_spec_id),
+			]);
+		}
+
 		// build presets for joindate pulldowns
 		$now = getdate();
 		$s_playerjoin_day_options = '<option value="0"	>--</option>';
@@ -880,6 +896,7 @@ class bbguild_module
 				'PLAYER_NAME'            => $players->getPlayerName(),
 				'PLAYER_TITLE'            => $players->getPlayerTitle(),
 				'PLAYER_ID'                => $players->player_id,
+				'PLAYER_SPEC_ID'           => $players->getPlayerSpecId(),
 				'PLAYER_LEVEL'            => $players->getPlayerLevel(),
 				'MALE_CHECKED'            => ($players->getPlayerGenderId()  == '0') ? ' checked="checked"' : '' ,
 				'FEMALE_CHECKED'        => ($players->getPlayerGenderId()  == '1') ? ' checked="checked"' : '' ,

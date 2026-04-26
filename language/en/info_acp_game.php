@@ -44,7 +44,5 @@ $lang = array_merge(
 	'ADMIN_ADD_SPEC_SUCCESS'       => 'Specialization "%s" added.',
 	'ADMIN_UPDATE_SPEC_SUCCESS'    => 'Specialization "%s" updated.',
 	'FV_REQUIRED_SPEC_NAME'        => 'Specialization name is required.',
-	'SPEC'                         => 'Specialization',
-	'PLAYER_SPEC_EXPLAIN'          => 'Optional. Pick a specialization within the selected class.',
 	)
 );

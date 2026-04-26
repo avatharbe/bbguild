@@ -135,6 +135,43 @@
                     </dd>
                 </dl>
 
+                {% if loops.spec_option|length %}
+                <dl>
+                    <dt><label for="player_spec_id">{{ lang('SPEC') }}:</label></dt>
+                    <dd>
+                        <select id="player_spec_id" name="player_spec_id" class="inputbox">
+                            <option value="0"{% if PLAYER_SPEC_ID == 0 %} selected="selected"{% endif %}>--</option>
+                            {% for opt in loops.spec_option %}
+                            <option value="{{ opt.SPEC_ID }}" data-class-id="{{ opt.CLASS_ID }}"{% if opt.S_SELECTED %} selected="selected"{% endif %}>{{ opt.SPEC_NAME }}</option>
+                            {% endfor %}
+                        </select>
+                    </dd>
+                </dl>
+                <script type="text/javascript">
+                    //<![CDATA[
+                    (function() {
+                        var classSel = document.getElementById('player_class_id');
+                        var specSel = document.getElementById('player_spec_id');
+                        if (!classSel || !specSel) { return; }
+                        function filter() {
+                            var classId = classSel.value;
+                            var current = specSel.value;
+                            var keepCurrent = false;
+                            Array.prototype.forEach.call(specSel.options, function(opt) {
+                                if (opt.value === '0') { opt.hidden = false; return; }
+                                var match = opt.getAttribute('data-class-id') === classId;
+                                opt.hidden = !match;
+                                if (match && opt.value === current) { keepCurrent = true; }
+                            });
+                            if (!keepCurrent) { specSel.value = '0'; }
+                        }
+                        classSel.addEventListener('change', filter);
+                        filter();
+                    })();
+                    //]]>
+                </script>
+                {% endif %}
+
                 <dl>
                     <dt><label for="player_role">{{ lang('ROLES') }}:</label></dt>
                     <dd>
