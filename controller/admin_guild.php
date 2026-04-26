@@ -418,16 +418,16 @@ class admin_guild
 		$game_id = $addguild->getGameId();
 
 		/**
-		 * Event dispatched when a guild is being saved from the ACP edit form.
+		 * Event dispatched when a new guild is being created from the ACP add-guild form.
 		 * Allows game plugins to mutate the guild object before persistence.
 		 *
-		 * @event avathar.bbguild.acp_editguild_submit
+		 * @event avathar.bbguild.acp_addguild_submit
 		 * @var guilds updateguild The guild object being created
 		 * @var string game_id     The game identifier from the form
 		 * @since 2.0.0-b2
 		 */
 		$vars = array('updateguild', 'game_id');
-		extract($this->dispatcher->trigger_event('avathar.bbguild.acp_editguild_submit', compact($vars)));
+		extract($this->dispatcher->trigger_event('avathar.bbguild.acp_addguild_submit', compact($vars)));
 		$addguild = $updateguild;
 
 		$addguild->make_guild();
@@ -838,14 +838,14 @@ class admin_guild
 		 * Event dispatched when the add-guild template is being built.
 		 * Allows game plugins to inject their own template variables.
 		 *
-		 * @event avathar.bbguild.acp_editguild_display
+		 * @event avathar.bbguild.acp_addguild_display
 		 * @var guilds updateguild The guild object being displayed
 		 * @var string game_id     The game identifier
 		 * @var bool   has_api     Whether this game has API support
 		 * @since 2.0.0-b2
 		 */
 		$vars = array('updateguild', 'game_id', 'has_api');
-		extract($this->dispatcher->trigger_event('avathar.bbguild.acp_editguild_display', compact($vars)));
+		extract($this->dispatcher->trigger_event('avathar.bbguild.acp_addguild_display', compact($vars)));
 
 		$this->page_title = $this->user->lang['ACP_ADDGUILD'];
 	}
