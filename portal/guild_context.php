@@ -251,7 +251,7 @@ class guild_context
 		}
 
 		// New format: relative path — resolve from phpBB root
-		if (strpos($emblempath, 'bbguild_wow/emblems/') !== false)
+		if (strpos($emblempath, 'bbguildwow/emblems/') !== false)
 		{
 			global $phpbb_root_path;
 			return file_exists($phpbb_root_path . $emblempath);

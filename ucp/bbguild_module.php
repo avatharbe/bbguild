@@ -1004,7 +1004,7 @@ class bbguild_module
 	/**
 	 * Resolve a filesystem-relative image path to a web URL.
 	 *
-	 * @param string|null $path Filesystem-relative path (e.g. ext/avathar/bbguild_wow/images/...)
+	 * @param string|null $path Filesystem-relative path (e.g. ext/avathar/bbguildwow/images/...)
 	 * @return string Web URL
 	 */
 	private function resolve_image_url(?string $path): string

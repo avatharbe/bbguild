@@ -107,7 +107,7 @@ class view_controller
 
 		/**
 		 * Event dispatched when the individual player detail page is rendered.
-		 * Allows game plugins (e.g. bbguild_wow) to inject API-specific content
+		 * Allows game plugins (e.g. bbguildwow) to inject API-specific content
 		 * such as gear, talents, achievements or pet collections.
 		 *
 		 * @event avathar.bbguild.player_detail_display

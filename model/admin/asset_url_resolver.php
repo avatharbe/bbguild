@@ -6,7 +6,7 @@
  *
  * Centralizes URL resolution for assets stored in phpBB's files/ directory
  * (emblems, portraits). Generates controller route URLs when the serving
- * extension (bbguild_wow) is installed, falls back gracefully when it's not.
+ * extension (bbguildwow) is installed, falls back gracefully when it's not.
  */
 
 namespace avathar\bbguild\model\admin;
@@ -56,12 +56,12 @@ class asset_url_resolver
 			return '';
 		}
 
-		// New format: files stored in files/bbguild_wow/emblems/ — serve via controller
-		if (strpos($emblempath, 'bbguild_wow/emblems/') !== false)
+		// New format: files stored in files/bbguildwow/emblems/ — serve via controller
+		if (strpos($emblempath, 'bbguildwow/emblems/') !== false)
 		{
 			try
 			{
-				return $this->helper->route('avathar_bbguild_wow_emblem', array('guild_id' => $guild_id));
+				return $this->helper->route('avathar_bbguildwow_emblem', array('guild_id' => $guild_id));
 			}
 			catch (\Symfony\Component\Routing\Exception\RouteNotFoundException $e)
 			{
@@ -93,12 +93,12 @@ class asset_url_resolver
 			return $url;
 		}
 
-		// Local file in files/bbguild_wow/ — serve via controller
-		if (strpos($url, 'bbguild_wow/') !== false)
+		// Local file in files/bbguildwow/ — serve via controller
+		if (strpos($url, 'bbguildwow/') !== false)
 		{
 			try
 			{
-				return $this->helper->route('avathar_bbguild_wow_portrait', array('player_id' => $player_id));
+				return $this->helper->route('avathar_bbguildwow_portrait', array('player_id' => $player_id));
 			}
 			catch (\Symfony\Component\Routing\Exception\RouteNotFoundException $e)
 			{

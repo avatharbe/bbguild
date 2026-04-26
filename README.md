@@ -81,15 +81,15 @@ Game support is provided by separate extensions. Install them the same way:
 
 | Plugin | Directory | Notes |
 |--------|-----------|-------|
-| [bbguild_wow](https://github.com/avatharbe/bbguild_wow) | `ext/avathar/bbguild_wow/` | Includes Battle.net API integration |
-| bbguild_gw2 | `ext/avathar/bbguild_gw2/` | Guild Wars 2 |
-| bbguild_eq | `ext/avathar/bbguild_eq/` | EverQuest |
-| bbguild_eq2 | `ext/avathar/bbguild_eq2/` | EverQuest 2 |
-| bbguild_ffxi | `ext/avathar/bbguild_ffxi/` | Final Fantasy XI |
-| bbguild_ffxiv | `ext/avathar/bbguild_ffxiv/` | Final Fantasy XIV |
-| bbguild_lotro | `ext/avathar/bbguild_lotro/` | Lord of the Rings Online |
-| bbguild_swtor | `ext/avathar/bbguild_swtor/` | Star Wars: The Old Republic |
-| bbguild_lineage2 | `ext/avathar/bbguild_lineage2/` | Lineage 2 |
+| [bbguildwow](https://github.com/avatharbe/bbguildwow) | `ext/avathar/bbguildwow/` | Includes Battle.net API integration |
+| bbguildgw2 | `ext/avathar/bbguildgw2/` | Guild Wars 2 |
+| bbguildeq | `ext/avathar/bbguildeq/` | EverQuest |
+| bbguildeq2 | `ext/avathar/bbguildeq2/` | EverQuest 2 |
+| bbguildffxi | `ext/avathar/bbguildffxi/` | Final Fantasy XI |
+| bbguildffxiv | `ext/avathar/bbguildffxiv/` | Final Fantasy XIV |
+| bbguildlotro | `ext/avathar/bbguildlotro/` | Lord of the Rings Online |
+| bbguildswtor | `ext/avathar/bbguildswtor/` | Star Wars: The Old Republic |
+| bbguildlineage2 | `ext/avathar/bbguildlineage2/` | Lineage 2 |
 
 ## Uninstall
 
