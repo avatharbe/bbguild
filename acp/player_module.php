@@ -470,6 +470,7 @@ class player_module
 		}
 		$newplayer->setPlayerRaceId($this->request->variable('player_race_id', 1));
 		$newplayer->setPlayerClassId($this->request->variable('player_class_id', 1));
+		$newplayer->setPlayerSpecId($this->request->variable('player_spec_id', 0));
 		$newplayer->setPlayerRole($this->request->variable('player_role', 0));
 		$newplayer->setPlayerGenderId($this->request->variable('gender', 0));
 		$newplayer->setPlayerComment($this->request->variable('player_comment', '', true));
@@ -532,6 +533,7 @@ class player_module
 
 		$updateplayer->game_id = $this->request->variable('game_id', '');
 		$updateplayer->setPlayerClassId($this->request->variable('player_class_id', 0));
+		$updateplayer->setPlayerSpecId($this->request->variable('player_spec_id', 0));
 		$updateplayer->setPlayerRaceId($this->request->variable('player_race_id', 0));
 		$updateplayer->setPlayerRole($this->request->variable('player_role', 0));
 		$updateplayer->setPlayerRealm($this->request->variable('realm', ''));
@@ -1116,6 +1118,20 @@ class player_module
 			);
 		}
 
+		// Specializations dropdown — issue #331. Empty list = feature inert for this game.
+		$bb_specializations_table = $this->phpbb_container->getParameter('avathar.bbguild.tables.bb_specializations');
+		$spec_model = new \avathar\bbguild\model\games\rpg\specialization($this->db, $this->bbguild_cache, $bb_specializations_table);
+		$current_spec_id = $editplayer->player_id > 0 ? $editplayer->getPlayerSpecId() : 0;
+		foreach ($spec_model->get_for_class($this->guild->getGameId()) as $sp)
+		{
+			$this->template->assign_block_vars('spec_option', [
+				'SPEC_ID'    => $sp['spec_id'],
+				'CLASS_ID'   => $sp['class_id'],
+				'SPEC_NAME'  => $sp['spec_name'],
+				'S_SELECTED' => ($sp['spec_id'] === $current_spec_id),
+			]);
+		}
+
 		// build presets for joindate pulldowns
 		$now                      = getdate();
 		$s_playerjoin_day_options = '<option value="0"	>--</option>';
@@ -1209,6 +1225,7 @@ class player_module
 				'STATUS'                   => $editplayer->isPlayerStatus() == 1 ? 'checked="checked"' : '',
 				'PLAYER_NAME'              => $editplayer->getPlayerName(),
 				'PLAYER_ID'                => $editplayer->player_id,
+				'PLAYER_SPEC_ID'           => $editplayer->getPlayerSpecId(),
 				'PLAYER_LEVEL'             => $editplayer->getPlayerLevel(),
 				'REALM'                    => $editplayer->getPlayerRealm(),
 				'REGION'                   => $editplayer->getPlayerRegion(),

@@ -149,6 +149,14 @@ class player
 	protected $player_class;
 
 	/**
+	 * Specialization (subclass) id, FK to bb_specializations.
+	 * 0 = unset.
+	 *
+	 * @var int
+	 */
+	protected $player_spec_id = 0;
+
+	/**
 	 * guild rankid
 	 *
 	 * @var int
@@ -629,6 +637,22 @@ class player
 	public function setPlayerClassId($player_class_id)
 	{
 		$this->player_class_id = $player_class_id;
+	}
+
+	/**
+	 * @return int FK to bb_specializations, or 0 when no spec is set
+	 */
+	public function getPlayerSpecId(): int
+	{
+		return (int) $this->player_spec_id;
+	}
+
+	/**
+	 * @param int $player_spec_id
+	 */
+	public function setPlayerSpecId($player_spec_id): void
+	{
+		$this->player_spec_id = (int) $player_spec_id;
 	}
 
 	/**
@@ -1132,6 +1156,7 @@ class player
 			$this->player_race = $row['player_race'] ;
 			$this->player_class_id = $row['player_class_id'] ;
 			$this->player_class = $row['player_class'] ;
+			$this->player_spec_id = isset($row['player_spec_id']) ? (int) $row['player_spec_id'] : 0;
 			$this->player_level = $row['player_level'] ;
 			$this->player_rank_id = $row['player_rank_id'] ;
 			$this->player_comment = $row['player_comment'] ;
@@ -1346,6 +1371,7 @@ class player
 				'player_level' => $this->player_level ,
 				'player_race_id' => $this->player_race_id ,
 				'player_class_id' => $this->player_class_id,
+				'player_spec_id' => (int) $this->player_spec_id,
 				'player_role' => $this->player_role,
 				'player_rank_id' => $this->player_rank_id ,
 				'player_gender_id' => $this->player_gender_id ,
@@ -1534,6 +1560,7 @@ class player
 				'player_level' => $this->player_level,
 				'player_race_id' => $this->player_race_id ,
 				'player_class_id' => $this->player_class_id ,
+				'player_spec_id' => (int) $this->player_spec_id ,
 				'player_rank_id' => $this->player_rank_id ,
 				'player_role' => $this->player_role,
 				'player_realm' => $this->player_realm,
