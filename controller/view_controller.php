@@ -105,7 +105,16 @@ class view_controller
 			throw new \phpbb\exception\http_exception(404, 'NO_PLAYER');
 		}
 
-		// Allow plugins (e.g. bbguild_wow) to inject additional content
+		/**
+		 * Event dispatched when the individual player detail page is rendered.
+		 * Allows game plugins (e.g. bbguild_wow) to inject API-specific content
+		 * such as gear, talents, achievements or pet collections.
+		 *
+		 * @event avathar.bbguild.player_detail_display
+		 * @var int player_id The player being displayed
+		 * @var int guild_id  The guild the player belongs to
+		 * @since 2.0.0-b2
+		 */
 		$vars = ['player_id', 'guild_id'];
 		extract($this->dispatcher->trigger_event('avathar.bbguild.player_detail_display', compact($vars)));
 

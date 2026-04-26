@@ -414,13 +414,18 @@ class admin_guild
 		$addguild->setStartdate(time());
 		$addguild->setArmoryresult('KO');
 
+		$updateguild = $addguild;
+		$game_id = $addguild->getGameId();
+
 		/**
+		 * Event dispatched when a guild is being saved from the ACP edit form.
+		 * Allows game plugins to mutate the guild object before persistence.
+		 *
 		 * @event avathar.bbguild.acp_editguild_submit
 		 * @var guilds updateguild The guild object being created
 		 * @var string game_id     The game identifier from the form
+		 * @since 2.0.0-b2
 		 */
-		$updateguild = $addguild;
-		$game_id = $addguild->getGameId();
 		$vars = array('updateguild', 'game_id');
 		extract($this->dispatcher->trigger_event('avathar.bbguild.acp_editguild_submit', compact($vars)));
 		$addguild = $updateguild;

@@ -928,6 +928,7 @@ class player_module
 		 * @event avathar.bbguild.acp_listplayers_display
 		 * @var string game_id  The game identifier for the current guild
 		 * @var bool   has_api  Whether this game has API support
+		 * @since 2.0.0-b2
 		 */
 		$vars = array('game_id', 'has_api');
 		extract($dispatcher->trigger_event('avathar.bbguild.acp_listplayers_display', compact($vars)));

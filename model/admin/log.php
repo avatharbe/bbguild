@@ -8,7 +8,7 @@
  * Logging class
  *
  * Follows phpBB log design pattern: stores a log type (language key)
- * and a serialized array of vsprintf substitution args.
+ * and a JSON-encoded array of vsprintf substitution args.
  * The log viewer resolves the language key and fills in the args.
  */
 
@@ -167,10 +167,9 @@ class log
 			return false;
 		}
 
-		// Serialize log_action
 		if (is_array($values['log_action']))
 		{
-			$values['log_action'] = serialize($values['log_action']);
+			$values['log_action'] = (string) json_encode($values['log_action']);
 		}
 
 		$query = $this->db->sql_build_array('INSERT', $values);
@@ -307,10 +306,10 @@ class log
 
 	/**
 	 * Format a log message for display.
-	 * Unserializes stored args and applies them to the VLOG_ format string via vsprintf.
+	 * Decodes stored args and applies them to the VLOG_ format string via vsprintf.
 	 *
 	 * @param  string $log_type    The clean log type (e.g. 'GUILD_ADDED')
-	 * @param  string $log_action  The stored log_action data (serialized array)
+	 * @param  string $log_action  The stored log_action data (JSON-encoded array)
 	 * @param  int    $log_userid  The user ID who performed the action
 	 * @param  string $username    The username
 	 * @param  string $user_colour The user colour
@@ -327,7 +326,7 @@ class log
 		}
 
 		$userstring = get_username_string('full', $log_userid, $username, $user_colour);
-		$args = @unserialize($log_action);
+		$args = json_decode((string) $log_action, true);
 
 		if (!is_array($args))
 		{
@@ -347,7 +346,7 @@ class log
 	 */
 	public function parse_log_action($log_action)
 	{
-		$data = @unserialize($log_action);
+		$data = json_decode((string) $log_action, true);
 		return is_array($data) ? $data : [];
 	}
 

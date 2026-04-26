@@ -971,6 +971,7 @@ class admin_games
 		 * @var game   editgame  The game object being saved
 		 * @var string game_id   The game identifier
 		 * @var bool   has_api   Whether this game has API support
+		 * @since 2.0.0-b2
 		 */
 		$vars = array('editgame', 'game_id', 'has_api');
 		extract($this->dispatcher->trigger_event('avathar.bbguild.acp_editgames_submit', compact($vars)));
