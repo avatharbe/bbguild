@@ -89,6 +89,7 @@ abstract class abstract_game_install implements game_install_interface
 		$this->install_classes();
 		$this->install_races();
 		$this->install_roles();
+		$this->install_specs();
 
 		// insert a new entry in the game table
 		$data = array(
@@ -113,6 +114,10 @@ abstract class abstract_game_install implements game_install_interface
 		$this->cache->destroy('sql', $this->table('bb_races_table'));
 		$this->cache->destroy('sql', $this->table('bb_players_table'));
 		$this->cache->destroy('sql', $this->table('bb_gameroles_table'));
+		if (isset($this->table_names['bb_specializations_table']))
+		{
+			$this->cache->destroy('sql', $this->table('bb_specializations_table'));
+		}
 	}
 
 	/**
@@ -169,6 +174,13 @@ abstract class abstract_game_install implements game_install_interface
 		$sql = 'DELETE FROM ' . $this->table('bb_games_table') . " WHERE game_id = '" . $this->db->sql_escape($game_id) . "'";
 		$this->db->sql_query($sql);
 
+		// Drop specializations rows for this game (if the table is wired in).
+		// Older installs without the v200b4 schema simply skip this step.
+		if (isset($this->table_names['bb_specializations_table']))
+		{
+			$this->db->sql_query('DELETE FROM ' . $this->table('bb_specializations_table') . " WHERE game_id = '" . $this->db->sql_escape($game_id) . "'");
+		}
+
 		$this->db->sql_transaction('commit');
 
 		$this->cache->destroy('sql', $this->table('bb_games_table'));
@@ -176,6 +188,10 @@ abstract class abstract_game_install implements game_install_interface
 		$this->cache->destroy('sql', $this->table('bb_language_table'));
 		$this->cache->destroy('sql', $this->table('bb_races_table'));
 		$this->cache->destroy('sql', $this->table('bb_players_table'));
+		if (isset($this->table_names['bb_specializations_table']))
+		{
+			$this->cache->destroy('sql', $this->table('bb_specializations_table'));
+		}
 	}
 
 	/**
@@ -266,5 +282,16 @@ abstract class abstract_game_install implements game_install_interface
 			array('game_id' => $this->game_id, 'attribute_id' => 2, 'language' => 'it', 'attribute' => 'role', 'name' => 'Difeza',  'name_short' => 'Tank'),
 		);
 		$this->db->sql_multi_insert($this->table('bb_language_table'), $sql_ary);
+	}
+
+	/**
+	 * Install specializations (subclasses). Default no-op — opt in by
+	 * overriding in a plugin's installer when the game has specs (issue #331).
+	 *
+	 * Skipped automatically when the bb_specializations table isn't wired
+	 * in (older installs that haven't run core migration v200b4 yet).
+	 */
+	protected function install_specs(): void
+	{
 	}
 }

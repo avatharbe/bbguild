@@ -460,7 +460,7 @@ class game
 	{
 		global $phpbb_container;
 
-		return array(
+		$tables = array(
 			'bb_games_table'     => $phpbb_container->getParameter('avathar.bbguild.tables.bb_games'),
 			'bb_logs_table'      => $phpbb_container->getParameter('avathar.bbguild.tables.bb_logs'),
 			'bb_ranks_table'     => $phpbb_container->getParameter('avathar.bbguild.tables.bb_ranks'),
@@ -477,6 +477,13 @@ class game
 			'bb_zonetable'       => $phpbb_container->getParameter('avathar.bbguild.tables.bb_zonetable'),
 			'bb_news'            => $phpbb_container->getParameter('avathar.bbguild.tables.bb_news'),
 		);
+		// Only set when the spec migration (v200b4) has run; older installs
+		// without bb_specializations skip the spec install/uninstall path.
+		if ($phpbb_container->hasParameter('avathar.bbguild.tables.bb_specializations'))
+		{
+			$tables['bb_specializations_table'] = $phpbb_container->getParameter('avathar.bbguild.tables.bb_specializations');
+		}
+		return $tables;
 	}
 
 	/**
