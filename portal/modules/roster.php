@@ -56,6 +56,7 @@ class roster extends module_base
 	protected string $guild_table;
 	protected string $factions_table;
 	protected string $games_table;
+	protected string $specializations_table = '';
 
 	public function __construct(
 		driver_interface $db,
@@ -79,7 +80,8 @@ class roster extends module_base
 		string $language_table,
 		string $guild_table,
 		string $factions_table,
-		string $games_table
+		string $games_table,
+		string $specializations_table = ''
 	)
 	{
 		$this->db = $db;
@@ -104,6 +106,7 @@ class roster extends module_base
 		$this->guild_table = $guild_table;
 		$this->factions_table = $factions_table;
 		$this->games_table = $games_table;
+		$this->specializations_table = $specializations_table;
 	}
 
 	/**
@@ -169,18 +172,24 @@ class roster extends module_base
 			'page'     => 'roster',
 		]);
 
+		// Specialization lookup (#331). Empty when the game has no specs;
+		// the SPEC column / cell is hidden via S_SHOWSPEC.
+		$spec_lookup = $this->load_spec_lookup($game_id);
+		$show_spec = !empty($spec_lookup);
+
 		if ($mode == 0)
 		{
-			$this->display_listing($characters, $ext_path_images, $base_url, $start);
+			$this->display_listing($characters, $ext_path_images, $base_url, $start, $spec_lookup, $show_spec);
 		}
 		else
 		{
-			$this->display_grid($players, $characters, $ext_path_images, $base_url, $start, $filter, $query_by_armor);
+			$this->display_grid($players, $characters, $ext_path_images, $base_url, $start, $filter, $query_by_armor, $spec_lookup);
 		}
 
 		$this->template->assign_vars([
 			'S_PORTAL_HAS_ROSTER'  => count($characters[0]) > 0,
 			'S_SHOWACH'            => $this->config['bbguild_show_achiev'],
+			'S_SHOWSPEC'           => $show_spec,
 			'S_RSTYLE'             => (string) $mode,
 			'ROSTER_FOOTCOUNT'     => count($characters[0]),
 			'ROSTER_PLAYER_NAME'   => $player_filter,
@@ -192,12 +201,62 @@ class roster extends module_base
 	}
 
 	/**
+	 * Load all specs for the given game keyed by spec_id.
+	 *
+	 * Returns [] when no specializations table is wired (older portal
+	 * configs) or when the game has no specs seeded — callers treat the
+	 * empty array as "feature inert".
+	 *
+	 * @return array<int, array{name:string,icon:string,class_id:int}>
+	 */
+	protected function load_spec_lookup(string $game_id): array
+	{
+		if ($this->specializations_table === '')
+		{
+			return [];
+		}
+
+		$spec = new \avathar\bbguild\model\games\rpg\specialization($this->db, $this->cache, $this->specializations_table);
+		$lookup = [];
+		foreach ($spec->get_for_class($game_id) as $row)
+		{
+			$lookup[$row['spec_id']] = [
+				'name'     => $row['spec_name'],
+				'icon'     => $row['spec_icon'],
+				'class_id' => $row['class_id'],
+			];
+		}
+		return $lookup;
+	}
+
+	/**
+	 * Resolve display-ready spec name + icon URL for a single roster row.
+	 *
+	 * Falls back to the legacy free-text `player_spec` column when the
+	 * structured `player_spec_id` is unset or doesn't match a known spec.
+	 *
+	 * @return array{name:string,icon:string}
+	 */
+	protected function resolve_spec(array $char, array $spec_lookup, string $ext_path_images): array
+	{
+		$spec_id = (int) ($char['player_spec_id'] ?? 0);
+		if ($spec_id > 0 && isset($spec_lookup[$spec_id]))
+		{
+			$row = $spec_lookup[$spec_id];
+			$icon = $row['icon'] !== '' ? $ext_path_images . 'spec_icons/' . basename($row['icon']) . '.png' : '';
+			return ['name' => $row['name'], 'icon' => $icon];
+		}
+		return ['name' => (string) ($char['player_spec'] ?? ''), 'icon' => ''];
+	}
+
+	/**
 	 * Display the listing (table) view.
 	 */
-	protected function display_listing(array $characters, string $ext_path_images, string $base_url, int $start): void
+	protected function display_listing(array $characters, string $ext_path_images, string $base_url, int $start, array $spec_lookup = [], bool $show_spec = false): void
 	{
 		foreach ($characters[0] as $char)
 		{
+			$spec = $this->resolve_spec($char, $spec_lookup, $ext_path_images);
 			$this->template->assign_block_vars('portal_roster_row', [
 				'PLAYER_ID'   => $char['player_id'],
 				'GAME'        => $char['game_id'],
@@ -212,6 +271,8 @@ class roster extends module_base
 				'ACHIEVPTS'   => $char['player_achiev'],
 				'CLASS_IMAGE' => $ext_path_images . 'class_images/' . basename($char['class_image']),
 				'RACE_IMAGE'  => $ext_path_images . 'race_images/' . basename($char['race_image']),
+				'SPEC'        => $spec['name'],
+				'SPEC_ICON'   => $spec['icon'],
 				'U_PLAYER_DETAIL' => $this->helper->route('avathar_bbguild_player', [
 					'guild_id'  => $this->guild_id,
 					'player_id' => $char['player_id'],
@@ -257,7 +318,7 @@ class roster extends module_base
 	/**
 	 * Display the grid (grouped by class) view.
 	 */
-	protected function display_grid(player $players, array $characters, string $ext_path_images, string $base_url, int $start, string $filter, bool $query_by_armor): void
+	protected function display_grid(player $players, array $characters, string $ext_path_images, string $base_url, int $start, string $filter, bool $query_by_armor, array $spec_lookup = []): void
 	{
 		$classgroup = $players->get_classes(
 			$filter, $query_by_armor,
@@ -288,6 +349,7 @@ class roster extends module_base
 				{
 					if ($char['player_class_id'] == $classid)
 					{
+						$grid_spec = $this->resolve_spec($char, $spec_lookup, $ext_path_images);
 						$this->template->assign_block_vars('class.players_row', [
 							'PLAYER_ID' => $char['player_id'],
 							'GAME'      => $char['game_id'],
@@ -300,7 +362,8 @@ class roster extends module_base
 							'ARMORY'    => $char['player_armory_url'],
 							'PHPBBUID'  => $char['username'],
 							'PORTRAIT'  => $this->resolve_portrait_with_fallback($char, $ext_path_images),
-							'SPEC'      => isset($char['player_spec']) ? $char['player_spec'] : '',
+							'SPEC'      => $grid_spec['name'],
+							'SPEC_ICON' => $grid_spec['icon'],
 							'ACHIEVPTS' => $char['player_achiev'],
 							'CLASS_IMAGE' => $ext_path_images . 'class_images/' . basename($char['class_image']),
 							'RACE_IMAGE'  => $ext_path_images . 'race_images/' . basename($char['race_image']),

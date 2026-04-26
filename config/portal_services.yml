@@ -125,5 +125,6 @@ services:
             - '%avathar.bbguild.tables.bb_guild%'
             - '%avathar.bbguild.tables.bb_factions%'
             - '%avathar.bbguild.tables.bb_games%'
+            - '%avathar.bbguild.tables.bb_specializations%'
         tags:
             - { name: bbguild.portal.module }

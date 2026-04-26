@@ -76,13 +76,16 @@
 					{% endif %}
 					<th style="text-align: left;">{{ lang('RACE') }}</th>
 					<th style="text-align: left;"><a href="{{ O_CLASS }}">{{ lang('CLASS') }}</a></th>
+					{% if S_SHOWSPEC %}
+					<th style="text-align: left;">{{ lang('SPEC') }}</th>
+					{% endif %}
 					<th style="text-align: left;"><a href="{{ O_RANK }}">{{ lang('RANK') }}</a></th>
 					<th style="text-align: left;"><a href="{{ O_PHPBB }}">{{ lang('MEMBER') }}</a></th>
 				</tr>
 				</thead>
 				<tfoot>
 				<tr>
-					<td colspan="{% if S_SHOWACH == 1 %}7{% else %}6{% endif %}" style="text-align: left; white-space: nowrap;">{{ LISTPLAYERS_FOOTCOUNT }}</td>
+					<td colspan="{% if S_SHOWSPEC %}{% if S_SHOWACH == 1 %}8{% else %}7{% endif %}{% else %}{% if S_SHOWACH == 1 %}7{% else %}6{% endif %}{% endif %}" style="text-align: left; white-space: nowrap;">{{ LISTPLAYERS_FOOTCOUNT }}</td>
 				</tr>
 				</tfoot>
 				<tbody>
@@ -100,6 +103,11 @@
 						<img src="{{ row.CLASS_IMAGE }}" alt="{{ row.CLASS }}" />&nbsp;
 						<span style="white-space: nowrap; color:{{ row.COLORCODE }}">{{ row.CLASS }}</span>
 					</td>
+					{% if S_SHOWSPEC %}
+					<td style="text-align: left;">
+						{% if row.SPEC_ICON %}<img src="{{ row.SPEC_ICON }}" alt="{{ row.SPEC }}" />&nbsp;{% endif %}{{ row.SPEC }}
+					</td>
+					{% endif %}
 					<td style="text-align:left; white-space:nowrap;">{{ row.RANK }}</td>
 					<td style="text-align:left;">{{ row.PHPBBUID }}</td>
 				</tr>
