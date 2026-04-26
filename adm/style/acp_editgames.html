@@ -262,6 +262,53 @@
             <input class="button2" name="showclassadd" type="submit" value="{{ lang('ACP_BBGUILD_CLASS_ADD') }}" />
         </fieldset>
     </fieldset>
+
+    <fieldset>
+        <legend>{{ lang('ACP_LISTSPEC') }}</legend>
+        <p>{{ lang('ACP_LISTSPEC_EXPLAIN') }}</p>
+
+        {% if loops.spec_row|length %}
+        <table cellspacing="1" id="phpbb_table">
+            <thead>
+            <tr>
+                <th>{{ lang('SPEC_ID') }}</th>
+                <th>{{ lang('CLASS') }}</th>
+                <th>{{ lang('SPEC_NAME') }}</th>
+                <th>{{ lang('ROLE') }}</th>
+                <th>{{ lang('SPEC_ICON') }}</th>
+                <th>{{ lang('SPEC_ORDER') }}</th>
+                <th>{{ lang('ACTION') }}</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for spec_row in loops.spec_row %}
+            {% if spec_row.S_ROW_COUNT is even %}
+            <tr class="row1">
+                {% else %}
+            <tr class="row2">
+                {% endif %}
+                <td>{{ spec_row.SPEC_ID }}</td>
+                <td>{{ spec_row.CLASS_NAME }}</td>
+                <td><strong><a href="{{ spec_row.U_EDIT }}">{{ spec_row.SPEC_NAME }}</a></strong></td>
+                <td>{{ spec_row.ROLE_NAME }}</td>
+                <td>{{ spec_row.SPEC_ICON }}</td>
+                <td>{{ spec_row.SPEC_ORDER }}</td>
+                <td style="white-space: nowrap">
+                    <a href="{{ spec_row.U_DELETE }}">{{ ICON_DELETE }}</a>
+                    <a href="{{ spec_row.U_EDIT }}">{{ ICON_EDIT }}</a>
+                </td>
+            </tr>
+            {% endfor %}
+            <tr>
+                <th colspan="7" class="footer">{{ LISTSPEC_FOOTCOUNT }}</th>
+            </tr>
+            </tbody>
+        </table>
+        {% endif %}
+        <fieldset class="quick" style="float: {{ S_CONTENT_FLOW_BEGIN }};">
+            <input class="button2" name="showspecadd" type="submit" value="{{ lang('ACP_BBGUILD_SPEC_ADD') }}" />
+        </fieldset>
+    </fieldset>
 </form>
 
 {% INCLUDE 'overall_footer.html' %}

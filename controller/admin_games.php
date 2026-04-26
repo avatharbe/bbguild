@@ -27,6 +27,7 @@ use avathar\bbguild\model\games\rpg\classes;
 use avathar\bbguild\model\games\rpg\faction;
 use avathar\bbguild\model\games\rpg\races;
 use avathar\bbguild\model\games\rpg\roles;
+use avathar\bbguild\model\games\rpg\specialization;
 
 /**
  * Class admin_controller
@@ -115,6 +116,7 @@ class admin_games
 	public $bb_bosstable;
 	public $bb_zonetable;
 	public $bb_news;
+	public $bb_specializations_table;
 
 	/**
 	 * partly installed games
@@ -200,7 +202,8 @@ class admin_games
 		$bb_recruit_table,
 		$bb_bosstable,
 		$bb_zonetable,
-		$bb_news)
+		$bb_news,
+		$bb_specializations_table = '')
 	{
 
 		$this->bb_games_table = $bb_games_table;
@@ -218,6 +221,7 @@ class admin_games
 		$this->bb_bosstable = $bb_bosstable;
 		$this->bb_zonetable =  $bb_zonetable;
 		$this->bb_news = $bb_news;
+		$this->bb_specializations_table = $bb_specializations_table;
 
 		$this->auth = $auth;
 		$this->cache = $cache;
@@ -437,6 +441,9 @@ class admin_games
 		$addclass = $this->request->is_set_post('showclassadd');
 		$classedit = (isset($_GET['classedit'])) ? true : false;
 		$classdelete = (isset($_GET['classdelete'])) ? true : false;
+		$addspec = $this->request->is_set_post('showspecadd');
+		$specedit = (isset($_GET['specedit'])) ? true : false;
+		$specdelete = (isset($_GET['specdelete'])) ? true : false;
 
 		// Save handlers for add/edit forms
 		$save_faction_add = $this->request->is_set_post('factionadd');
@@ -445,6 +452,8 @@ class admin_games
 		$save_role_edit = $this->request->is_set_post('editrole');
 		$save_race_or_class = $this->request->is_set_post('add');
 		$update_race_or_class = $this->request->is_set_post('update');
+		$save_spec_add = $this->request->is_set_post('addspec');
+		$save_spec_edit = $this->request->is_set_post('editspec');
 
 		if ($save_faction_add || $save_faction_edit)
 		{
@@ -536,6 +545,24 @@ class admin_games
 		else if ($classdelete)
 		{
 			$this->DeleteClass($editgame);
+		}
+		else if ($save_spec_add || $save_spec_edit)
+		{
+			$this->SaveSpec($editgame, $save_spec_add);
+		}
+		else if ($addspec)
+		{
+			$this->BuildTemplateSpec($editgame);
+			return;
+		}
+		else if ($specedit)
+		{
+			$this->BuildTemplateSpec($editgame);
+			return;
+		}
+		else if ($specdelete)
+		{
+			$this->DeleteSpec($editgame);
 		}
 
 		$this->showgame($editgame);
@@ -902,6 +929,120 @@ class admin_games
 	}
 
 	/**
+	 * Build template for adding/editing a specialization. Issue #331.
+	 *
+	 * @param game $editgame
+	 */
+	private function BuildTemplateSpec(game $editgame)
+	{
+		$game_id = $editgame->game_id;
+		$spec_id = $this->request->variable('spec_id', 0);
+		$action = $this->request->variable('action', '');
+		$is_add = ($action !== 'editspec') && !$spec_id;
+
+		$spec = new specialization($this->db, $this->cache, $this->bb_specializations_table);
+
+		if (!$is_add)
+		{
+			$spec->load($spec_id);
+		}
+		else
+		{
+			$spec->game_id = $game_id;
+		}
+
+		// Build class dropdown
+		$classes_obj = new classes($this->db, $this->config, $this->cache, $this->user, $this->bb_language_table, $this->bb_players_table, $this->bb_games_table, $this->bb_classes_table);
+		$classes_obj->game_id = $game_id;
+		foreach ($classes_obj->list_classes('class_id', 1) as $cls)
+		{
+			$this->template->assign_block_vars('spec_class_option', [
+				'CLASS_ID'   => (int) $cls['class_id'],
+				'CLASS_NAME' => $cls['class_name'],
+				'S_SELECTED' => ((int) $cls['class_id'] === $spec->class_id),
+			]);
+		}
+
+		// Build role dropdown
+		$role = new roles($this->db, $this->config, $this->cache, $this->user, $this->bb_gameroles_table, $this->bb_language_table, $this->bb_games_table, $this->bb_classes_table);
+		$role->game_id = $game_id;
+		foreach ($role->list_roles('role_id') as $r)
+		{
+			$this->template->assign_block_vars('spec_role_option', [
+				'ROLE_ID'    => (int) $r['role_id'],
+				'ROLE_NAME'  => $r['rolename'],
+				'S_SELECTED' => ((int) $r['role_id'] === $spec->role_id),
+			]);
+		}
+
+		$this->tpl_name = 'acp_addspec';
+		$this->page_title = $is_add ? 'ACP_BBGUILD_SPEC_ADD' : 'ACP_BBGUILD_SPEC_EDIT';
+
+		$this->template->assign_vars([
+			'IS_ADD'      => $is_add,
+			'GAME_ID'     => $game_id,
+			'GAME_NAME'   => $editgame->getName(),
+			'SPEC_ID'     => $spec->spec_id,
+			'SPEC_NAME'   => $spec->spec_name,
+			'SPEC_ICON'   => $spec->spec_icon,
+			'SPEC_ORDER'  => $spec->spec_order,
+			'U_BACK'      => append_sid("index.$this->php_ext", 'i=-avathar-bbguild-acp-game_module&amp;mode=editgames&amp;' . constants::URI_GAME . "=$game_id"),
+			'U_ACTION2'   => append_sid("index.$this->php_ext", 'i=-avathar-bbguild-acp-game_module&amp;mode=editgames&amp;' . constants::URI_GAME . "=$game_id"),
+			'MSG_NAME_EMPTY' => $this->language->lang('FV_REQUIRED_SPEC_NAME'),
+		]);
+	}
+
+	/**
+	 * Save (insert or update) a specialization.
+	 *
+	 * @param game $editgame
+	 * @param bool $is_add
+	 */
+	private function SaveSpec(game $editgame, bool $is_add)
+	{
+		$spec = new specialization($this->db, $this->cache, $this->bb_specializations_table);
+
+		if (!$is_add)
+		{
+			$spec->load($this->request->variable('hidden_spec_id', 0));
+		}
+
+		$spec->game_id    = $editgame->game_id;
+		$spec->class_id   = $this->request->variable('class_id', 0);
+		$spec->role_id    = $this->request->variable('role_id', 0);
+		$spec->spec_name  = $this->request->variable('spec_name', '', true);
+		$spec->spec_icon  = $this->request->variable('spec_icon', '');
+		$spec->spec_order = $this->request->variable('spec_order', 0);
+		$spec->save();
+
+		$success_message = sprintf(
+			$this->language->lang($is_add ? 'ADMIN_ADD_SPEC_SUCCESS' : 'ADMIN_UPDATE_SPEC_SUCCESS'),
+			$spec->spec_name
+		);
+		meta_refresh(3, append_sid("index.$this->php_ext", 'i=-avathar-bbguild-acp-game_module&amp;mode=editgames&amp;' . constants::URI_GAME . "={$editgame->game_id}"));
+		trigger_error($success_message . $this->link, E_USER_NOTICE);
+	}
+
+	/**
+	 * Delete a specialization.
+	 *
+	 * @param game $editgame
+	 */
+	private function DeleteSpec(game $editgame)
+	{
+		$spec_id = $this->request->variable('spec_id', 0);
+		$spec = new specialization($this->db, $this->cache, $this->bb_specializations_table);
+
+		if ($spec->load($spec_id) && $spec->game_id === $editgame->game_id)
+		{
+			// Null out player_spec_id on any players that reference this spec
+			$sql = 'UPDATE ' . $this->bb_players_table . ' SET player_spec_id = 0 WHERE player_spec_id = ' . (int) $spec_id;
+			$this->db->sql_query($sql);
+			$spec->delete();
+		}
+	}
+
+	/**
 	 * Reset (reinstall) a game: uninstall then install again.
 	 *
 	 * @param game $editgame The game to reset
@@ -1157,6 +1298,37 @@ class admin_games
 			));
 		}
 		$this->template->assign_var('LISTCLASS_FOOTCOUNT', sprintf($this->language->lang('LISTCLASS_FOOTCOUNT'), count($class_list)));
+
+		// Specializations (issue #331). Grouped by class for readability.
+		$class_name_by_id = [];
+		foreach ($class_list as $cls)
+		{
+			$class_name_by_id[(int) $cls['class_id']] = $cls['class_name'];
+		}
+		$role_name_by_id = [];
+		foreach ($role_list as $role)
+		{
+			$role_name_by_id[(int) $role['role_id']] = $role['rolename'];
+		}
+
+		$spec = new specialization($this->db, $this->cache, $this->bb_specializations_table);
+		$spec_list = $spec->get_for_class($game_id);
+		$row_count = 0;
+		foreach ($spec_list as $sp)
+		{
+			$this->template->assign_block_vars('spec_row', [
+				'SPEC_ID'    => $sp['spec_id'],
+				'SPEC_NAME'  => $sp['spec_name'],
+				'SPEC_ICON'  => $sp['spec_icon'],
+				'SPEC_ORDER' => $sp['spec_order'],
+				'CLASS_NAME' => $class_name_by_id[$sp['class_id']] ?? '?',
+				'ROLE_NAME'  => $role_name_by_id[$sp['role_id']] ?? '?',
+				'U_DELETE'   => $u_edit_game . '&amp;specdelete=1&amp;spec_id=' . $sp['spec_id'],
+				'U_EDIT'     => $u_edit_game . '&amp;specedit=1&amp;spec_id=' . $sp['spec_id'],
+				'S_ROW_COUNT'=> $row_count++,
+			]);
+		}
+		$this->template->assign_var('LISTSPEC_FOOTCOUNT', sprintf($this->language->lang('LISTSPEC_FOOTCOUNT'), count($spec_list)));
 	}
 
 	/**

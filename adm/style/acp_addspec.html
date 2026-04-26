@@ -1,0 +1,94 @@
+{% INCLUDE 'overall_header.html' %}
+
+<script type="text/javascript">
+    //<![CDATA[
+    function check_form()
+    {
+        if (document.getElementById('spec_name').value.length < 2)
+        {
+            alert('{{ MSG_NAME_EMPTY }}');
+            return false;
+        }
+        return true;
+    }
+    //]]>
+</script>
+
+<a href="{{ U_BACK }}" style="float: {{ S_CONTENT_FLOW_END }};">&laquo; {{ lang('BACK') }}</a>
+{% if ! IS_ADD %}
+<h1>{{ lang('ACP_BBGUILD_SPEC_EDIT') }}</h1>
+{% else %}
+<h1>{{ lang('ACP_BBGUILD_SPEC_ADD') }}</h1>
+{% endif %}
+<p>{{ lang('ACP_BBGUILD_SPEC_EXPLAIN') }}</p>
+
+<form id="acp_addspec" method="post" action="{{ U_ACTION2 }}" onsubmit="return check_form()">
+    <div>
+        <fieldset>
+            <dl>
+                <dt><label>{{ lang('GAME') }}:</label></dt>
+                <dd><h4>{{ GAME_NAME }}</h4></dd>
+            </dl>
+
+            {% if ! IS_ADD %}
+            <dl>
+                <dt><label for="spec_id_label">{{ lang('SPEC_ID') }}:</label></dt>
+                <dd><strong>{{ SPEC_ID }}</strong></dd>
+            </dl>
+            {% endif %}
+
+            <dl>
+                <dt><label for="class_id">{{ lang('CLASS') }}:</label></dt>
+                <dd>
+                    <select id="class_id" name="class_id">
+                        {% for opt in loops.spec_class_option %}
+                        <option value="{{ opt.CLASS_ID }}"{% if opt.S_SELECTED %} selected="selected"{% endif %}>{{ opt.CLASS_NAME }}</option>
+                        {% endfor %}
+                    </select>
+                </dd>
+            </dl>
+
+            <dl>
+                <dt><label for="spec_name">{{ lang('SPEC_NAME') }}:</label></dt>
+                <dd><input type="text" id="spec_name" name="spec_name" value="{{ SPEC_NAME }}" /></dd>
+            </dl>
+
+            <dl>
+                <dt><label for="role_id">{{ lang('ROLE') }}:</label></dt>
+                <dd>
+                    <select id="role_id" name="role_id">
+                        {% for opt in loops.spec_role_option %}
+                        <option value="{{ opt.ROLE_ID }}"{% if opt.S_SELECTED %} selected="selected"{% endif %}>{{ opt.ROLE_NAME }}</option>
+                        {% endfor %}
+                    </select>
+                </dd>
+            </dl>
+
+            <dl>
+                <dt><label for="spec_icon">{{ lang('SPEC_ICON') }}:</label></dt>
+                <dd><input type="text" id="spec_icon" name="spec_icon" value="{{ SPEC_ICON }}" /></dd>
+            </dl>
+
+            <dl>
+                <dt><label for="spec_order">{{ lang('SPEC_ORDER') }}:</label></dt>
+                <dd><input type="number" id="spec_order" name="spec_order" value="{{ SPEC_ORDER }}" min="0" step="1" /></dd>
+            </dl>
+        </fieldset>
+
+        <fieldset class="quick" style="float: {{ S_CONTENT_FLOW_END }};">
+            {{ S_FORM_TOKEN }}
+            <input type="hidden" name="hidden_game_id" value="{{ GAME_ID }}" />
+            <input type="hidden" name="hidden_spec_id" value="{{ SPEC_ID }}" />
+
+            {% if ! IS_ADD %}
+            <input type="submit" name="editspec" value="{{ lang('ACP_BBGUILD_SPEC_EDIT') }}" class="button1" />
+            {% else %}
+            <input type="submit" name="addspec" value="{{ lang('ACP_BBGUILD_SPEC_ADD') }}" class="button1" />
+            {% endif %}
+
+            <input type="reset" name="reset" value="{{ lang('RESET') }}" class="button1" />
+        </fieldset>
+    </div>
+</form>
+
+{% INCLUDE 'overall_footer.html' %}

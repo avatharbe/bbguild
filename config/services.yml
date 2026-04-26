@@ -169,6 +169,7 @@ services:
             - '%avathar.bbguild.tables.bb_bosstable%'
             - '%avathar.bbguild.tables.bb_zonetable%'
             - '%avathar.bbguild.tables.bb_news%'
+            - '%avathar.bbguild.tables.bb_specializations%'
     avathar.bbguild.admin.guild:
         class: avathar\bbguild\controller\admin_guild
         arguments:
