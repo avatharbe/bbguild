@@ -1,6 +1,9 @@
 [![bbGuild](https://www.avathar.be/forum/images/site_logo.png)](https://www.avathar.be/forum)
 
 # bbGuild
+
+**Version:** [![Latest Stable Version](https://img.shields.io/github/v/release/avatharbe/bbguild)](https://github.com/avatharbe/bbguild/releases)
+
 [![Tests](https://github.com/avatharbe/bbguild/actions/workflows/tests.yml/badge.svg)](https://github.com/avatharbe/bbguild/actions/workflows/tests.yml)
 
 A Guild Management System for [phpBB 3.3](https://www.phpbb.com/). Manage your gaming guild's roster, recruitment, and news directly from your forum.
