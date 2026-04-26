@@ -16,3 +16,4 @@ parameters:
     avathar.bbguild.tables.bb_news: '%core.table_prefix%bb_news'
     avathar.bbguild.tables.bb_portal_modules: '%core.table_prefix%bb_portal_modules'
     avathar.bbguild.tables.bb_portal_config: '%core.table_prefix%bb_portal_config'
+    avathar.bbguild.tables.bb_specializations: '%core.table_prefix%bb_specializations'
