@@ -25,6 +25,7 @@ use phpbb\db\driver\driver_interface;
 class specialization
 {
 	public $bb_specializations_table;
+	public string $bb_language_table;
 
 	/** @var driver_interface */
 	protected $db;
@@ -39,11 +40,12 @@ class specialization
 	public string $spec_icon = '';
 	public int $spec_order = 0;
 
-	public function __construct(driver_interface $db, cache_interface $cache, string $bb_specializations_table)
+	public function __construct(driver_interface $db, cache_interface $cache, string $bb_specializations_table, string $bb_language_table = '')
 	{
 		$this->db = $db;
 		$this->cache = $cache;
 		$this->bb_specializations_table = $bb_specializations_table;
+		$this->bb_language_table = $bb_language_table;
 	}
 
 	/**
@@ -154,5 +156,41 @@ class specialization
 		}
 		$this->db->sql_freeresult($result);
 		return $rows;
+	}
+
+	/**
+	 * Return localized spec names for a game in the given language.
+	 *
+	 * Reads `bb_language` rows with `attribute='spec'`. Returns
+	 * `[spec_id => translated_name]`. Empty when:
+	 *  - no language table is wired (older installs)
+	 *  - the language has no rows for this game (locale not seeded by
+	 *    the plugin — caller falls back to canonical `spec_name`)
+	 *
+	 * Callers typically merge the result on top of the catalog from
+	 * `get_for_class()` so the canonical spec_name acts as the fallback.
+	 *
+	 * @return array<int, string>
+	 */
+	public function get_translations(string $game_id, string $language): array
+	{
+		if ($this->bb_language_table === '' || $language === '')
+		{
+			return [];
+		}
+
+		$sql = 'SELECT attribute_id, name FROM ' . $this->bb_language_table
+			. " WHERE attribute = 'spec'"
+			. " AND game_id = '" . $this->db->sql_escape($game_id) . "'"
+			. " AND language = '" . $this->db->sql_escape($language) . "'";
+
+		$result = $this->db->sql_query($sql);
+		$translations = [];
+		while ($row = $this->db->sql_fetchrow($result))
+		{
+			$translations[(int) $row['attribute_id']] = (string) $row['name'];
+		}
+		$this->db->sql_freeresult($result);
+		return $translations;
 	}
 }

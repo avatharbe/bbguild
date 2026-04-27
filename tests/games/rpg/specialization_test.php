@@ -193,4 +193,42 @@ class specialization_test extends TestCase
 		$this->assertStringContainsString("game_id = 'wow'", $capturedSql);
 		$this->assertStringNotContainsString('class_id', $capturedSql);
 	}
+
+	public function test_get_translations_returns_empty_when_language_table_unwired(): void
+	{
+		// Default constructor leaves bb_language_table = ''
+		$this->db->expects($this->never())->method('sql_query');
+		$this->assertSame([], $this->spec->get_translations('wow', 'de'));
+	}
+
+	public function test_get_translations_returns_empty_when_locale_blank(): void
+	{
+		$spec = new specialization($this->db, $this->cache, self::TABLE, 'phpbb_bb_language');
+		$this->db->expects($this->never())->method('sql_query');
+		$this->assertSame([], $spec->get_translations('wow', ''));
+	}
+
+	public function test_get_translations_maps_attribute_id_to_translated_name(): void
+	{
+		$spec = new specialization($this->db, $this->cache, self::TABLE, 'phpbb_bb_language');
+		$this->db->method('sql_escape')->willReturnCallback(fn ($v) => addslashes($v));
+
+		$capturedSql = '';
+		$this->db->method('sql_query')->willReturnCallback(function ($sql) use (&$capturedSql) {
+			$capturedSql = $sql;
+			return true;
+		});
+		$this->db->method('sql_fetchrow')->willReturnOnConsecutiveCalls(
+			['attribute_id' => '7', 'name' => 'Frost'],
+			['attribute_id' => '8', 'name' => 'Givre'],
+			false
+		);
+
+		$result = $spec->get_translations('wow', 'fr');
+
+		$this->assertSame([7 => 'Frost', 8 => 'Givre'], $result);
+		$this->assertStringContainsString("attribute = 'spec'", $capturedSql);
+		$this->assertStringContainsString("game_id = 'wow'", $capturedSql);
+		$this->assertStringContainsString("language = 'fr'", $capturedSql);
+	}
 }
