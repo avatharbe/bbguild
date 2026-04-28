@@ -1,5 +1,20 @@
 # Changelog
 
+## 2.0.0-b4 28/04/2026
+  - [NEW] Specialization system (#331) — model, migration, and ACP/UCP integration
+    - `bb_specializations` table with `(spec_id, game_id, class_id, role_id, spec_name, spec_icon, spec_order)` and a nullable `player_spec_id` FK on `bb_players`
+    - `specialization` model with `load`/`save`/`delete`/`get_for_class`/`get_translations`
+    - Specializations panel on the Edit Game page (add/edit/delete with class + role dropdowns)
+    - Spec dropdown on ACP and UCP player edit forms, JS-filtered by selected class
+    - Optional Spec column on the roster portal module (listing + grid views), hidden for games without specs, with per-locale display names overlaid from `bb_language` (`attribute='spec'`)
+    - Optional `specialization_provider_interface` (`get_specializations()`, `get_spec_label()`) for game plugins to declare their spec catalog without breaking the existing 9 plugin providers
+    - `install_specs()` extension point on `abstract_game_install`; called during install/uninstall and guarded so older installs without `bb_specializations` are unaffected
+  - [CHG] Repo and PHP namespaces dropped to no-separator form (`bbguildwow`, `bbguildeq`, …); composer name, dir name, PHP namespace, and GitHub repo all match. DB-stored config and cache keys (`bbguild_<game>_version`, `bbguild_eqdkp_start`, `bbguild_wow_oauth_token_*`, …) preserved with the original underscore form to avoid orphaning rows
+  - [FIX] EPV CI green: event docblocks gain `@since`, `acp_editguild_*` events split into `acp_editguild_*` + `acp_addguild_*` to satisfy the unique-event-name rule, `unserialize` calls in `model/admin/log.php` replaced with `json_decode`
+  - [FIX] `avathar.bbguild.log` service definition gained the missing `@user` constructor argument (latent bug since 547ec380; surfaced when the container rebuilt)
+  - [FIX] `tests/functional/.gitkeep` so PHPUnit's functional test suite resolves on CI checkout
+  - [DOCS] Test plan documents added under `tests/` (epv / unit / functional / smoke / integration)
+
 ## 2.0.0-b3 15/03/2026
   - [NEW] Game edition field on guilds for WoW Classic support (#15) — edition dropdown in guild ACP, flows to child plugins via template events
   - [NEW] Auto-disable child game-plugin extensions when bbGuild core is disabled

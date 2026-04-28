@@ -3,8 +3,8 @@
   "type": "phpbb-extension",
   "description": "bbGuild Extension for phpBB 3.3. Guild management system with guild portal, roster, recruitment, achievements, and game plugin architecture. Games supported via plugins: WoW, GW2, LOTRO, EQ, EQ2, FFXI, FFXIV, SWTOR, Lineage 2, Custom. Languages: English, German, French, Italian, Dutch, Spanish, Polish.",
   "homepage": "https://github.com/avatharbe/bbguild",
-  "version": "2.0.0-b3",
-  "time": "2026-03-15",
+  "version": "2.0.0-b4",
+  "time": "2026-04-28",
   "license": "GPL-2.0-only",
   "authors": [{
     "name": "Andreas Vandenberghe (Sajaki)",
