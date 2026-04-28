@@ -82,6 +82,7 @@ services:
         arguments:
             - '%avathar.bbguild.tables.bb_logs%'
             - '@dbal.conn'
+            - '@user'
 
     avathar.bbguild.specialization:
         class: avathar\bbguild\model\games\rpg\specialization
