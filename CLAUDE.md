@@ -5,7 +5,7 @@
 **bbGuild** is a Guild Management System for phpBB 3.3+ designed for World of Warcraft gaming communities. It provides guild roster management, character tracking, achievements, recruitment, and integration with the Battle.net API.
 
 - **Author:** Andreas Vandenberghe (Sajaki)
-- **Version:** 2.0.0-b2 (beta)
+- **Version:** 2.0.0-b4 (beta, tagged 2026-04-28; not yet announced on the forum)
 - **License:** GPL-2.0-only
 - **Repository:** https://github.com/avatharbe/bbguild
 
@@ -190,12 +190,33 @@ Additionally, the config setting `bbguild_maxchars` limits how many characters e
 5. ~~Fix multiple minor bugs (#336, #337, #341, #343, #344)~~ Done
 6. ~~Migrations squashed to b2~~ Done
 
-### Phase 2: Feature completion
-- #290 — UCP bbguild page
-- #288 — Individual player page
+### Phase 1.7: Polish, namespace cleanup, EPV CI green — COMPLETE (2.0.0-b3)
+1. ~~Game edition field (#15) — WoW Classic support flowing through plugins via template events~~ Done
+2. ~~Auto-disable child plugins when bbguild core is disabled~~ Done
+3. ~~Block game deletion when guilds/players reference it~~ Done
+4. ~~Namespace drop-separator across the family (`bbguild_<game>` → `bbguild<game>`)~~ Done. Composer name = dir name = PHP namespace = repo name. DB-stored config/cache keys preserved with original underscore form to avoid orphaning rows.
+5. ~~EPV CI green: event docblock `@since`, unique event names (`acp_addguild_*` split from `acp_editguild_*`), `unserialize` → `json_decode` in log model~~ Done
+6. ~~Test workflow: dual-checkout (bbguild + bbguildwow) so plugin tests resolve core interfaces~~ Done
+
+### Phase 1.8: Specialization system — COMPLETE (2.0.0-b4)
+Issue #331. Adds a layer between class and role.
+1. ~~Migration `v200b4`: `bb_specializations` table + `player_spec_id` column~~ Done
+2. ~~`specialization` model with `load`/`save`/`delete`/`get_for_class`/`get_translations`~~ Done
+3. ~~ACP CRUD on Edit Game page (specs panel + Add/Edit form)~~ Done
+4. ~~ACP and UCP player edit dropdown filtered by class~~ Done
+5. ~~Roster Spec column (listing + grid views) with i18n via bb_language~~ Done
+6. ~~Optional `specialization_provider_interface` for plugins~~ Done
+7. ~~`install_specs()` hook in `abstract_game_install`~~ Done
+8. ~~bbguildwow Phase 4: 39 specs + icons + de/fr/it/es_x_tu translations~~ Done
+
+### Phase 2: Remaining feature work
+- #290 — UCP bbguild page (partial; spec dropdown done)
+- #288 — Individual player page (partial; spec field done)
 - #278 — Achievements pane
-- Update Battle.net API integration (OAuth 2.0)
-- Add unit tests (#244)
+- #331 Phase 3c — Recruitment spec filter (not started)
+- #331 Phase 5 — Migrate legacy free-text `player_spec` text → `player_spec_id` (not started)
+- 8 of 9 plugin Phase 4 sub-issues open (eq, eq2, ffxi, ffxiv, gw2, lineage2, lotro, swtor)
+- Add unit / functional / smoke / integration tests (#244 + tests/*.md plans)
 
 ## Key Files
 
