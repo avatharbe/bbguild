@@ -24,7 +24,16 @@ class simple_test extends TestCase
 	{
 		parent::setUp();
 
+		$user = $this->createMock(\phpbb\user::class);
+		$user->method('lang')->willReturnArgument(0);
+
 		$this->container = $this->createMock(\Symfony\Component\DependencyInjection\ContainerInterface::class);
+		$this->container->method('get')->willReturnCallback(function ($id) use ($user) {
+			return match ($id) {
+				'user' => $user,
+				default => null,
+			};
+		});
 
 		$this->extension_finder = $this->getMockBuilder(\phpbb\finder::class)
 			->disableOriginalConstructor()

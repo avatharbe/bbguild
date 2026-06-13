@@ -340,5 +340,11 @@ $lang = array_merge(
 	'ADDITIONS' => 'Code Hilfen',
 	'CONTRIB' => 'Mitwirkungen',
 
+	// is_enableable() error messages
+	'BBGUILD_PHP_VERSION_FAIL'		=> 'Diese Erweiterung benötigt PHP %1$s oder höher. Du verwendest PHP %2$s.',
+	'BBGUILD_PHPBB_VERSION_FAIL'	=> 'Diese Erweiterung benötigt phpBB %1$s oder höher. Du verwendest phpBB %2$s.',
+	'BBGUILD_REQUIRES_GD'			=> 'Diese Erweiterung benötigt die GD PHP-Erweiterung.',
+	'BBGUILD_REQUIRES_CURL'			=> 'Diese Erweiterung benötigt die cURL PHP-Erweiterung.',
+
 	)
 );

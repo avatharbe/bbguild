@@ -336,5 +336,11 @@ Même si elle n\'est pas requise pour l\'usage gratuit, elle aide à soutenir l\
 	'ADDITIONS' => 'Code Additions',
 	'CONTRIB' => 'Contributions',
 
+	// is_enableable() error messages
+	'BBGUILD_PHP_VERSION_FAIL'		=> 'Cette extension nécessite PHP %1$s ou supérieur. Vous utilisez PHP %2$s.',
+	'BBGUILD_PHPBB_VERSION_FAIL'	=> 'Cette extension nécessite phpBB %1$s ou supérieur. Vous utilisez phpBB %2$s.',
+	'BBGUILD_REQUIRES_GD'			=> 'Cette extension nécessite l\'extension PHP GD.',
+	'BBGUILD_REQUIRES_CURL'			=> 'Cette extension nécessite l\'extension PHP cURL.',
+
 	)
 );

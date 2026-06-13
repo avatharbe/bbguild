@@ -338,5 +338,11 @@ bbDKP (c) 2008, 2009 Sajaki, Malfate, Kapli, Hroar',
 	'ADDITIONS' => 'Code Additions',
 	'CONTRIB' => 'Contributions',
 
+	// is_enableable() error messages
+	'BBGUILD_PHP_VERSION_FAIL'		=> 'This extension requires PHP %1$s or higher. You are running PHP %2$s.',
+	'BBGUILD_PHPBB_VERSION_FAIL'	=> 'This extension requires phpBB %1$s or higher. You are running phpBB %2$s.',
+	'BBGUILD_REQUIRES_GD'			=> 'This extension requires the GD PHP extension to be loaded.',
+	'BBGUILD_REQUIRES_CURL'			=> 'This extension requires the cURL PHP extension to be loaded.',
+
 	)
 );
