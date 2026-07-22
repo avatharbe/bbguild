@@ -209,14 +209,12 @@ Issue #331. Adds a layer between class and role.
 7. ~~`install_specs()` hook in `abstract_game_install`~~ Done
 8. ~~bbguildwow Phase 4: 39 specs + icons + de/fr/it/es_x_tu translations~~ Done
 
-### Phase 2: Remaining feature work
-- #290 — UCP bbguild page (partial; spec dropdown done)
-- #288 — Individual player page (partial; spec field done)
-- #278 — Achievements pane
-- #331 Phase 3c — Recruitment spec filter (not started)
-- #331 Phase 5 — Migrate legacy free-text `player_spec` text → `player_spec_id` (not started)
-- 8 of 9 plugin Phase 4 sub-issues open (eq, eq2, ffxi, ffxiv, gw2, lineage2, lotro, swtor)
-- Add unit / functional / smoke / integration tests (#244 + tests/*.md plans)
+### Phase 2: Remaining feature work (post-rc1, milestone 2.1.0/2.2.0)
+- #288 — Individual player page as a portal module (deferred to 2.1.0; legacy view works and ships in rc1)
+- #331 Phase 3c — Recruitment spec filter (not started, 2.2.0)
+- #331 Phase 5 — Migrate legacy free-text `player_spec` text → `player_spec_id` (not started, 2.2.0)
+- 8 of 9 plugin Phase 4 sub-issues open (eq, eq2, ffxi, ffxiv, gw2, lineage2, lotro, swtor) — spec data only, 2.2.0
+- #278 (achievements) and #290 (claim/unclaim) confirmed shipped in b2/pre-rc1 — removed from this list
 
 ## Key Files
 
