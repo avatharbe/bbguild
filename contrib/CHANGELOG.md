@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.0.0-rc1 23/07/2026
+  - [FIX] `u_bbguild`, `u_charclaim`, `u_charadd`, `u_chardelete`, `u_charupdate` defaulting to "No" for REGISTERED, ADMINISTRATORS, and GLOBAL_MODERATORS on installs that manage user permissions via direct per-group grants instead of the stock role templates — v200b3's role-based grant never reached them; now also granted directly, matching the pattern already used for GUESTS
+  - [FIX] Claiming/unclaiming a character (#290) and the guild achievements pane (#278) confirmed already shipped in earlier b-releases; stale roadmap notes removed
+  - [DOCS] Individual player page (#288) deferred to 2.1.0 as a portal-module conversion — the existing standalone page ships and works in rc1
+  - [DOCS] Unit test coverage added for the character claim/unclaim flow (#244)
+  - All 8 issues in the GitHub 2.0.0-rc1 milestone confirmed shipped: guild pane, achievements pane, player page, claiming/unclaiming, UCP language files, UCP bugfixes, roster portal grid view, game-plugin compatibility
+
 ## 2.0.0-b4 28/04/2026
   - [NEW] Specialization system (#331) — model, migration, and ACP/UCP integration
     - `bb_specializations` table with `(spec_id, game_id, class_id, role_id, spec_name, spec_icon, spec_order)` and a nullable `player_spec_id` FK on `bb_players`

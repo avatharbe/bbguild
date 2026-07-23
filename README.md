@@ -10,7 +10,7 @@ A Guild Management System for [phpBB 3.3](https://www.phpbb.com/). Manage your g
 
 Originally forked as bbDKP from EQDKP to phpBB 3.0 in 2008, the 2.0 version has been renamed bbGuild and rebuilt for phpBB 3.3 and PHP 8.x.
 
-**Current version:** 2.0.0-b3 (beta)
+**Current version:** 2.0.0-rc1 (release candidate)
 
 ## Features
 
@@ -63,7 +63,7 @@ Originally forked as bbDKP from EQDKP to phpBB 3.0 in 2008, the 2.0 version has 
 ## Requirements
 
 - phpBB >= 3.3.0
-- PHP >= 7.4
+- PHP >= 8.1
 - PHP GD extension (`php_gd2`)
 - PHP cURL extension (`php_curl`)
 
