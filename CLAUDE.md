@@ -143,9 +143,7 @@ Additionally, the config setting `bbguild_maxchars` limits how many characters e
 
 ## Incomplete Features (Must Have)
 
-- #290 - UCP bbguild page
-- #288 - Individual player page
-- #278 - Achievements pane
+- #288 - Individual player page as a portal module (deferred to 2.1.0; legacy view ships in rc1)
 
 ## Compatibility Status
 
