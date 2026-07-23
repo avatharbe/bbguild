@@ -922,13 +922,21 @@ class guilds
 
 		// Clean up emblem file from stored path or legacy location
 		global $phpbb_root_path;
+		$filesystem = new \phpbb\filesystem\filesystem();
 		$emblem_deleted = false;
 		if (!empty($this->emblempath) && strpos($this->emblempath, 'bbguildwow/emblems/') !== false)
 		{
 			$imgfile = $phpbb_root_path . $this->emblempath;
-			if (file_exists($imgfile))
+			if ($filesystem->exists($imgfile))
 			{
-				@unlink($imgfile);
+				try
+				{
+					$filesystem->remove($imgfile);
+				}
+				catch (\phpbb\filesystem\exception\filesystem_exception $e)
+				{
+					// best-effort cleanup; guild deletion should not fail over it
+				}
 				$emblem_deleted = true;
 			}
 		}
@@ -937,9 +945,16 @@ class guilds
 		if (!$emblem_deleted)
 		{
 			$imgfile = $phpbb_root_path . 'ext/avathar/bbguild/images/guildemblem/' . $this->region . '_' . $this->realm . '_' . str_replace(' ', '_', $this->name) . '.png';
-			if (file_exists($imgfile))
+			if ($filesystem->exists($imgfile))
 			{
-				@unlink($imgfile);
+				try
+				{
+					$filesystem->remove($imgfile);
+				}
+				catch (\phpbb\filesystem\exception\filesystem_exception $e)
+				{
+					// best-effort cleanup; guild deletion should not fail over it
+				}
 			}
 		}
 
