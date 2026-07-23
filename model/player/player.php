@@ -86,6 +86,12 @@ class player
 	protected $util;
 	/** @var \avathar\bbguild\model\games\game_registry|null */
 	protected $game_registry;
+	/** @var string */
+	protected $ext_path;
+	/** @var int */
+	protected $time;
+	/** @var array */
+	protected $games;
 
 	/**
 	 * game id
