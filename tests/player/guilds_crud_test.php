@@ -7,8 +7,9 @@
  * Guild CRUD characterization tests — issue #244
  *
  * Covers: update_guilddefault(), get_guild() (both branches), and
- * update_guild()'s success path (including the recompute-playercount
- * side effect via count_players()).
+ * update_guild()'s success path — both the unchanged-name/realm branch and
+ * the renamed-but-not-a-duplicate branch (including the recompute-
+ * playercount side effect via count_players() in both cases).
  *
  * NOT covered (documented gap, not silently dropped):
  *   - The trigger_error(E_USER_WARNING) guard clauses in make_guild(),
@@ -176,5 +177,37 @@ class guilds_crud_test extends TestCase
 		$this->assertSame(9, $g->getPlayercount());
 		$this->assertStringContainsString('UPDATE bb_guild SET', $db->queries[1]);
 		$this->assertStringContainsString('WHERE id= 5', $db->queries[1]);
+	}
+
+	public function test_update_guild_success_when_renamed_and_not_a_duplicate(): void
+	{
+		$g = $this->make_guild();
+		$old = $this->make_guild();
+		$db = new fake_guilds_db_driver();
+		$cache = new fake_guilds_cache_driver();
+		$this->set_prop($g, 'db', $db);
+		$this->set_prop($g, 'cache', $cache);
+		$this->set_prop($g, 'config', ['bbguild_lang' => 'en']);
+		$g->setName('New Name');
+		$g->setRealm('NewRealm');
+		$old->setName('Old Name');
+		$old->setRealm('OldRealm');
+		$g->guildid = 5;
+		$g->bb_guild_table = 'bb_guild';
+		$g->bb_players_table = 'bb_players';
+		$g->bb_ranks_table = 'bb_ranks';
+		$g->bb_classes_table = 'bb_classes';
+		$g->bb_races_table = 'bb_races';
+		$g->bb_language_table = 'bb_language';
+		$db->queue_fetchrow(['evcount' => 0]); // duplicate-check query: no clash
+		$db->queue_fetchfield(4); // count_players()
+
+		$result = $g->update_guild($old);
+
+		$this->assertTrue($result);
+		$this->assertSame(4, $g->getPlayercount());
+		$this->assertCount(3, $db->queries);
+		$this->assertStringContainsString('UPDATE bb_guild SET', $db->queries[2]);
+		$this->assertStringContainsString('WHERE id= 5', $db->queries[2]);
 	}
 }
