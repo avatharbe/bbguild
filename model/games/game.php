@@ -598,7 +598,7 @@ class game
 		$sql = 'SELECT id, game_id, game_name, status, imagename, armory_enabled,
  				bossbaseurl, zonebaseurl, apikey, apilocale, privkey, region
     			FROM ' . $this->bb_game_table . "
-    			WHERE game_id = '" . $this->game_id . "'";
+    			WHERE game_id = '" . $this->db->sql_escape($this->game_id) . "'";
 
 		$result = $this->db->sql_query($sql);
 		while ($row = $this->db->sql_fetchrow($result))
@@ -639,7 +639,7 @@ class game
 			)
 		);
 
-		$sql = 'UPDATE ' . $this->bb_game_table . ' SET ' . $query . " WHERE game_id = '" . $this->game_id . "'";
+		$sql = 'UPDATE ' . $this->bb_game_table . ' SET ' . $query . " WHERE game_id = '" . $this->db->sql_escape($this->game_id) . "'";
 		$this->db->sql_query($sql);
 
 		$this->db->sql_transaction('commit');

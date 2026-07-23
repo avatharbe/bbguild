@@ -140,7 +140,7 @@ class faction
 	{
 		$sql = 'SELECT game_id, f_index, faction_id, faction_name, faction_hide
     			FROM ' . $this->bb_factions_table . '
-    			WHERE f_index = ' . (int) $this->faction_id . " and game_id = '" . $this->game_id . "'";
+    			WHERE f_index = ' . (int) $this->faction_id . " and game_id = '" . $this->db->sql_escape($this->game_id) . "'";
 		$result = $this->db->sql_query($sql);
 		while ($row = $this->db->sql_fetchrow($result))
 		{
@@ -158,7 +158,7 @@ class faction
 	public function make_faction()
 	{
 		$sql = 'SELECT max(faction_id) as faction_id FROM ' . $this->bb_factions_table . "
-				WHERE game_id = '" . $this->game_id . "' ";
+				WHERE game_id = '" . $this->db->sql_escape($this->game_id) . "' ";
 		$result = $this->db->sql_query($sql);
 		$row = $this->db->sql_fetchrow($result);
 		$this->faction_id = (int) $row['faction_id'] + 1;
@@ -193,7 +193,7 @@ class faction
 
 		$this->db->sql_transaction('begin');
 
-		$sql = 'UPDATE ' . $this->bb_factions_table . ' SET ' . $this->db->sql_build_array('UPDATE', $data) . ' WHERE faction_id = ' . $this->faction_id . " AND game_id = '" . $this->game_id . "'";
+		$sql = 'UPDATE ' . $this->bb_factions_table . ' SET ' . $this->db->sql_build_array('UPDATE', $data) . ' WHERE faction_id = ' . $this->faction_id . " AND game_id = '" . $this->db->sql_escape($this->game_id) . "'";
 		$this->db->sql_query($sql);
 
 		$this->db->sql_transaction('commit');
@@ -212,7 +212,7 @@ class faction
 		'FROM' => array (
 		 $this->bb_races_table => 'r', $this->bb_factions_table => 'f' ),
 		'WHERE' => "r.race_faction_id = f.faction_id
-				AND f.game_id = '" . $this->game_id . "'
+				AND f.game_id = '" . $this->db->sql_escape($this->game_id) . "'
 				AND f.f_index =  " . $this->faction_id );
 
 		$sql = $this->db->sql_build_query('SELECT', $sql_array);
@@ -221,7 +221,7 @@ class faction
 
 		if ($factioncount == 0)
 		{
-			$sql = 'DELETE FROM ' . $this->bb_factions_table . ' WHERE f_index =' . $this->faction_id . " AND game_id = '" .   $this->game_id . "'"  ;
+			$sql = 'DELETE FROM ' . $this->bb_factions_table . ' WHERE f_index =' . $this->faction_id . " AND game_id = '" .   $this->db->sql_escape($this->game_id) . "'"  ;
 			$this->db->sql_query($sql);
 			$this->cache->destroy('sql', $this->bb_factions_table);
 		}
@@ -236,7 +236,7 @@ class faction
 	 */
 	public function delete_all_factions()
 	{
-		$sql = 'DELETE FROM ' . $this->bb_factions_table . " WHERE game_id = '" .   $this->game_id . "'"  ;
+		$sql = 'DELETE FROM ' . $this->bb_factions_table . " WHERE game_id = '" .   $this->db->sql_escape($this->game_id) . "'"  ;
 		$this->db->sql_query($sql);
 		$this->cache->destroy('sql', $this->bb_factions_table);
 	}
@@ -251,7 +251,7 @@ class faction
 		$sql_array = array (
 		'SELECT' => ' f.game_id, f.f_index, f.faction_id, f.faction_name, f.faction_hide ',
 		'FROM' => array ($this->bb_factions_table => 'f' ),
-		'WHERE' => " f.game_id = '" . $this->game_id . "'",
+		'WHERE' => " f.game_id = '" . $this->db->sql_escape($this->game_id) . "'",
 		'ORDER_BY' => 'faction_id ASC ' );
 		$sql = $this->db->sql_build_query('SELECT', $sql_array);
 		$result = $this->db->sql_query($sql);

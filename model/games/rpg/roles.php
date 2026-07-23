@@ -128,7 +128,7 @@ class roles
 				$this->bb_gameroles_table => 'r', $this->bb_language_table => 'l' ),
 			'WHERE' => " r.role_id = l.attribute_id
 							AND l.attribute='role'
-							AND l.game_id = '" . $this->game_id . "'
+							AND l.game_id = '" . $this->db->sql_escape($this->game_id) . "'
 							AND r.game_id = l.game_id
 							AND l.language= '" . $this->config['bbguild_lang'] . "'
 							AND r.role_id = " . $this->role_id);
@@ -154,7 +154,7 @@ class roles
 	public function make_role()
 	{
 		$sql = 'SELECT max(role_id) + 1 AS new_role_id FROM ' . $this->bb_gameroles_table . ' WHERE ' .
-			" game_id = '" . $this->game_id . "'";
+			" game_id = '" . $this->db->sql_escape($this->game_id) . "'";
 		$resultc = $this->db->sql_query($sql);
 
 		$this->role_id = (int) $this->db->sql_fetchfield('new_role_id', false, $resultc);
@@ -216,7 +216,7 @@ class roles
 
 		$sql = 'UPDATE ' . $this->bb_language_table  . ' SET ' . $this->db->sql_build_array('UPDATE', $names) . '
              WHERE attribute_id = ' . $oldrole->role_id . " AND attribute='role'
-             AND language= '" . $this->config['bbguild_lang'] . "' AND game_id = '" . $this->game_id . "'";
+             AND language= '" . $this->config['bbguild_lang'] . "' AND game_id = '" . $this->db->sql_escape($this->game_id) . "'";
 		$this->db->sql_query($sql);
 
 		$this->db->sql_transaction('commit');
@@ -234,11 +234,11 @@ class roles
 	{
 		$this->db->sql_transaction('begin');
 
-		$sql = 'DELETE FROM ' . $this->bb_gameroles_table . ' WHERE role_id  = ' . $this->role_id . " and game_id = '" . $this->game_id . "'";
+		$sql = 'DELETE FROM ' . $this->bb_gameroles_table . ' WHERE role_id  = ' . $this->role_id . " and game_id = '" . $this->db->sql_escape($this->game_id) . "'";
 		$this->db->sql_query($sql);
 
 		$sql = 'DELETE FROM ' . $this->bb_language_table  . " WHERE language= '" . $this->config['bbguild_lang'] . "' AND attribute = 'role'
-                and attribute_id= " . $this->role_id . " and game_id = '" . $this->game_id . "'";
+                and attribute_id= " . $this->role_id . " and game_id = '" . $this->db->sql_escape($this->game_id) . "'";
 		$this->db->sql_query($sql);
 
 		$this->db->sql_transaction('commit');
@@ -251,10 +251,10 @@ class roles
 	 */
 	public function delete_all_roles()
 	{
-		$sql = 'DELETE FROM ' . $this->bb_gameroles_table . " WHERE game_id = '" .   $this->game_id . "'"  ;
+		$sql = 'DELETE FROM ' . $this->bb_gameroles_table . " WHERE game_id = '" .   $this->db->sql_escape($this->game_id) . "'"  ;
 		$this->db->sql_query($sql);
 
-		$sql = 'DELETE FROM ' . $this->bb_language_table  . " WHERE attribute = 'role' AND game_id = '" . $this->game_id . "'";
+		$sql = 'DELETE FROM ' . $this->bb_language_table  . " WHERE attribute = 'role' AND game_id = '" . $this->db->sql_escape($this->game_id) . "'";
 		$this->db->sql_query($sql);
 
 		$this->cache->destroy('sql', $this->bb_gameroles_table);

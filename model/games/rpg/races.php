@@ -128,7 +128,7 @@ class races
 						AND r.race_id = l.attribute_id
 						AND l.attribute='race'
 						AND l.language= '" . $this->config['bbguild_lang'] . "'
-						AND l.game_id = '" . $this->game_id . "'
+						AND l.game_id = '" . $this->db->sql_escape($this->game_id) . "'
 						AND r.race_id = " . $this->race_id
 		);
 
@@ -154,7 +154,7 @@ class races
 		$sql = 'SELECT COUNT(race_id) AS countrace
 			FROM ' . $this->bb_races_table . '
 			WHERE race_id  = ' . $this->race_id . "
-			AND game_id = '" . $this->game_id . "'";
+			AND game_id = '" . $this->db->sql_escape($this->game_id) . "'";
 		$resultr = $this->db->sql_query($sql);
 		$a = $this->db->sql_fetchfield('countrace', false, $resultr);
 		if (( int ) $a > 0)
@@ -206,7 +206,7 @@ class races
 		'WHERE' => 'm.player_race_id = r.race_id
 		    			and r.race_id =  ' .  $this->race_id . "
 		    			and r.game_id = m.game_id
-		    			and r.game_id = '" . $this->game_id . "'" );
+		    			and r.game_id = '" . $this->db->sql_escape($this->game_id) . "'" );
 
 		$sql = $this->db->sql_build_query('SELECT', $sql_array);
 		$result = $this->db->sql_query($sql);
@@ -220,13 +220,13 @@ class races
 		{
 			$this->db->sql_transaction('begin');
 
-			$sql = 'DELETE FROM ' . $this->bb_races_table . ' WHERE race_id =' . $this->race_id . " AND game_id = '" . $this->game_id . "'";
+			$sql = 'DELETE FROM ' . $this->bb_races_table . ' WHERE race_id =' . $this->race_id . " AND game_id = '" . $this->db->sql_escape($this->game_id) . "'";
 			$this->db->sql_query($sql);
 
 			$sql = 'DELETE FROM ' . $this->bb_language_table  . " WHERE language= '" . $this->config['bbguild_lang'] . "'
 							AND attribute = 'race'
 							AND attribute_id= " . $this->race_id . "
-							AND game_id = '" . $this->game_id . "'";
+							AND game_id = '" . $this->db->sql_escape($this->game_id) . "'";
 
 			$this->db->sql_query($sql);
 
@@ -244,11 +244,11 @@ class races
 	 */
 	public function delete_all_races()
 	{
-		$sql = 'DELETE FROM ' . $this->bb_races_table  . " WHERE game_id = '" .   $this->game_id . "'"  ;
+		$sql = 'DELETE FROM ' . $this->bb_races_table  . " WHERE game_id = '" .   $this->db->sql_escape($this->game_id) . "'"  ;
 		$this->db->sql_query($sql);
 
 		$sql = 'DELETE FROM ' . $this->bb_language_table  . " WHERE attribute = 'race'
-							AND game_id = '" . $this->game_id . "'";
+							AND game_id = '" . $this->db->sql_escape($this->game_id) . "'";
 
 		$this->db->sql_query($sql);
 
@@ -304,7 +304,7 @@ class races
 			$this->bb_games_table => 'g'
 		),
 		'WHERE' => " r.race_faction_id = f.faction_id
-					AND f.game_id = r.game_id AND r.game_id = g.game_id AND r.game_id = '" . $this->game_id . "'
+					AND f.game_id = r.game_id AND r.game_id = g.game_id AND r.game_id = '" . $this->db->sql_escape($this->game_id) . "'
 		    		AND l.attribute_id = r.race_id AND l.game_id = r.game_id and l.language= '" . $this->config['bbguild_lang'] . "'
 		    		AND l.attribute = 'race' ", 'ORDER_BY' => $order );
 

@@ -192,7 +192,7 @@ class classes
 			$this->bb_language_table => 'l' ),
 		'WHERE' => " c.class_id = l.attribute_id
 							AND l.attribute='class'
-							AND l.game_id = '" . $this->game_id . "'
+							AND l.game_id = '" . $this->db->sql_escape($this->game_id) . "'
 							AND c.game_id = l.game_id
 							AND l.language= '" . $this->config['bbguild_lang'] . "'
 							AND c.class_id = " . $this->class_id);
@@ -221,7 +221,7 @@ class classes
 	public function make_class()
 	{
 		$sql = 'SELECT count(*) AS countclass FROM ' . $this->bb_classes_table . ' WHERE class_id  = ' .
-		$this->class_id . " AND game_id = '" . $this->game_id . "'";
+		$this->class_id . " AND game_id = '" . $this->db->sql_escape($this->game_id) . "'";
 		$resultc = $this->db->sql_query($sql);
 
 		if (( int ) $this->db->sql_fetchfield('countclass', false, $resultc) > 0)
@@ -273,7 +273,7 @@ class classes
 		'FROM' => array (
 			$this->bb_players_table => 'm',
 			$this->bb_classes_table => 'c' ),
-		'WHERE' =>     "m.game_id = c.game_id AND m.game_id = '" . $this->game_id . "'
+		'WHERE' =>     "m.game_id = c.game_id AND m.game_id = '" . $this->db->sql_escape($this->game_id) . "'
     					and m.player_class_id = c.class_id AND c.class_id =  " . $this->class_id ,
 		'GROUP_BY' => 'c.class_id'
 		);
@@ -287,11 +287,11 @@ class classes
 		{
 			$this->db->sql_transaction('begin');
 
-			$sql = 'DELETE FROM ' . $this->bb_classes_table . ' WHERE class_id  = ' . $this->class_id . " and game_id = '" . $this->game_id . "'";
+			$sql = 'DELETE FROM ' . $this->bb_classes_table . ' WHERE class_id  = ' . $this->class_id . " and game_id = '" . $this->db->sql_escape($this->game_id) . "'";
 			$this->db->sql_query($sql);
 
 			$sql = 'DELETE FROM ' . $this->bb_language_table . " WHERE language= '" . $this->config['bbguild_lang'] . "' AND attribute = 'class'
-					and attribute_id= " . $this->class_id . " and game_id = '" . $this->game_id . "'";
+					and attribute_id= " . $this->class_id . " and game_id = '" . $this->db->sql_escape($this->game_id) . "'";
 			$this->db->sql_query($sql);
 
 			$this->db->sql_transaction('commit');
@@ -310,11 +310,11 @@ class classes
 	 */
 	public function delete_all_classes()
 	{
-		$sql = 'DELETE FROM ' . $this->bb_classes_table . " WHERE game_id = '" .   $this->game_id . "'"  ;
+		$sql = 'DELETE FROM ' . $this->bb_classes_table . " WHERE game_id = '" .   $this->db->sql_escape($this->game_id) . "'"  ;
 		$this->db->sql_query($sql);
 
 		$sql = 'DELETE FROM ' . $this->bb_language_table . " WHERE attribute = 'class'
-							AND game_id = '" . $this->game_id . "'";
+							AND game_id = '" . $this->db->sql_escape($this->game_id) . "'";
 		$this->db->sql_query($sql);
 
 		$this->cache->destroy('sql', $this->bb_classes_table);
@@ -332,7 +332,7 @@ class classes
 		$sql = 'SELECT count(*) AS countclass FROM ' . $this->bb_classes_table . '
 				WHERE c_index != ' . $this->c_index . "
 				AND class_id = '" . $this->db->sql_escape($oldclass->class_id) . "'
-				AND game_id = '" . $this->game_id. "'";
+				AND game_id = '" . $this->db->sql_escape($this->game_id) . "'";
 
 		$result = $this->db->sql_query($sql);
 		if (( int ) $this->db->sql_fetchfield('countclass', false, $result) > 0)
@@ -364,7 +364,7 @@ class classes
 
 		$sql = 'UPDATE ' . $this->bb_language_table . ' SET ' . $this->db->sql_build_array('UPDATE', $names) . '
 		 WHERE attribute_id = ' . $oldclass->class_id . " AND attribute='class'
-		 AND language= '" . $this->config['bbguild_lang'] . "' AND game_id = '" . $this->game_id . "'";
+		 AND language= '" . $this->config['bbguild_lang'] . "' AND game_id = '" . $this->db->sql_escape($this->game_id) . "'";
 		$this->db->sql_query($sql);
 
 		$this->db->sql_transaction('commit');
