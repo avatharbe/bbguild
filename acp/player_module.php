@@ -282,7 +282,7 @@ class player_module
 					$this->guild->setGuildid($this->request->variable('player_guild_id', 0));
 				}
 
-				$sortlink = isset($_GET[constants::URI_GUILD])  ? true : false;
+				$sortlink = $this->request->is_set(constants::URI_GUILD, \phpbb\request\request_interface::GET);
 				if ($sortlink)
 				{
 					// user selected dropdown - get guildid
@@ -726,7 +726,7 @@ class player_module
 		$minlevel = $this->request->variable('minlevel', 0);
 		$maxlevel = $this->request->variable('maxlevel', 200);
 
-		if (isset($_GET['active']) || isset($_GET['nonactive']) || $this->request->is_set_post('search') )
+		if ($this->request->is_set('active', \phpbb\request\request_interface::GET) || $this->request->is_set('nonactive', \phpbb\request\request_interface::GET) || $this->request->is_set_post('search') )
 		{
 			$selectactive    = $this->request->variable('active', 0);
 			$selectnonactive = $this->request->variable('nonactive', 0);
@@ -751,7 +751,7 @@ class player_module
 		$current_order   = $util->switch_order($sort_order);
 		$sort_index      = explode('.', $current_order['uri']['current']);
 		$previous_source = preg_replace('/( (asc|desc))?/i', '', $sort_order[$sort_index[0]][$sort_index[1]]);
-		$show_all        = ((isset($_GET['show'])) && $this->request->variable('show', '') == 'all') ? true : false;
+		$show_all        = (($this->request->is_set('show', \phpbb\request\request_interface::GET)) && $this->request->variable('show', '') == 'all') ? true : false;
 
 		$result       = $this->guild->list_players($current_order['sql'], 0, 0, $minlevel, $maxlevel, $selectactive, $selectnonactive, $player_filter);
 		$player_count = 0;

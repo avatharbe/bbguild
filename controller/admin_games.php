@@ -436,14 +436,14 @@ class admin_games
 		$action = $this->request->variable('action', '');
 		$addfaction = $this->request->is_set_post('showfactionadd');
 		$addrace = $this->request->is_set_post('showraceadd');
-		$raceedit = (isset($_GET['raceedit'])) ? true : false;
-		$racedelete = (isset($_GET['racedelete'])) ? true : false;
+		$raceedit = $this->request->is_set('raceedit', \phpbb\request\request_interface::GET);
+		$racedelete = $this->request->is_set('racedelete', \phpbb\request\request_interface::GET);
 		$addclass = $this->request->is_set_post('showclassadd');
-		$classedit = (isset($_GET['classedit'])) ? true : false;
-		$classdelete = (isset($_GET['classdelete'])) ? true : false;
+		$classedit = $this->request->is_set('classedit', \phpbb\request\request_interface::GET);
+		$classdelete = $this->request->is_set('classdelete', \phpbb\request\request_interface::GET);
 		$addspec = $this->request->is_set_post('showspecadd');
-		$specedit = (isset($_GET['specedit'])) ? true : false;
-		$specdelete = (isset($_GET['specdelete'])) ? true : false;
+		$specedit = $this->request->is_set('specedit', \phpbb\request\request_interface::GET);
+		$specdelete = $this->request->is_set('specdelete', \phpbb\request\request_interface::GET);
 
 		// Save handlers for add/edit forms
 		$save_faction_add = $this->request->is_set_post('factionadd');
