@@ -131,7 +131,7 @@ class roles
 							AND l.game_id = '" . $this->db->sql_escape($this->game_id) . "'
 							AND r.game_id = l.game_id
 							AND l.language= '" . $this->config['bbguild_lang'] . "'
-							AND r.role_id = " . $this->role_id);
+							AND r.role_id = " . ( int ) $this->role_id);
 
 		$sql = $this->db->sql_build_query('SELECT', $sql_array);
 		$result = $this->db->sql_query($sql);
@@ -204,7 +204,7 @@ class roles
 		$this->db->sql_transaction('begin');
 
 		$sql = 'UPDATE ' . $this->bb_gameroles_table . ' SET ' . $this->db->sql_build_array('UPDATE', $data) . '
-			    WHERE role_pkid = ' . $this->role_pkid;
+			    WHERE role_pkid = ' . ( int ) $this->role_pkid;
 
 		$this->db->sql_query($sql);
 
@@ -215,7 +215,7 @@ class roles
 			'name_short' => ( string ) $this->rolename);
 
 		$sql = 'UPDATE ' . $this->bb_language_table  . ' SET ' . $this->db->sql_build_array('UPDATE', $names) . '
-             WHERE attribute_id = ' . $oldrole->role_id . " AND attribute='role'
+             WHERE attribute_id = ' . ( int ) $oldrole->role_id . " AND attribute='role'
              AND language= '" . $this->config['bbguild_lang'] . "' AND game_id = '" . $this->db->sql_escape($this->game_id) . "'";
 		$this->db->sql_query($sql);
 
@@ -234,11 +234,11 @@ class roles
 	{
 		$this->db->sql_transaction('begin');
 
-		$sql = 'DELETE FROM ' . $this->bb_gameroles_table . ' WHERE role_id  = ' . $this->role_id . " and game_id = '" . $this->db->sql_escape($this->game_id) . "'";
+		$sql = 'DELETE FROM ' . $this->bb_gameroles_table . ' WHERE role_id  = ' . ( int ) $this->role_id . " and game_id = '" . $this->db->sql_escape($this->game_id) . "'";
 		$this->db->sql_query($sql);
 
 		$sql = 'DELETE FROM ' . $this->bb_language_table  . " WHERE language= '" . $this->config['bbguild_lang'] . "' AND attribute = 'role'
-                and attribute_id= " . $this->role_id . " and game_id = '" . $this->db->sql_escape($this->game_id) . "'";
+                and attribute_id= " . ( int ) $this->role_id . " and game_id = '" . $this->db->sql_escape($this->game_id) . "'";
 		$this->db->sql_query($sql);
 
 		$this->db->sql_transaction('commit');

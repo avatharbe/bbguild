@@ -129,7 +129,7 @@ class races
 						AND l.attribute='race'
 						AND l.language= '" . $this->config['bbguild_lang'] . "'
 						AND l.game_id = '" . $this->db->sql_escape($this->game_id) . "'
-						AND r.race_id = " . $this->race_id
+						AND r.race_id = " . ( int ) $this->race_id
 		);
 
 		$sql = $this->db->sql_build_query('SELECT', $sql_array);
@@ -153,7 +153,7 @@ class races
 	{
 		$sql = 'SELECT COUNT(race_id) AS countrace
 			FROM ' . $this->bb_races_table . '
-			WHERE race_id  = ' . $this->race_id . "
+			WHERE race_id  = ' . ( int ) $this->race_id . "
 			AND game_id = '" . $this->db->sql_escape($this->game_id) . "'";
 		$resultr = $this->db->sql_query($sql);
 		$a = $this->db->sql_fetchfield('countrace', false, $resultr);
@@ -204,7 +204,7 @@ class races
 			$this->bb_players_table => 'm',
 			$this->bb_races_table => 'r' ),
 		'WHERE' => 'm.player_race_id = r.race_id
-		    			and r.race_id =  ' .  $this->race_id . "
+		    			and r.race_id =  ' .  ( int ) $this->race_id . "
 		    			and r.game_id = m.game_id
 		    			and r.game_id = '" . $this->db->sql_escape($this->game_id) . "'" );
 
@@ -220,12 +220,12 @@ class races
 		{
 			$this->db->sql_transaction('begin');
 
-			$sql = 'DELETE FROM ' . $this->bb_races_table . ' WHERE race_id =' . $this->race_id . " AND game_id = '" . $this->db->sql_escape($this->game_id) . "'";
+			$sql = 'DELETE FROM ' . $this->bb_races_table . ' WHERE race_id =' . ( int ) $this->race_id . " AND game_id = '" . $this->db->sql_escape($this->game_id) . "'";
 			$this->db->sql_query($sql);
 
 			$sql = 'DELETE FROM ' . $this->bb_language_table  . " WHERE language= '" . $this->config['bbguild_lang'] . "'
 							AND attribute = 'race'
-							AND attribute_id= " . $this->race_id . "
+							AND attribute_id= " . ( int ) $this->race_id . "
 							AND game_id = '" . $this->db->sql_escape($this->game_id) . "'";
 
 			$this->db->sql_query($sql);
@@ -278,7 +278,7 @@ class races
 		'name' => ( string ) $this->race_name, 'name_short' => ( string ) $this->race_name );
 
 		$sql = 'UPDATE ' . $this->bb_language_table  . ' SET ' . $this->db->sql_build_array('UPDATE', $names) . '
-			WHERE attribute_id = ' . $this->race_id . " AND attribute='race'  AND language= '" . $this->config['bbguild_lang'] . "' AND game_id =   '" . $this->db->sql_escape($this->game_id) . "'";
+			WHERE attribute_id = ' . ( int ) $this->race_id . " AND attribute='race'  AND language= '" . $this->config['bbguild_lang'] . "' AND game_id =   '" . $this->db->sql_escape($this->game_id) . "'";
 		$this->db->sql_query($sql);
 
 		$this->db->sql_transaction('commit');
