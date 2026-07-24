@@ -183,7 +183,7 @@ class roster extends module_base
 		}
 		else
 		{
-			$this->display_grid($players, $characters, $ext_path_images, $base_url, $start, $filter, $query_by_armor, $spec_lookup);
+			$this->display_grid($players, $characters, $ext_path_images, $base_url, $start, $filter, $query_by_armor, $class_id, $spec_lookup);
 		}
 
 		$this->template->assign_vars([
@@ -334,11 +334,11 @@ class roster extends module_base
 	/**
 	 * Display the grid (grouped by class) view.
 	 */
-	protected function display_grid(player $players, array $characters, string $ext_path_images, string $base_url, int $start, string $filter, bool $query_by_armor, array $spec_lookup = []): void
+	protected function display_grid(player $players, array $characters, string $ext_path_images, string $base_url, int $start, string $filter, bool $query_by_armor, int $class_id = 0, array $spec_lookup = []): void
 	{
 		$classgroup = $players->get_classes(
 			$filter, $query_by_armor,
-			0, $players->game_id, $this->guild_id, 0, 0, 200
+			$class_id, $players->game_id, $this->guild_id, 0, 0, 200
 		);
 
 		if (count($classgroup) > 0)
