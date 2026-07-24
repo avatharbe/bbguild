@@ -1,10 +1,18 @@
 # Changelog
 
-## 2.0.0-rc1 23/07/2026
+## 2.0.0-rc1 24/07/2026
+  - [FIX] SQL injection risk (#352): `game_id` interpolated unescaped into raw-concatenated queries across `game.php` and the `rpg/{classes,races,roles,faction}` models (~33 sites) — now consistently escaped via `sql_escape()`, matching the pattern already used correctly in a handful of sibling methods
+  - [FIX] Follow-up hardening (#352): `class_id`/`c_index`, `race_id`, `role_id`/`role_pkid`, and `faction_id` cast to `(int)` at every remaining raw-concatenated SQL site in those same models — not previously exploitable (every caller already passed pre-cast ints) but fragile without the query itself being protected
   - [FIX] `u_bbguild`, `u_charclaim`, `u_charadd`, `u_chardelete`, `u_charupdate` defaulting to "No" for REGISTERED, ADMINISTRATORS, and GLOBAL_MODERATORS on installs that manage user permissions via direct per-group grants instead of the stock role templates — v200b3's role-based grant never reached them; now also granted directly, matching the pattern already used for GUESTS
+  - [FIX] Fresh-install failure: `bbguild_version` was never created via `config.add` anywhere in the migration history (only ever updated), so a genuinely from-scratch install failed with `CONFIG_NOT_EXIST` during the v200b4 migration
+  - [FIX] `bb_language.language` column (`CHAR:2`) too narrow for this project's own `es_x_tu`-style locale codes (used across recenttopics/bbaccounts/bbpoints) — widened to `VCHAR:10`; previously crashed bbguildwow's install outright with a hard SQL error, and would hit any game plugin shipping that locale
+  - [FIX] PHP 8.2+ "creation of dynamic property" deprecation warnings on every `player` instantiation — `ext_path`/`time`/`games` are now declared properties instead of ad-hoc constructor assignments
+  - [FIX] 9 raw `$_GET` reads in `admin_games.php`/`acp/player_module.php` replaced with `$this->request->is_set(..., GET)`, consistent with every neighboring input check in those same methods
+  - [FIX] `@unlink()` + `@`-suppressed `file_exists()` in `delete_guild()`'s emblem cleanup replaced with the phpBB filesystem service (`exists()`/`remove()`), preserving the existing best-effort semantics
   - [FIX] Claiming/unclaiming a character (#290) and the guild achievements pane (#278) confirmed already shipped in earlier b-releases; stale roadmap notes removed
+  - [CHG] `bbguild_version` moved out of `phpbb_config` entirely into `ext::BBGUILD_VERSION`, a class constant (#353) — matches `avatharbe/recenttopics`'s `ext::RT_VERSION` pattern; the ACP version-check panel and every migration's `effectively_installed()` now read from it (or a concrete per-migration artifact check) instead of a config row
   - [DOCS] Individual player page (#288) deferred to 2.1.0 as a portal-module conversion — the existing standalone page ships and works in rc1
-  - [DOCS] Unit test coverage added for the character claim/unclaim flow (#244)
+  - [DOCS] Unit test coverage added for guild CRUD (`update_guilddefault`, `get_guild`, `update_guild`) and the character claim/unclaim flow (#244)
   - All 8 issues in the GitHub 2.0.0-rc1 milestone confirmed shipped: guild pane, achievements pane, player page, claiming/unclaiming, UCP language files, UCP bugfixes, roster portal grid view, game-plugin compatibility
 
 ## 2.0.0-b4 28/04/2026
