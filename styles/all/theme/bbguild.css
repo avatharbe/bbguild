@@ -36,6 +36,10 @@ table.table1.bbguild th {
    pbwow3/pbtech/avathar children) already sizes ".search-box .inputbox"
    and ".search-box button.search-icon" for that full-size widget. Reusing
    the name here inflated the roster filter field/button to match it. */
+.roster-search-box {
+    padding-top: 3px;
+}
+
 .roster-search-box fieldset {
     border: none;
     margin: 0;
