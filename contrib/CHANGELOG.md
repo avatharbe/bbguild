@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.0.0-rc2 24/07/2026
+  - [FIX] Roster search form (layout/filter dropdowns, name search, submit button) disappeared entirely when a search returned zero results, leaving no way to search again without navigating away — the form was nested inside the same conditional as the results listing
+  - [FIX] Class filter did nothing in the roster's "grouped by class" grid view — `display_grid()` called `player::get_classes()` with a hardcoded `0` for the class id instead of the actual selected class, so every class still got a heading regardless of the filter (armor-type filters were unaffected, since that branch doesn't depend on class id)
+  - [CHG] Split the roster's combined class/armor-type filter into two independent dropdowns (`class_filter` and `armor_filter`) — the single merged `filter` pulldown (disambiguated server-side by checking which lookup array the value matched) was legacy EQDKP design and is what made the class-filter bug above possible in the first place
+  - [FIX] Roster search field and filter button rendered oversized — the filter box reused phpBB's reserved `search-box` class, which every active style already sizes for the full header search widget; renamed to `roster-search-box` and given its own compact sizing, decoupled from any site-style search-box CSS
+  - [FIX] Roster search field/button sat ~2px off from the layout/class/armor dropdowns — the site style sizes `<select>` and `<button>` on different box-sizing/line-height bases; every control in the filter row now gets the same explicit height/line-height/box-sizing so they line up regardless
+  - [FIX] UCP "bbGuild" tab (character claim/add) was entirely hidden for admin accounts not also in REGISTERED — v200rc1 only granted ADMINISTRATORS/GLOBAL_MODERATORS the `u_bbguild` view-only floor, but the UCP modes require `u_charclaim`/`u_charadd` specifically; ADMINISTRATORS now also gets `u_charclaim`/`u_charadd`/`u_chardelete`/`u_charupdate` (GLOBAL_MODERATORS intentionally stays view-only)
+  - [DOCS] README fixed: stale `bbguild_<game>` naming corrected to `bbguild<game>`, and the specialization system (#331) — previously undocumented — added to the feature list
+
 ## 2.0.0-rc1 24/07/2026
   - [FIX] SQL injection risk (#352): `game_id` interpolated unescaped into raw-concatenated queries across `game.php` and the `rpg/{classes,races,roles,faction}` models (~33 sites) — now consistently escaped via `sql_escape()`, matching the pattern already used correctly in a handful of sibling methods
   - [FIX] Follow-up hardening (#352): `class_id`/`c_index`, `race_id`, `role_id`/`role_pkid`, and `faction_id` cast to `(int)` at every remaining raw-concatenated SQL site in those same models — not previously exploitable (every caller already passed pre-cast ints) but fragile without the query itself being protected

@@ -6,7 +6,7 @@ bbGuild is a guild management extension for phpBB 3.3+. It provides guild roster
 
 - **Vendor namespace:** `avathar\bbguild`
 - **Entry point:** `ext.php`
-- **Requirements:** PHP >= 7.4, phpBB >= 3.3, GD, cURL
+- **Requirements:** PHP >= 8.1, phpBB >= 3.3, GD, cURL
 
 ## Directory Structure
 
@@ -18,8 +18,10 @@ bbguild/
 ├── event/                  # phpBB event listeners
 ├── language/               # Localization (en, de, fr, it, nl, es_x_tu, pl)
 ├── migrations/             # Database migrations
-│   ├── basics/             # Initial install (schema, data, config, permissions, modules)
-│   └── v200b2/             # 2.0.0-b2 (schema fix, release stamp)
+│   ├── v200b3/             # 2.0.0-b3 — squashed base install (schema, data, config, permissions, modules)
+│   ├── v200b4/             # 2.0.0-b4 — specialization system (bb_specializations, player_spec_id)
+│   ├── v200rc1/            # 2.0.0-rc1 — permission fixes, bb_language column widen
+│   └── v200rc2/            # 2.0.0-rc2 — ADMINISTRATORS char-management permissions
 ├── model/                  # Business logic and data access
 │   ├── admin/              # Utilities: curl, log, constants, util
 │   ├── api/                # Battle.net API client
@@ -116,7 +118,7 @@ The primary route is `/guild/{guild_id}`. The legacy `/guild/{page}/{guild_id}` 
 
 ## ACP Modules
 
-Registered via migrations in `migrations/basics/modules.php`:
+Registered via `update_data()` in `migrations/v200b3/release_2_0_0_b3.php`:
 
 | Category | Module | Controller |
 |---|---|---|
@@ -135,7 +137,10 @@ Registered via migrations in `migrations/basics/modules.php`:
 
 ## Database Schema
 
-21 tables total (see `database.html` for full column details):
+16 tables in core (see `database.html` for full column details). Achievement tables
+(`bb_achievement`, `bb_achievement_track`, `bb_achievement_criteria`,
+`bb_achievement_rewards`, `bb_relations_table`, `bb_criteria_track`) are **not**
+created by core — they belong to the `bbguildwow` game plugin's own migrations.
 
 ### Core Tables
 | Table | Purpose |
@@ -148,6 +153,7 @@ Registered via migrations in `migrations/basics/modules.php`:
 | `bb_news` | Guild news items |
 | `bb_motd` | Message of the Day |
 | `bb_recruit` | Recruitment postings |
+| `bb_specializations` | Class/role specializations (#331 — e.g. Frost Mage vs Fire Mage) |
 
 ### Game Content Tables
 | Table | Purpose |
@@ -164,17 +170,7 @@ Registered via migrations in `migrations/basics/modules.php`:
 | `bb_portal_modules` | Module layout per guild (column, order, status) |
 | `bb_portal_config` | Module config values per guild |
 
-### Achievement Tables (WoW)
-| Table | Purpose |
-|---|---|
-| `bb_achievement` | Achievement definitions |
-| `bb_achievement_track` | Guild achievement progress |
-| `bb_achievement_criteria` | Achievement criteria |
-| `bb_achievement_rewards` | Achievement rewards |
-| `bb_relations_table` | Achievement relationships |
-| `bb_criteria_track` | Criteria progress tracking |
-
-### Planned (schema TBD)
+### Planned (schema TBD, not yet created)
 | Table | Purpose |
 |---|---|
 | `bb_bosstable` | Boss encounters |
@@ -182,7 +178,11 @@ Registered via migrations in `migrations/basics/modules.php`:
 
 ## Game Plugin System
 
-Games are external extensions at `ext/avathar/bbguild_<game>/`. Each plugin provides:
+Games are external extensions at `ext/avathar/bbguild<game>/` (no separator —
+composer name, directory, PHP namespace, and GitHub repo all match; dropped
+in 2.0.0-b4 since phpBB's extension class loader can't handle a hyphenated
+directory name and EPV rejects underscores in the composer name). Each
+plugin provides:
 
 - `composer.json` + `ext.php` (standard phpBB extension)
 - `game/<game>_provider.php` implementing `game_provider_interface`
@@ -195,15 +195,15 @@ Providers are collected via `phpbb\di\service_collection` (tagged `bbguild.game_
 ### Available Plugins
 | Plugin | Game | API |
 |---|---|---|
-| `bbguild_wow` | World of Warcraft | Battle.net |
-| `bbguild_gw2` | Guild Wars 2 | - |
-| `bbguild_lotro` | Lord of the Rings Online | - |
-| `bbguild_eq` | EverQuest | - |
-| `bbguild_eq2` | EverQuest 2 | - |
-| `bbguild_ffxi` | Final Fantasy XI | - |
-| `bbguild_ffxiv` | Final Fantasy XIV | - |
-| `bbguild_swtor` | Star Wars: The Old Republic | - |
-| `bbguild_lineage2` | Lineage 2 | - |
+| `bbguildwow` | World of Warcraft | Battle.net |
+| `bbguildgw2` | Guild Wars 2 | - |
+| `bbguildlotro` | Lord of the Rings Online | - |
+| `bbguildeq` | EverQuest | - |
+| `bbguildeq2` | EverQuest 2 | - |
+| `bbguildffxi` | Final Fantasy XI | - |
+| `bbguildffxiv` | Final Fantasy XIV | - |
+| `bbguildswtor` | Star Wars: The Old Republic | - |
+| `bbguildlineage2` | Lineage 2 | - |
 
 A built-in "Custom" game is included in core (`model/games/library/install_custom.php`).
 
@@ -227,13 +227,35 @@ The log system (`model/admin/log.php`) follows the phpBB log design pattern:
 | `u_chardelete` | User | Delete a character |
 | `u_charupdate` | User | Update a character |
 
+Default grants are a mix of role-based (`ROLE_USER_STANDARD`/`ROLE_USER_FULL`,
+`ROLE_ADMIN_FULL`/`ROLE_ADMIN_STANDARD`) and direct per-group grants. Direct
+grants exist because installs that manage `u_` permissions via direct
+per-group checkboxes instead of the stock role templates never inherit a
+role-based grant at all — REGISTERED, ADMINISTRATORS, GLOBAL_MODERATORS, and
+GUESTS each get an explicit direct `u_bbguild` grant for this reason
+(`v200rc1`); ADMINISTRATORS additionally gets the full `u_char*` set so the
+UCP "bbGuild" tab isn't hidden for an admin who isn't also in REGISTERED
+(`v200rc2`). GLOBAL_MODERATORS intentionally stays view-only.
+
 ## Migration Chain
 
 ```
-basics/schema -> basics/data -> basics/config -> basics/permissions -> basics/modules
-    -> v200b2/release_2_0_0_b2
+v200b3/release_2_0_0_b3   (squashed base install: schema, data, config, permissions, modules)
+    -> v200b4/release_2_0_0_b4   (specialization system: bb_specializations, player_spec_id)
+    -> v200rc1/release_2_0_0_rc1 (permission fixes, bb_language column widen, bbguild_version cleanup)
+    -> v200rc2/release_2_0_0_rc2 (ADMINISTRATORS char-management permissions)
 ```
 
-## Future: DKP Plugin
+Each migration's `effectively_installed()` checks a concrete artifact it
+itself creates (a table, a column, a permission grant) rather than a
+version-string comparison — the version now lives solely in
+`ext::BBGUILD_VERSION`, not in `phpbb_config` (see `contrib/CHANGELOG.md`'s
+2.0.0-rc1 entry for why).
 
-The DKP (Dragon Kill Points) system is being developed as a separate extension at https://github.com/avatharbe/bbDKP. It will provide raid tracking, loot management, point pools, and its own log types. See issue [#321](https://github.com/avatharbe/bbguild/issues/321).
+## DKP Plugin
+
+The DKP (Dragon Kill Points) system ships as a separate extension at
+https://github.com/avatharbe/bbDKP — a ground-up rewrite (not just planned;
+`v2.0.0-alpha1`/`alpha2` already shipped) using bbAccounts as its canonical
+ledger. It provides raid tracking, loot management, point pools, and its own
+log types. See issue [#321](https://github.com/avatharbe/bbguild/issues/321).

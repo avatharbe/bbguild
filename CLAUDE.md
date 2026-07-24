@@ -5,7 +5,7 @@
 **bbGuild** is a Guild Management System for phpBB 3.3+ designed for World of Warcraft gaming communities. It provides guild roster management, character tracking, achievements, recruitment, and integration with the Battle.net API.
 
 - **Author:** Andreas Vandenberghe (Sajaki)
-- **Version:** 2.0.0-b4 (beta, tagged 2026-04-28; not yet announced on the forum)
+- **Version:** 2.0.0-rc2 (release candidate; version lives in `ext::BBGUILD_VERSION`, not `phpbb_config`)
 - **License:** GPL-2.0-only
 - **Repository:** https://github.com/avatharbe/bbguild
 
@@ -14,7 +14,7 @@
 | Metric | Value |
 |--------|-------|
 | First commit | May 28, 2010 |
-| Status | Phase 2 in progress, Portal refactored |
+| Status | rc2 track — bug fixes accumulating on `main` since the `v2.0.0-rc1` tag/release |
 | Tracking issue | [#303](https://github.com/avatharbe/bbguild/issues/303) |
 
 ## Requirements
@@ -42,8 +42,10 @@ bbguild/
 │   └── modules/          # Module infrastructure + built-in modules
 ├── event/                 # Event listeners
 ├── migrations/            # Database migrations
-│   ├── basics/           # Initial install (schema, data, config, permissions, modules)
-│   └── v200b2/           # Release 2.0.0-b2 (schema fix, version stamp)
+│   ├── v200b3/           # Squashed base install (schema, data, config, permissions, modules)
+│   ├── v200b4/           # Specialization system (bb_specializations, player_spec_id)
+│   ├── v200rc1/          # Permission fixes, bb_language column widen
+│   └── v200rc2/          # ADMINISTRATORS char-management permissions
 ├── config/                # Services and routing (YAML)
 ├── styles/                # Templates
 ├── language/              # Localization (en, fr, de, it, nl, es_x_tu, pl)
@@ -64,25 +66,23 @@ bbguild/
 | `ajax_controller.php` | AJAX endpoints (faction, rank, player, class/race selectors) |
 | `validator.php` | Input validation |
 
-### Database Tables (21)
+### Database Tables (16 in core)
 
-**Core:** bb_games, bb_guild, bb_players, bb_ranks, bb_logs, bb_news, bb_motd
+**Core:** bb_games, bb_guild, bb_players, bb_ranks, bb_logs, bb_news, bb_motd, bb_recruit, bb_specializations
 
 **Portal:** bb_portal_modules, bb_portal_config
 
 **Game Content:** bb_classes, bb_races, bb_factions, bb_gameroles, bb_language
 
-**Recruitment:** bb_recruit
-
-**Achievements (WoW-only):** bb_achievement, bb_achievement_track, bb_achievement_criteria, bb_achievement_rewards, bb_relations_table, bb_criteria_track
-
 **Not yet created (roadmap):** bb_bosstable, bb_zonetable (defined in tables.yml, schema TBD)
+
+Achievement tables (`bb_achievement`, `bb_achievement_track`, `bb_achievement_criteria`, `bb_achievement_rewards`, `bb_relations_table`, `bb_criteria_track`) are **not** core tables — they belong to the `bbguildwow` game plugin's own migrations.
 
 ### Supported Games (via plugins)
 
 WoW (Battle.net API), GW2, LOTRO, EQ, EQ2, FFXI, FFXIV, SWTOR, Lineage 2, Custom
 
-Game plugins live at `ext/avathar/bbguild_<game>/`. Each provides a provider + installer; game data is seeded on-demand from ACP (not via migrations). Archived: AION, DAOC, Rift, TERA, Vanguard, Warhammer.
+Game plugins live at `ext/avathar/bbguild<game>/` (no separator — composer name, directory, PHP namespace, and GitHub repo all match; dropped in 2.0.0-b4 since phpBB's extension class loader can't handle a hyphenated directory name and EPV rejects underscores in the composer name). Each provides a provider + installer; game data is seeded on-demand from ACP (not via migrations). DB-stored config/cache keys (`bbguild_<game>_version`, `bbguild_wow_oauth_token_*`, ...) keep the original underscore form to avoid orphaning rows. Archived: AION, DAOC, Rift, TERA, Vanguard, Warhammer.
 
 ### Routes
 
@@ -107,6 +107,8 @@ Managed in ACP > Permissions > Group/User permissions under the "bbGuild" catego
 | `u_chardelete` | User | ROLE_USER_FULL | Delete own characters via UCP |
 
 Additionally, the config setting `bbguild_maxchars` limits how many characters each user can own.
+
+Default grants are a mix of role-based (`ROLE_USER_STANDARD`/`ROLE_USER_FULL`, `ROLE_ADMIN_FULL`/`ROLE_ADMIN_STANDARD`) and direct per-group grants. Direct grants exist because installs that manage `u_` permissions via direct per-group checkboxes instead of the stock role templates never inherit a role-based grant at all — REGISTERED, ADMINISTRATORS, GLOBAL_MODERATORS, and GUESTS each get an explicit direct `u_bbguild` grant for this reason (`v200rc1`); ADMINISTRATORS additionally gets the full `u_char*` set so the UCP "bbGuild" tab isn't hidden for an admin who isn't also in REGISTERED (`v200rc2`). GLOBAL_MODERATORS intentionally stays view-only.
 
 ## Known Bugs
 
@@ -140,10 +142,22 @@ Additionally, the config setting `bbguild_maxchars` limits how many characters e
 - **Missing DI args** - new game() calls in admin_main.php and admin_games.php were missing db, cache, config, user, ext_manager
 - **ACP/UCP service locator** - player_module.php and bbguild_module.php no longer depend on view_controller for table names; resolve from container parameters
 - **Dead code cleanup** - Removed viewwelcome.php, viewroster.php, viewnavigation.php, iviews.php, admin_player.php, model/blocks/
+- **#352 SQL injection** - `game_id` interpolated unescaped into raw-concatenated queries across `game.php` and `rpg/{classes,races,roles,faction}` models (~33 sites), now `sql_escape()`'d; follow-up cast to `(int)` for `class_id`/`race_id`/`role_id`/`faction_id` at remaining raw-concatenated sites
+- **9 raw `$_GET` reads** - `admin_games.php`/`acp/player_module.php` now use `$this->request->is_set(..., GET)`
+- **`@unlink()` filesystem bypass** - `delete_guild()` emblem cleanup now uses the phpBB filesystem service (`exists()`/`remove()`)
+- **PHP 8.2+ dynamic property deprecations** - `ext_path`/`time`/`games` declared as properties on `player` instead of ad-hoc constructor assignment
+- **#353 bbguild_version refactor** - version moved out of `phpbb_config` entirely into `ext::BBGUILD_VERSION`, matching `avatharbe/recenttopics`'s `ext::RT_VERSION` pattern; fixed a fresh-install failure where `bbguild_version` was never `config.add`'d, only ever updated
+- **Missing `u_bbguild`/`u_char*` grants** (rc1) - REGISTERED/ADMINISTRATORS/GLOBAL_MODERATORS defaulted to "No" on installs managing permissions via direct per-group grants instead of role templates
+- **`bb_language.language` too narrow** (rc1) - `CHAR:2` widened to `VCHAR:10` for `es_x_tu`-style locale codes; previously crashed bbguildwow's install
+- **UCP "bbGuild" tab hidden for admins** (rc2) - ADMINISTRATORS only had the `u_bbguild` view-only floor from rc1; UCP modes require `u_charclaim`/`u_charadd` specifically, now granted
+- **Roster search form disappearing** (rc2) - form was nested inside the same conditional as the results listing, so a zero-result search hid the form itself
+- **Roster class filter broken in grid view** (rc2) - `display_grid()` passed a hardcoded `0` for class id to `player::get_classes()` instead of the selected class
+- **Roster combined class/armor filter** (rc2) - split the legacy single `filter` pulldown (server-side disambiguated by lookup-array match) into independent `class_filter`/`armor_filter` dropdowns
+- **Roster search box CSS** (rc2) - reused phpBB's reserved `search-box` class (oversized); renamed to `roster-search-box` with its own compact sizing and box-model alignment fixes
 
 ## Incomplete Features (Must Have)
 
-- #288 - Individual player page as a portal module (deferred to 2.1.0; legacy view ships in rc1)
+- #288 - Individual player page as a portal module (deferred to 2.1.0; legacy view ships in rc2)
 
 ## Compatibility Status
 
@@ -207,8 +221,26 @@ Issue #331. Adds a layer between class and role.
 7. ~~`install_specs()` hook in `abstract_game_install`~~ Done
 8. ~~bbguildwow Phase 4: 39 specs + icons + de/fr/it/es_x_tu translations~~ Done
 
-### Phase 2: Remaining feature work (post-rc1, milestone 2.1.0/2.2.0)
-- #288 — Individual player page as a portal module (deferred to 2.1.0; legacy view works and ships in rc1)
+### Phase 1.9: Security/standards audit, RC1 — COMPLETE (2.0.0-rc1, 2026-07-24)
+1. ~~SQL injection hardening (#352): `sql_escape()`/`(int)` cast across game.php + rpg/{classes,races,roles,faction} models~~ Done
+2. ~~Raw `$_GET` reads replaced with `request->is_set()`~~ Done
+3. ~~`@unlink()`/`@file_exists()` replaced with phpBB filesystem service~~ Done
+4. ~~PHP 8.2+ dynamic property deprecations fixed on `player`~~ Done
+5. ~~`bbguild_version` moved out of `phpbb_config` into `ext::BBGUILD_VERSION` (#353)~~ Done
+6. ~~Missing `u_bbguild`/`u_char*` direct-grants for REGISTERED/ADMINISTRATORS/GLOBAL_MODERATORS~~ Done
+7. ~~`bb_language.language` widened `CHAR:2` → `VCHAR:10`~~ Done
+8. ~~Tagged and released `v2.0.0-rc1` on GitHub~~ Done
+
+### Phase 2: RC2 — bug fixes from manual testing, IN PROGRESS (2.0.0-rc2)
+1. ~~UCP "bbGuild" tab hidden for ADMINISTRATORS-only accounts — granted `u_charclaim`/`u_charadd`/`u_chardelete`/`u_charupdate`~~ Done
+2. ~~Roster search form disappearing on zero-result search~~ Done
+3. ~~Roster class filter broken in grid view~~ Done
+4. ~~Roster class/armor filter split into independent dropdowns~~ Done
+5. ~~Roster search box CSS (class collision, box-model alignment)~~ Done
+6. ~~Documentation sweep: composer.json, README, CHANGELOG, architecture.md, CLAUDE.md, cleanup.sql~~ Done
+
+### Phase 3: Remaining feature work (post-rc2, milestone 2.1.0/2.2.0)
+- #288 — Individual player page as a portal module (deferred to 2.1.0; legacy view works and ships in rc2)
 - #331 Phase 3c — Recruitment spec filter (not started, 2.2.0)
 - #331 Phase 5 — Migrate legacy free-text `player_spec` text → `player_spec_id` (not started, 2.2.0)
 - 8 of 9 plugin Phase 4 sub-issues open (eq, eq2, ffxi, ffxiv, gw2, lineage2, lotro, swtor) — spec data only, 2.2.0

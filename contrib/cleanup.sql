@@ -9,14 +9,14 @@
 --
 -- Assumptions:
 --   - phpBB table prefix is "phpbb_"
---   - bbguild_wow plugin tables exist (skip errors if not installed)
+--   - bbguildwow plugin tables exist (skip errors if not installed)
 --
 -- After running this script, disable and re-enable the extensions in
 -- phpBB ACP to re-run migrations and restore default config/permissions.
 -- ============================================================================
 
 -- ----------------------------------------------------------------------------
--- 1. Drop bbguild_wow tables (child tables first)
+-- 1. Drop bbguildwow tables (child tables first)
 -- ----------------------------------------------------------------------------
 
 DROP TABLE IF EXISTS phpbb_bb_criteria_track;
@@ -26,6 +26,7 @@ DROP TABLE IF EXISTS phpbb_bb_achievement_rewards;
 DROP TABLE IF EXISTS phpbb_bb_achievement_criteria;
 DROP TABLE IF EXISTS phpbb_bb_achievement_category;
 DROP TABLE IF EXISTS phpbb_bb_achievement;
+DROP TABLE IF EXISTS phpbb_bb_player_equipment;
 DROP TABLE IF EXISTS phpbb_bb_guild_wow;
 
 -- ----------------------------------------------------------------------------
@@ -40,6 +41,7 @@ DROP TABLE IF EXISTS phpbb_bb_portal_modules;
 -- ----------------------------------------------------------------------------
 
 DROP TABLE IF EXISTS phpbb_bb_players;
+DROP TABLE IF EXISTS phpbb_bb_specializations;
 DROP TABLE IF EXISTS phpbb_bb_ranks;
 DROP TABLE IF EXISTS phpbb_bb_recruit;
 DROP TABLE IF EXISTS phpbb_bb_motd;
@@ -63,7 +65,7 @@ DELETE FROM phpbb_config WHERE config_name LIKE 'bbguild\_%';
 -- 5. phpBB extension registrations
 -- ----------------------------------------------------------------------------
 
-DELETE FROM phpbb_ext WHERE ext_name IN ('avathar/bbguild', 'avathar/bbguild_wow');
+DELETE FROM phpbb_ext WHERE ext_name IN ('avathar/bbguild', 'avathar/bbguildwow');
 
 -- ----------------------------------------------------------------------------
 -- 6. phpBB migration tracking
