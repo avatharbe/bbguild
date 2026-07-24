@@ -47,7 +47,8 @@ class release_2_0_0_rc1 extends \phpbb\db\migration\container_aware_migration
 			WHERE g.group_name = \'REGISTERED\'
 				AND ao.auth_option = \'u_bbguild\'
 				AND ag.forum_id = 0
-				AND ag.auth_role_id = 0';
+				AND ag.auth_role_id = 0
+				AND ag.auth_setting = 1';
 		$result = $this->db->sql_query($sql);
 		$row = $this->db->sql_fetchrow($result);
 		$this->db->sql_freeresult($result);

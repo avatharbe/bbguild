@@ -5,6 +5,8 @@
  * Combines all schema, data-seeding, config, permissions, and module
  * registration from the former basics/, v200b2/, and v200b3/ migrations.
  *
+ * Canonical version lives in ext::BBGUILD_VERSION; not in phpbb_config.
+ *
  * @package   avathar\bbguild
  * @copyright 2026 avathar.be
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU General Public License v2

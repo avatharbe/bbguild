@@ -10,6 +10,8 @@
  * compatibility; it's deprecated in favor of player_spec_id and will be
  * dropped in a later release once data is migrated.
  *
+ * Canonical version lives in ext::BBGUILD_VERSION; not in phpbb_config.
+ *
  * @package   avathar\bbguild
  * @copyright 2026 avathar.be
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU General Public License v2
