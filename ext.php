@@ -20,7 +20,7 @@ use phpbb\extension\base;
  */
 class ext extends base
 {
-	const BBGUILD_VERSION = '2.0.0-rc3';
+	const BBGUILD_VERSION = '2.0.0-rc4';
 	const MIN_PHP_VERSION = '8.1.0';
 	const MIN_PHPBB_VERSION = '3.3.0';
 

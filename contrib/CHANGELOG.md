@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.0-rc4 24/07/2026
+  - [FIX] ACP guild update failed with "Cannot modify header information — headers already sent" when the message-of-the-day field was left empty (#28) — the empty MOTD was still run through `generate_text_for_storage()`, whose empty-message branch references the posting-only `TOO_FEW_CHARS` language key (not loaded in the ACP); on PHP 8 with `display_errors` on, the resulting "Undefined array key" warning printed before the ACP headers and corrupted the response. The message parser is now skipped entirely when the MOTD is empty (an empty MOTD is valid).
+  - [FIX] Faction dropdown on the ACP edit-guild form snapped to the last option (Horde) whenever the game dropdown was changed (#29) — the AJAX faction rebuild created every `<option>` with `defaultSelected = true`, so the last one always won the selection; now created with `defaultSelected = false`
+  - [CHG] Default minimum roster level lowered from 50 to 1 — 50 hid every guild member below that level from the roster (both at Battle.net sync time and at display time), too high a floor for a default. New installs seed 1 so all members are visible out of the box; existing installs keep their configured value and the setting stays adjustable in the ACP.
+
 ## 2.0.0-rc3 24/07/2026
   - [FIX] Fatal error `Call to undefined method player::getPlayerId()` on the UCP character-add form, UCP character-edit form, and ACP roster's character-edit form (#354) — `player` only ever exposed `player_id` as a public property (plus an unrelated `get_player_id($playername, $playerrealm, $guild_id)` lookup method); all three portrait-URL call sites now read the property directly
 
