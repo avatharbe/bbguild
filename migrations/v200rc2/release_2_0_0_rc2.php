@@ -54,6 +54,15 @@ class release_2_0_0_rc2 extends \phpbb\db\migration\container_aware_migration
 
 	public function revert_data()
 	{
+		// Note: as in v200rc1, phpBB core's permission_unset('group') deletes
+		// the target auth_option's direct-grant row without scoping the
+		// DELETE to a group_id (phpbb/db/migration/tool/permission.php
+		// ~line 644), so reverting this migration in isolation also strips
+		// REGISTERED's direct grant of these same four permissions from
+		// v200rc1, since REGISTERED shares the same unscoped direct-grant
+		// row type. A full uninstall doesn't hit this — v200b3's own revert
+		// separately calls permission.remove, which removes the option
+		// everywhere regardless.
 		return [
 			['permission.permission_unset', ['ADMINISTRATORS', ['u_charclaim', 'u_charadd', 'u_chardelete', 'u_charupdate'], 'group']],
 		];
