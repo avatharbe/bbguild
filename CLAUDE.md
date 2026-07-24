@@ -231,6 +231,7 @@ Issue #331. Adds a layer between class and role.
 6. ~~Missing `u_bbguild`/`u_char*` direct-grants for REGISTERED/ADMINISTRATORS/GLOBAL_MODERATORS~~ Done
 7. ~~`bb_language.language` widened `CHAR:2` → `VCHAR:10`~~ Done
 8. ~~Tagged and released `v2.0.0-rc1` on GitHub~~ Done
+9. ~~Forum-announced: all 9 game plugins + core published as individual posts~~ Done (2026-07-24, https://www.avathar.be/forum/viewforum.php?f=2) — first public forum announcement since `2.0.0-b1`; b2/b3/b4/rc2/rc3 were GitHub-only
 
 ### Phase 2: RC2 — bug fixes from manual testing — COMPLETE (2.0.0-rc2, tagged 2026-07-24)
 1. ~~UCP "bbGuild" tab hidden for ADMINISTRATORS-only accounts — granted `u_charclaim`/`u_charadd`/`u_chardelete`/`u_charupdate`~~ Done
