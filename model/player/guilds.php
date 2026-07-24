@@ -979,7 +979,11 @@ class guilds
 				FROM ' . $this->bb_guild_table . ' g
 				LEFT JOIN '  . $this->bb_factions_table . ' f ON f.game_id=g.game_id and f.faction_id=g.faction
 				WHERE id = ' . $this->guildid;
-		$result = $this->db->sql_query($sql, 604800);
+		// Not cached: this per-guild row is edited interactively in the ACP and
+		// written by several paths (update_guild, update_guild_battleNet), not all
+		// of which invalidate the cache. A stale 7-day cache here made ACP edits
+		// (e.g. region) appear to revert even though the DB was updated (#31).
+		$result = $this->db->sql_query($sql);
 
 		$row = $this->db->sql_fetchrow($result);
 		$this->db->sql_freeresult($result);
