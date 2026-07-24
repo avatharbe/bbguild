@@ -33,13 +33,20 @@ Originally forked as bbDKP from EQDKP to phpBB 3.0 in 2008, the 2.0 version has 
 - **Character management** — add, edit, delete, and claim characters via ACP and UCP
 - **Rank management** — define custom guild ranks with display preferences
 
+### Specializations
+- **Subclass layer between class and role** — e.g. a Frost Mage and a Fire Mage are both Mages, but distinct specs
+- **ACP management** — add, edit, and reorder specializations per class on the Edit Game page
+- **ACP/UCP character assignment** — spec dropdown filtered by the character's class
+- **Roster display** — optional Spec column (listing and grid views), localized per language
+- **Opt-in per game plugin** — games without specialization data simply don't show the column
+
 ### Recruitment
 - **Recruitment board** — post open positions by role and class
 - **Status tracking** — open/closed status, number of positions, applicant count
 - **Role-based filtering** — recruit by game role (tank, healer, DPS, etc.)
 
 ### Multi-Game Support
-- **Plugin architecture** — game support provided via separate `bbguild_<game>` extensions
+- **Plugin architecture** — game support provided via separate `bbguild<game>` extensions
 - **Available plugins:** World of Warcraft (with Battle.net API), Guild Wars 2, LOTRO, EverQuest, EverQuest 2, FFXI, FFXIV, SWTOR, Lineage 2
 - **Custom game support** — define your own game with custom classes, races, factions, and roles
 - **Per-game data** — classes, races, factions, and roles are fully configurable per game
