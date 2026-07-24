@@ -1239,7 +1239,7 @@ class player_module
 				'PLAYER_COMMENT'           => $editplayer->getPlayerComment(),
 				'S_CAN_HAVE_ARMORY'        => $this->game_has_api($editplayer->game_id),
 				'PLAYER_URL'               => $editplayer->getPlayerArmoryUrl(),
-				'PLAYER_PORTRAIT'          => $this->asset_resolver->resolve_portrait_url((string) $editplayer->getPlayerPortraitUrl(), (int) $editplayer->getPlayerId()),
+				'PLAYER_PORTRAIT'          => $this->asset_resolver->resolve_portrait_url((string) $editplayer->getPlayerPortraitUrl(), (int) $editplayer->player_id),
 				'S_PLAYER_PORTRAIT_EXISTS' => (strlen($editplayer->getPlayerPortraitUrl()) > 1) ? true : false,
 				'S_CAN_GENERATE_ARMORY'    => $this->game_has_api($editplayer->game_id),
 				'COLORCODE'                => ($editplayer->getColorcode() == '') ? '#254689' : $editplayer->getColorcode(),

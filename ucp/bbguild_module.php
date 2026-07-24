@@ -904,7 +904,7 @@ class bbguild_module
 				'REALM'                 => $players->getPlayerRealm(),
 				'S_CAN_HAVE_ARMORY'        => $this->game_has_api($players->game_id),
 				'PLAYER_URL'            =>  $players->getPlayerArmoryUrl(),
-				'PLAYER_PORTRAIT'        =>  $this->asset_resolver->resolve_portrait_url((string) $players->getPlayerPortraitUrl(), (int) $players->getPlayerId()),
+				'PLAYER_PORTRAIT'        =>  $this->asset_resolver->resolve_portrait_url((string) $players->getPlayerPortraitUrl(), (int) $players->player_id),
 				'S_PLAYER_PORTRAIT_EXISTS'  => strlen((string) $players->getPlayerPortraitUrl()) > 1 ? true : false,
 				'S_CAN_GENERATE_ARMORY'        => $this->game_has_api($players->game_id),
 				'COLORCODE'             => $players->getColorcode() == '' ? '#254689' : $players->getColorcode(),
