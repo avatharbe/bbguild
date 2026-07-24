@@ -42,16 +42,32 @@ table.table1.bbguild th {
     padding: 0;
 }
 
+/* select.inputbox and button.button don't render the same height in the
+   site style even with matching padding: selects use a relative,
+   inherited line-height with content-box sizing, while .button uses a
+   fixed px line-height with border-box sizing (see buttons.css). That
+   mismatch is what misaligned the filter row. Rather than touch those
+   site-wide rules, give every control in this row the same explicit
+   height/line-height/box-sizing so they line up regardless of it. */
+.roster .action-bar select.inputbox,
+.roster-search-box input.inputbox,
+.roster-search-box button.search-icon {
+    box-sizing: border-box;
+    height: 28px;
+    line-height: 26px;
+    vertical-align: middle;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
 .roster-search-box input.inputbox {
-    height: auto;
-    line-height: normal;
-    padding: 2px 4px;
+    padding-left: 4px;
+    padding-right: 4px;
 }
 
 .roster-search-box button.search-icon {
-    height: auto;
-    line-height: normal;
-    padding: 2px 8px;
+    padding-left: 8px;
+    padding-right: 8px;
     font-size: 0.85em;
 }
 
