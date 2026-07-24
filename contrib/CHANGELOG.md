@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.0.0-rc3 24/07/2026
+  - [FIX] Fatal error `Call to undefined method player::getPlayerId()` on the UCP character-add form, UCP character-edit form, and ACP roster's character-edit form (#354) — `player` only ever exposed `player_id` as a public property (plus an unrelated `get_player_id($playername, $playerrealm, $guild_id)` lookup method); all three portrait-URL call sites now read the property directly
+
 ## 2.0.0-rc2 24/07/2026
   - [FIX] Roster search form (layout/filter dropdowns, name search, submit button) disappeared entirely when a search returned zero results, leaving no way to search again without navigating away — the form was nested inside the same conditional as the results listing
   - [FIX] Class filter did nothing in the roster's "grouped by class" grid view — `display_grid()` called `player::get_classes()` with a hardcoded `0` for the class id instead of the actual selected class, so every class still got a heading regardless of the filter (armor-type filters were unaffected, since that branch doesn't depend on class id)

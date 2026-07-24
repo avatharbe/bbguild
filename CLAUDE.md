@@ -5,7 +5,7 @@
 **bbGuild** is a Guild Management System for phpBB 3.3+ designed for World of Warcraft gaming communities. It provides guild roster management, character tracking, achievements, recruitment, and integration with the Battle.net API.
 
 - **Author:** Andreas Vandenberghe (Sajaki)
-- **Version:** 2.0.0-rc2 (release candidate; version lives in `ext::BBGUILD_VERSION`, not `phpbb_config`)
+- **Version:** 2.0.0-rc3 (release candidate; version lives in `ext::BBGUILD_VERSION`, not `phpbb_config`)
 - **License:** GPL-2.0-only
 - **Repository:** https://github.com/avatharbe/bbguild
 
@@ -14,7 +14,7 @@
 | Metric | Value |
 |--------|-------|
 | First commit | May 28, 2010 |
-| Status | rc2 track — bug fixes accumulating on `main` since the `v2.0.0-rc1` tag/release |
+| Status | rc3 track — bug fixes accumulating on `main` since the `v2.0.0-rc2` tag/release |
 | Tracking issue | [#303](https://github.com/avatharbe/bbguild/issues/303) |
 
 ## Requirements
@@ -154,6 +154,7 @@ Default grants are a mix of role-based (`ROLE_USER_STANDARD`/`ROLE_USER_FULL`, `
 - **Roster class filter broken in grid view** (rc2) - `display_grid()` passed a hardcoded `0` for class id to `player::get_classes()` instead of the selected class
 - **Roster combined class/armor filter** (rc2) - split the legacy single `filter` pulldown (server-side disambiguated by lookup-array match) into independent `class_filter`/`armor_filter` dropdowns
 - **Roster search box CSS** (rc2) - reused phpBB's reserved `search-box` class (oversized); renamed to `roster-search-box` with its own compact sizing and box-model alignment fixes
+- **#354 `getPlayerId()` fatal error** (rc3) - UCP character-add form, UCP character-edit form, and ACP roster's character-edit form all called a nonexistent `player::getPlayerId()` method when resolving the portrait URL; `player` only ever exposed `player_id` as a public property, now read directly
 
 ## Incomplete Features (Must Have)
 
@@ -231,7 +232,7 @@ Issue #331. Adds a layer between class and role.
 7. ~~`bb_language.language` widened `CHAR:2` → `VCHAR:10`~~ Done
 8. ~~Tagged and released `v2.0.0-rc1` on GitHub~~ Done
 
-### Phase 2: RC2 — bug fixes from manual testing, IN PROGRESS (2.0.0-rc2)
+### Phase 2: RC2 — bug fixes from manual testing — COMPLETE (2.0.0-rc2, tagged 2026-07-24)
 1. ~~UCP "bbGuild" tab hidden for ADMINISTRATORS-only accounts — granted `u_charclaim`/`u_charadd`/`u_chardelete`/`u_charupdate`~~ Done
 2. ~~Roster search form disappearing on zero-result search~~ Done
 3. ~~Roster class filter broken in grid view~~ Done
@@ -239,8 +240,11 @@ Issue #331. Adds a layer between class and role.
 5. ~~Roster search box CSS (class collision, box-model alignment)~~ Done
 6. ~~Documentation sweep: composer.json, README, CHANGELOG, architecture.md, CLAUDE.md, cleanup.sql~~ Done
 
-### Phase 3: Remaining feature work (post-rc2, milestone 2.1.0/2.2.0)
-- #288 — Individual player page as a portal module (deferred to 2.1.0; legacy view works and ships in rc2)
+### Phase 2.5: RC3 — bug fixes from manual testing, IN PROGRESS (2.0.0-rc3)
+1. ~~Fatal error `getPlayerId()` undefined method on UCP character-add, UCP character-edit, and ACP roster character-edit forms (#354)~~ Done
+
+### Phase 3: Remaining feature work (post-rc3, milestone 2.1.0/2.2.0)
+- #288 — Individual player page as a portal module (deferred to 2.1.0; legacy view works and ships in rc3)
 - #331 Phase 3c — Recruitment spec filter (not started, 2.2.0)
 - #331 Phase 5 — Migrate legacy free-text `player_spec` text → `player_spec_id` (not started, 2.2.0)
 - 8 of 9 plugin Phase 4 sub-issues open (eq, eq2, ffxi, ffxiv, gw2, lineage2, lotro, swtor) — spec data only, 2.2.0
