@@ -120,33 +120,39 @@ class roster extends module_base
 		// Read request values
 		$start = $this->request->variable('start', 0);
 		$mode = $this->request->variable('rosterlayout', 0);
-		$filter = $this->request->variable('filter', $this->user->lang['ALL']);
+		$class_filter = $this->request->variable('class_filter', $this->user->lang['ALL']);
+		$armor_filter = $this->request->variable('armor_filter', $this->user->lang['ALL']);
 		$player_filter = $this->request->variable('player_name', '', true);
 
-		// Determine filter type
+		// Determine filter type. Class and armor type are independent filters
+		// (armor type is a WoW/trinity-game concept, not something every game
+		// plugin has a meaningful notion of) — kept as two separate dropdowns
+		// and two separate request params rather than one combined pulldown
+		// disambiguated by value, which previously made it possible for a
+		// selected class filter to silently do nothing.
 		$query_by_armor = false;
 		$query_by_class = false;
 		$class_id = 0;
+		$armor_value = '';
 		$armor_types = $this->get_armor_types();
 		$class_names = $this->get_class_names($game_id);
 
-		if ($filter != $this->user->lang['ALL'])
+		if ($armor_filter != $this->user->lang['ALL'] && array_key_exists($armor_filter, $armor_types))
 		{
-			if (array_key_exists($filter, $armor_types))
-			{
-				$filter = preg_replace('/ Armor/', '', (string) $filter);
-				$query_by_armor = true;
-			}
-			else if (array_key_exists($filter, $class_names))
-			{
-				$query_by_class = true;
-				$t = explode('_', $filter);
-				$class_id = count($t) > 1 ? (int) $t[2] : 0;
-			}
+			$armor_value = $armor_filter;
+			$query_by_armor = true;
+		}
+
+		if ($class_filter != $this->user->lang['ALL'] && array_key_exists($class_filter, $class_names))
+		{
+			$query_by_class = true;
+			$t = explode('_', $class_filter);
+			$class_id = count($t) > 1 ? (int) $t[2] : 0;
 		}
 
 		// Build filter + layout dropdowns
-		$this->build_filter_dropdown($game_id, $filter, $armor_types, $class_names);
+		$this->build_class_filter_dropdown($class_filter, $class_names);
+		$this->build_armor_filter_dropdown($armor_filter, $armor_types);
 		$this->build_layout_dropdown($mode);
 
 		// Get player list
@@ -162,7 +168,7 @@ class roster extends module_base
 		$players->game_id = $game_id;
 
 		$characters = $players->getplayerlist(
-			$start, $mode, $query_by_armor, $query_by_class, $filter,
+			$start, $mode, $query_by_armor, $query_by_class, $armor_value,
 			$game_id, $this->guild_id, $class_id, 0, 0, 200, false, $player_filter, 0
 		);
 
@@ -183,7 +189,7 @@ class roster extends module_base
 		}
 		else
 		{
-			$this->display_grid($players, $characters, $ext_path_images, $base_url, $start, $filter, $query_by_armor, $class_id, $spec_lookup);
+			$this->display_grid($players, $characters, $ext_path_images, $base_url, $start, $armor_value, $query_by_armor, $class_id, $spec_lookup);
 		}
 
 		$this->template->assign_vars([
@@ -334,10 +340,10 @@ class roster extends module_base
 	/**
 	 * Display the grid (grouped by class) view.
 	 */
-	protected function display_grid(player $players, array $characters, string $ext_path_images, string $base_url, int $start, string $filter, bool $query_by_armor, int $class_id = 0, array $spec_lookup = []): void
+	protected function display_grid(player $players, array $characters, string $ext_path_images, string $base_url, int $start, string $armor_value, bool $query_by_armor, int $class_id = 0, array $spec_lookup = []): void
 	{
 		$classgroup = $players->get_classes(
-			$filter, $query_by_armor,
+			$armor_value, $query_by_armor,
 			$class_id, $players->game_id, $this->guild_id, 0, 0, 200
 		);
 
@@ -577,18 +583,11 @@ class roster extends module_base
 	}
 
 	/**
-	 * Build filter dropdown template vars.
+	 * Build the class filter dropdown template vars.
 	 */
-	protected function build_filter_dropdown(string $game_id, string $filter, array $armor_types, array $class_names): void
+	protected function build_class_filter_dropdown(string $selected, array $class_names): void
 	{
-		$values = [];
-		$values['all'] = $this->user->lang['ALL'];
-		$values['separator1'] = '--------';
-		foreach ($armor_types as $key => $label)
-		{
-			$values[$key] = $label;
-		}
-		$values['separator2'] = '--------';
+		$values = ['all' => $this->user->lang['ALL']];
 		foreach ($class_names as $key => $label)
 		{
 			$values[$key] = $label;
@@ -596,11 +595,31 @@ class roster extends module_base
 
 		foreach ($values as $fid => $fname)
 		{
-			$this->template->assign_block_vars('roster_filter_row', [
+			$this->template->assign_block_vars('roster_class_filter_row', [
 				'VALUE'    => $fid,
-				'SELECTED' => ($fid == $filter && $fname != '--------') ? ' selected="selected"' : '',
-				'DISABLED' => ($fname == '--------') ? ' disabled="disabled"' : '',
-				'OPTION'   => !empty($fname) ? $fname : $this->user->lang['ALL'],
+				'SELECTED' => ($fid == $selected) ? ' selected="selected"' : '',
+				'OPTION'   => $fname,
+			]);
+		}
+	}
+
+	/**
+	 * Build the armor type filter dropdown template vars.
+	 */
+	protected function build_armor_filter_dropdown(string $selected, array $armor_types): void
+	{
+		$values = ['all' => $this->user->lang['ALL']];
+		foreach ($armor_types as $key => $label)
+		{
+			$values[$key] = $label;
+		}
+
+		foreach ($values as $fid => $fname)
+		{
+			$this->template->assign_block_vars('roster_armor_filter_row', [
+				'VALUE'    => $fid,
+				'SELECTED' => ($fid == $selected) ? ' selected="selected"' : '',
+				'OPTION'   => $fname,
 			]);
 		}
 	}

@@ -12,9 +12,14 @@
 						<option value="{{ rosterlayout_row.VALUE }}"{{ rosterlayout_row.SELECTED }}>{{ rosterlayout_row.OPTION }}</option>
 						{% endfor %}
 					</select>
-					<select name="filter" class="inputbox" onchange="javascript:form.submit();">
-						{% for filter_row in loops.roster_filter_row %}
-						<option value="{{ filter_row.VALUE }}"{{ filter_row.SELECTED }}{{ filter_row.DISABLED }}>{{ filter_row.OPTION }}</option>
+					<select name="class_filter" class="inputbox" onchange="javascript:form.submit();">
+						{% for filter_row in loops.roster_class_filter_row %}
+						<option value="{{ filter_row.VALUE }}"{{ filter_row.SELECTED }}>{{ filter_row.OPTION }}</option>
+						{% endfor %}
+					</select>
+					<select name="armor_filter" class="inputbox" onchange="javascript:form.submit();">
+						{% for filter_row in loops.roster_armor_filter_row %}
+						<option value="{{ filter_row.VALUE }}"{{ filter_row.SELECTED }}>{{ filter_row.OPTION }}</option>
 						{% endfor %}
 					</select>
 				</div>
