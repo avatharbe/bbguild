@@ -31,6 +31,30 @@ table.table1.bbguild th {
     font-size: 1.1em;
 }
 
+/* Deliberately not named .search-box: that class is reserved by phpBB's
+   own header search widget, and every active style (prosilver and its
+   pbwow3/pbtech/avathar children) already sizes ".search-box .inputbox"
+   and ".search-box button.search-icon" for that full-size widget. Reusing
+   the name here inflated the roster filter field/button to match it. */
+.roster-search-box fieldset {
+    border: none;
+    margin: 0;
+    padding: 0;
+}
+
+.roster-search-box input.inputbox {
+    height: auto;
+    line-height: normal;
+    padding: 2px 4px;
+}
+
+.roster-search-box button.search-icon {
+    height: auto;
+    line-height: normal;
+    padding: 2px 8px;
+    font-size: 0.85em;
+}
+
 .category, .subheader-3 {
     color: inherit;
     font-size: 22px;
