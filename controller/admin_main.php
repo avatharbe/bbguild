@@ -300,7 +300,7 @@ class admin_main
 		//version check
 		$ext_meta_manager = $this->phpbb_extension_manager->create_extension_metadata_manager('avathar/bbguild', $this->template);
 		$meta_data  = $ext_meta_manager->get_metadata();
-		$ext_version  = $meta_data['version'];
+		$ext_version  = \avathar\bbguild\ext::BBGUILD_VERSION;
 
 		$latest_version_info = $this->version_check($meta_data, $this->request->variable('versioncheck_force', false));
 		if ($latest_version_info == false)
@@ -309,7 +309,7 @@ class admin_main
 		}
 		else
 		{
-			if (phpbb_version_compare($latest_version_info, $this->config['bbguild_version'], '='))
+			if (phpbb_version_compare($latest_version_info, $ext_version, '='))
 			{
 				$this->template->assign_vars(
 					array(
@@ -317,7 +317,7 @@ class admin_main
 					)
 				);
 			}
-			else if (phpbb_version_compare($latest_version_info, $this->config['bbguild_version'] , '>'))
+			else if (phpbb_version_compare($latest_version_info, $ext_version , '>'))
 			{
 				// you have an old version
 				$this->template->assign_vars(
@@ -325,13 +325,13 @@ class admin_main
 						'BBGUILD_NOT_UP_TO_DATE_TITLE' => sprintf($this->language->lang('NOT_UP_TO_DATE_TITLE'), 'bbGuild'),
 						'S_PRERELEASE'    => false,
 						'BBGUILD_LATESTVERSION' => $latest_version_info,
-						'BBGUILDVERSION' => $this->language->lang('BBGUILD_YOURVERSION') . $this->config['bbguild_version']  ,
+						'BBGUILDVERSION' => $this->language->lang('BBGUILD_YOURVERSION') . $ext_version  ,
 						'UPDATEINSTR' => $this->language->lang('BBGUILD_LATESTVERSION') . $latest_version_info . ', <a href="' .
 							$this->language->lang('WEBURL') . '">' . $this->language->lang('DOWNLOAD') . '</a>')
 				);
 
 			}
-			else if (phpbb_version_compare($latest_version_info, $this->config['bbguild_version'] , '<'))
+			else if (phpbb_version_compare($latest_version_info, $ext_version , '<'))
 			{
 				// you have a prerelease or development version
 				$this->template->assign_vars(
@@ -339,7 +339,7 @@ class admin_main
 						'BBGUILD_NOT_UP_TO_DATE_TITLE' => sprintf($this->language->lang('PRELELEASE_TITLE'), 'bbGuild'),
 						'BBGUILD_LATESTVERSION' => $latest_version_info,
 						'S_PRERELEASE'    => true,
-						'BBGUILDVERSION' => $this->language->lang('BBGUILD_YOURVERSION') . $this->config['bbguild_version']  ,
+						'BBGUILDVERSION' => $this->language->lang('BBGUILD_YOURVERSION') . $ext_version  ,
 						'UPDATEINSTR' => $this->language->lang('BBGUILD_LATESTVERSION') . $latest_version_info . ', <a href="' . $this->language->lang('WEBURL') . '">' . $this->language->lang('DOWNLOAD') . '</a>')
 				);
 			}
@@ -371,7 +371,7 @@ class admin_main
 				'NUMBER_OF_PLAYERS' => $total_players ,
 				'NUMBER_OF_GUILDS' => $total_guildcount ,
 				'BBGUILD_STARTED' => $bbguild_started,
-				'BBGUILD_VERSION'    => $this->config['bbguild_version'] ,
+				'BBGUILD_VERSION'    => $ext_version ,
 				'U_VERSIONCHECK_FORCE' => append_sid("index.$this->php_ext", 'i=-avathar-bbguild-acp-main_module&amp;mode=panel&amp;action=versioncheck_force') ,
 				'GAMES_INSTALLED' =>  (count($games) > 0) ? implode(', ', $games) : $this->user->lang['NA'],
 			)

@@ -19,14 +19,9 @@ class release_2_0_0_b3 extends \phpbb\db\migration\container_aware_migration
 		return ['\phpbb\db\migration\data\v320\v320'];
 	}
 
-	/* ------------------------------------------------------------------ */
-	/*  effectively_installed                                              */
-	/* ------------------------------------------------------------------ */
-
 	public function effectively_installed()
 	{
-		return isset($this->config['bbguild_version'])
-			&& version_compare($this->config['bbguild_version'], '2.0.0-b3', '>=');
+		return $this->db_tools->sql_table_exists($this->table_prefix . 'bb_guild');
 	}
 
 	/* ------------------------------------------------------------------ */
@@ -421,18 +416,12 @@ class release_2_0_0_b3 extends \phpbb\db\migration\container_aware_migration
 			'modes'           => ['char', 'add'],
 		]]];
 
-		// Version stamp
-		$data[] = ['custom', [[$this, 'set_version']]];
-
 		return $data;
 	}
 
 	public function revert_data()
 	{
 		return [
-			// Version
-			['config.remove', ['bbguild_version']],
-
 			// Guest permission
 			['permission.permission_unset', ['GUESTS', 'u_bbguild', 'group']],
 
@@ -506,11 +495,6 @@ class release_2_0_0_b3 extends \phpbb\db\migration\container_aware_migration
 	/* ------------------------------------------------------------------ */
 	/*  Helpers                                                            */
 	/* ------------------------------------------------------------------ */
-
-	public function set_version()
-	{
-		$this->config->set('bbguild_version', '2.0.0-b3');
-	}
 
 	public function insert_sample_data()
 	{

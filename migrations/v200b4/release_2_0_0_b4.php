@@ -26,8 +26,7 @@ class release_2_0_0_b4 extends \phpbb\db\migration\container_aware_migration
 
 	public function effectively_installed()
 	{
-		return isset($this->config['bbguild_version'])
-			&& version_compare($this->config['bbguild_version'], '2.0.0-b4', '>=');
+		return $this->db_tools->sql_table_exists($this->table_prefix . 'bb_specializations');
 	}
 
 	public function update_schema()
@@ -70,17 +69,4 @@ class release_2_0_0_b4 extends \phpbb\db\migration\container_aware_migration
 		];
 	}
 
-	public function update_data()
-	{
-		return [
-			['config.update', ['bbguild_version', '2.0.0-b4']],
-		];
-	}
-
-	public function revert_data()
-	{
-		return [
-			['config.update', ['bbguild_version', '2.0.0-b3']],
-		];
-	}
 }
