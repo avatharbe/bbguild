@@ -106,7 +106,7 @@ Game support is provided by separate extensions. Install them the same way:
 
 ## Community
 
-- Support forum: [https://www.avathar.be/forum](https://www.avathar.be/forum)
+- Support forum: [https://www.avathar.be/forum](https://www.avathar.be/forum/viewforum.php?f=106)
 - phpBB topic: [Extension development](https://www.phpbb.com/community/viewtopic.php?f=456&t=2258141)
 
 ## Contributing
