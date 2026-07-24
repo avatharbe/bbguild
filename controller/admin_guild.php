@@ -492,7 +492,14 @@ class admin_guild
 		$welcometext = $this->request->variable('message_of_the_day', '', true);
 		$uid = $bitfield = $options = '';
 		$allow_bbcode = $allow_urls = $allow_smilies = true;
-		generate_text_for_storage($welcometext, $uid, $bitfield, $options, $allow_bbcode, $allow_urls, $allow_smilies);
+		// An empty MOTD is valid. Skip the message parser when there is no text:
+		// its empty-message branch references the posting-only TOO_FEW_CHARS
+		// language key, which is not loaded in the ACP and emits a PHP warning
+		// that corrupts the response headers (#28).
+		if ($welcometext !== '')
+		{
+			generate_text_for_storage($welcometext, $uid, $bitfield, $options, $allow_bbcode, $allow_urls, $allow_smilies);
+		}
 
 		$guild_id = (int) $updateguild->getGuildid();
 
