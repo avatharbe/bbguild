@@ -330,7 +330,7 @@ class release_2_0_0_b3 extends \phpbb\db\migration\container_aware_migration
 			['config.add', ['bbguild_hide_inactive', 1]],
 			['config.add', ['bbguild_lang', 'en']],
 			['config.add', ['bbguild_maxchars', 5]],
-			['config.add', ['bbguild_minrosterlvl', 50]],
+			['config.add', ['bbguild_minrosterlvl', 1]],
 			['config.add', ['bbguild_n_news', 5]],
 			['config.add', ['bbguild_news_forumid', 2]],
 			['config.add', ['bbguild_regid', 0]],
