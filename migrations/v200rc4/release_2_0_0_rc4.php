@@ -84,20 +84,10 @@ class release_2_0_0_rc4 extends \phpbb\db\migration\container_aware_migration
 		}
 	}
 
-	public function revert_data()
-	{
-		return [
-			// Move "Game List" back to General Settings
-			['module.remove', ['acp', 'ACP_BBGUILD_GAMESETTINGS', [
-				'module_basename' => '\avathar\bbguild\acp\game_module',
-			]]],
-			['module.add', ['acp', 'ACP_BBGUILD_MAINPAGE', [
-				'module_basename' => '\avathar\bbguild\acp\game_module',
-				'modes'           => ['listgames', 'editgames', 'addfaction', 'addrace', 'addclass', 'addrole'],
-			]]],
-
-			// Remove the Game settings category
-			['module.remove', ['acp', 'ACP_CAT_BBGUILD', 'ACP_BBGUILD_GAMESETTINGS']],
-		];
-	}
+	// No revert_data(): phpBB's migrator already auto-reverses update_data() on
+	// uninstall (module.add -> remove, module.remove -> add, category removed).
+	// Defining an explicit revert that repeated those steps caused them to run
+	// twice — "A module already exists" — because migrator::revert() merges
+	// reverse_update_data(update_data) WITH revert_data(). The custom reorder
+	// step is skipped by reverse_update_data(), which is fine on teardown.
 }
