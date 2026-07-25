@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.0.0-rc4 24/07/2026
+## 2.0.0-rc4 25/07/2026
   - [FIX] Region (and any other edited field) appeared to revert on the ACP edit-guild form even though the DB was correctly updated (#31) — `guilds::get_guild()` cached its per-guild read for 7 days, and that cache was not reliably invalidated (it JOINs `bb_factions`, and `update_guild_battleNet()` writes `bb_guild` directly with no cache-destroy), so the ACP kept re-displaying a week-stale row. This primary-key read is no longer cached.
   - [FIX] ACP guild update failed with "Cannot modify header information — headers already sent" when the message-of-the-day field was left empty (#28) — the empty MOTD was still run through `generate_text_for_storage()`, whose empty-message branch references the posting-only `TOO_FEW_CHARS` language key (not loaded in the ACP); on PHP 8 with `display_errors` on, the resulting "Undefined array key" warning printed before the ACP headers and corrupted the response. The message parser is now skipped entirely when the MOTD is empty (an empty MOTD is valid).
   - [FIX] Faction dropdown on the ACP edit-guild form snapped to the last option (Horde) whenever the game dropdown was changed (#29) — the AJAX faction rebuild created every `<option>` with `defaultSelected = true`, so the last one always won the selection; now created with `defaultSelected = false`
