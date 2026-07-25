@@ -1093,6 +1093,10 @@ class admin_games
 		$editgame->setImagename($this->request->variable('imagename', '', true));
 		$editgame->setBossbaseurl($this->request->variable('bossbaseurl', '', true));
 		$editgame->setZonebaseurl($this->request->variable('zonebaseurl', '', true));
+		// Persist the region dropdown. Without this the selected region was
+		// silently discarded on save and always reverted to the stored default
+		// (bbguild#357). Defaults to the current value if the field isn't posted.
+		$editgame->setRegion($this->request->variable('region_id', (string) $editgame->getRegion()));
 
 		// Check if this game has API support via the game registry
 		$game_id = $editgame->game_id;
