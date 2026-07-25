@@ -21,7 +21,8 @@ bbguild/
 │   ├── v200b3/             # 2.0.0-b3 — squashed base install (schema, data, config, permissions, modules)
 │   ├── v200b4/             # 2.0.0-b4 — specialization system (bb_specializations, player_spec_id)
 │   ├── v200rc1/            # 2.0.0-rc1 — permission fixes, bb_language column widen
-│   └── v200rc2/            # 2.0.0-rc2 — ADMINISTRATORS char-management permissions
+│   ├── v200rc2/            # 2.0.0-rc2 — ADMINISTRATORS char-management permissions
+│   └── v200rc4/            # 2.0.0-rc4 — ACP "Game settings" category (moves Game List into it)
 ├── model/                  # Business logic and data access
 │   ├── admin/              # Utilities: curl, log, constants, util
 │   ├── api/                # Battle.net API client
@@ -118,22 +119,28 @@ The primary route is `/guild/{guild_id}`. The legacy `/guild/{page}/{guild_id}` 
 
 ## ACP Modules
 
-Registered via `update_data()` in `migrations/v200b3/release_2_0_0_b3.php`:
+The bbGuild ACP category (`ACP_CAT_BBGUILD`) has three sub-categories. The base
+tree is registered in `migrations/v200b3/release_2_0_0_b3.php`; the **Game
+settings** category was added in `migrations/v200rc4/release_2_0_0_rc4.php`,
+which also moved the Game List module into it and positions the category right
+after General Settings.
 
-| Category | Module | Controller |
-|---|---|---|
-| ACP_BBGUILD_MAINPAGE | Dashboard | `admin_main` |
-| ACP_BBGUILD_MAINPAGE | Settings | `admin_main` |
-| ACP_BBGUILD_MAINPAGE | Logs | `admin_main` |
-| ACP_BBGUILD_MAINPAGE | Portal | `admin_portal` |
-| ACP_BBGUILD_GUILD | Guilds | `admin_guild` |
-| ACP_BBGUILD_GUILD | Ranks | `admin_guild` |
-| ACP_BBGUILD_GUILD | Players | `admin_guild` |
-| ACP_BBGUILD_GAME | Games | `admin_games` |
-| ACP_BBGUILD_GAME | Factions | `admin_games` |
-| ACP_BBGUILD_GAME | Races | `admin_games` |
-| ACP_BBGUILD_GAME | Classes | `admin_games` |
-| ACP_BBGUILD_GAME | Roles | `admin_games` |
+| Sub-category (langname → title) | Module (`acp/*_module.php`) | Controller | Modes |
+|---|---|---|---|
+| `ACP_BBGUILD_MAINPAGE` → General Settings | `main_module` | `admin_main` | panel (Dashboard), config (Settings), logs (Activity Log) |
+| `ACP_BBGUILD_GAMESETTINGS` → Game settings | `game_module` | `admin_games` | listgames, editgames, addfaction, addrace, addclass, addrole |
+| `ACP_BBGUILD_PLAYER` → Guild and Player management | `guild_module` | `admin_guild` | addguild, editguild, listguilds |
+| `ACP_BBGUILD_PLAYER` → Guild and Player management | `player_module` | `admin_guild` | addplayer, listplayers |
+
+Notes:
+- **Portal management** is not a standalone ACP module — it is a tab on the
+  guild-edit page (`admin_guild::show_editguildportal`, delegating to
+  `admin_portal`).
+- **Game plugins register their own ACP modules into these categories.** For
+  example `bbguildwow` adds `battlenet_module` (BattleNet API) under
+  **Game settings** and `achievement_module` under **Guild and Player
+  management** (its migrations `depends_on` the core migration that owns the
+  target category).
 
 ## Database Schema
 
@@ -244,7 +251,10 @@ v200b3/release_2_0_0_b3   (squashed base install: schema, data, config, permissi
     -> v200b4/release_2_0_0_b4   (specialization system: bb_specializations, player_spec_id)
     -> v200rc1/release_2_0_0_rc1 (permission fixes, bb_language column widen, bbguild_version cleanup)
     -> v200rc2/release_2_0_0_rc2 (ADMINISTRATORS char-management permissions)
+    -> v200rc4/release_2_0_0_rc4 (ACP "Game settings" category; moves Game List into it, reorders it after General Settings)
 ```
+
+(There is no `v200rc3` migration — 2.0.0-rc3 was a code-only bug-fix release.)
 
 Each migration's `effectively_installed()` checks a concrete artifact it
 itself creates (a table, a column, a permission grant) rather than a
