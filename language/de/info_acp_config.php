@@ -26,6 +26,7 @@ $lang = array_merge(
 	$lang, array(
 	'ACP_CAT_BBGUILD'            => 'bbGuild',
 	'ACP_BBGUILD_MAINPAGE'        => 'Allgemeine Einstellungen',
+	'ACP_BBGUILD_GAMESETTINGS'  => 'Spieleinstellungen',
 	'ACP_BBGUILD_PANEL'                => 'Adminmenü',
 	'ACP_BBGUILD_CONFIG'        => 'Haupteinstellungen',
 	'ACP_BBGUILD_INDEX'            => 'Portaleinstellungen',
