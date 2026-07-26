@@ -1,0 +1,85 @@
+[color=#088A29]Green : delivered [/color]
+[color=#FF0000]Red : Must have[/color]
+[color=#BF40FF]Blue : Should have[/color]
+[color=#FFBFFF]Pink : Could have[/color]
+
+[i]Status update (2026-07-26): bbGuild is at [b]2.0.0-rc4[/b]. The extension was rebuilt on the phpBB 3.3 / Symfony architecture with a portal-first guild page, and the game-specific parts were split into 9 separate plugins. Releases are cut as a coordinated train across core + all 9 plugins. The plan now is to ship [b]2.0.0 stable first (stabilisation only)[/b], then start new features at 2.1.0. Project lives at the [b]avatharbe[/b] GitHub organisation.[/i]
+
+[color=#21AD36][size=200]Delivered (2.0.0-rc4 and earlier)[/size][/color]
+
+https://github.com/avatharbe/bbguild/milestone/21
+
+[list]
+[*][color=#088A29]Portal-first guild page (3-column layout) with MOTD, Recruitment and Roster modules √[/color]
+[*][color=#088A29]Roster : grid/listing views, class/armor filters, search, spec column √[/color]
+[*][color=#088A29]Guild achievement browser (categories, list, criteria drill-down, recent feed, API sync) √[/color]
+[*][color=#088A29]Individual character page (legacy view) √[/color]
+[*][color=#088A29]UCP : claim / add / edit / delete characters √[/color]
+[*][color=#088A29]Specialisation system (class -> role -> spec, 39 WoW specs) √[/color]
+[*][color=#088A29]9 game plugins (wow, gw2, lotro, eq, eq2, ffxi, ffxiv, swtor, lineage2) + Battle.net / GW2 API moved into the plugins √[/color]
+[*][color=#088A29]AJAX framework, SQL-injection hardening, PHP 8.1 / phpBB 3.3 compliance √[/color]
+[/list]
+
+[color=#21AD36][size=200]Roadmap[/size][/color]
+
+[color=#21AD36][size=150]2.0.0 — stable (due 2026-08-31)[/size][/color]
+https://github.com/avatharbe/bbguild/milestone/24
+Stabilisation only, no new features.
+[list]
+[*][url=https://github.com/avatharbe/bbguild/issues/244]#244[/url] [color=#FF0000]Add unit tests (gates stable)[/color]
+[*][color=#FF0000]Bug-bash pass across roster / UCP / ACP / portal / multi-guild, then tag the coordinated stable release.[/color]
+[/list]
+
+[color=#21AD36][size=150]2.1.0 — guild page overhaul (due 2026-10-15)[/size][/color]
+https://github.com/avatharbe/bbguild/milestone/16
+[list]
+[*][url=https://github.com/avatharbe/bbguild/issues/360]#360[/url] [color=#FF0000]Portal : page-level guild tabs (Overview / Roster / Statistics / Achievements / Recruitment)[/color]
+[*][url=https://github.com/avatharbe/bbguild/issues/361]#361[/url] [color=#FF0000]Core : character-sync scheduler contract + cron[/color]
+[*][url=https://github.com/avatharbe/bbguild/issues/362]#362[/url] [color=#FF0000]bbguildwow : automatic character sync (armory equipment)[/color]
+[*][url=https://github.com/avatharbe/bbguild/issues/363]#363[/url] [color=#FF0000]Gear tooltips via bbTips + capture bonus IDs[/color]
+[*][url=https://github.com/avatharbe/bbguild/issues/364]#364[/url] [color=#BF40FF]Character page polish (layout + async stats)[/color]
+[*][url=https://github.com/avatharbe/bbguild/issues/365]#365[/url] [color=#BF40FF]Per-character achievements view[/color]
+[*][url=https://github.com/avatharbe/bbguild/issues/369]#369[/url] [color=#FF0000]Character-based forum avatars (restores the removed pbWoW feature)[/color]
+[*][url=https://github.com/avatharbe/bbguild/issues/366]#366[/url] [color=#FF0000]Guild statistics portal module (class/race/level/rank/activity)[/color]
+[*][url=https://github.com/avatharbe/bbguild/issues/279]#279[/url] [color=#BF40FF]Class distribution (folds into the statistics module)[/color]
+[*][url=https://github.com/avatharbe/bbguild/issues/367]#367[/url] [color=#BF40FF]Complete plugin spec data for the 8 non-WoW games[/color]
+[/list]
+
+[color=#21AD36][size=150]2.2.0 — events + roster depth (due 2026-11-30)[/size][/color]
+https://github.com/avatharbe/bbguild/milestone/20
+[list]
+[*][color=#FF0000]Events / RSVP calendar — new extension (top guilds-of-wow parity gap; Raidplanner MOD is the prior art)[/color]
+[*][url=https://github.com/avatharbe/bbguild/issues/231]#231[/url] [color=#BF40FF]Roster integration with custom profile fields[/color]
+[*][url=https://github.com/avatharbe/bbguild/issues/368]#368[/url] [color=#BF40FF]Enhance phpBB profile fields with character info (part 2 of the removed pbWoW feature)[/color]
+[*][url=https://github.com/avatharbe/bbguild/issues/230]#230[/url] [color=#BF40FF]Professions support[/color]
+[*][url=https://github.com/avatharbe/bbguild/issues/289]#289[/url] [color=#BF40FF]Player statistics page[/color]
+[/list]
+
+[color=#21AD36][size=150]2.3.0 — integrations (due 2027-01-15)[/size][/color]
+https://github.com/avatharbe/bbguild/milestone/18
+[list]
+[*][url=https://github.com/avatharbe/bbguild/issues/370]#370[/url] [color=#FF0000]Expose a bbGuild API surface (phpBB events + read API) — the integration layer for the whole family; revives the 2012 bbDKP-API idea[/color]
+[*][color=#FF0000]Discord integration — new extension[/color]
+[*][color=#FF0000]Gameworld — new extension (boss / zone progress)[/color]
+[*][color=#BF40FF]Battle.net API modernisation[/color]
+[*][url=https://github.com/avatharbe/bbguild/issues/286]#286[/url] [color=#FFBFFF]Player spec build analysis[/color]
+[/list]
+
+[color=#21AD36][size=200]Game plugins (version-locked)[/size][/color]
+
+All 9 game plugins (wow, gw2, lotro, eq, eq2, ffxi, ffxiv, swtor, lineage2) ship in lockstep with core and now share the same milestones.
+[list]
+[*][b]2.0.0[/b] — [color=#FF0000]test suites (EPV / unit / functional / smoke / integration) and roster/class/race icon fixes across all plugins[/color]
+[*][b]2.1.0[/b] — [color=#BF40FF]seed specialisations for the 8 non-WoW games; LOTRO game-data update; GW2 elite-spec icons + API v2 roster/character sync; WoW gets scheduled Battle.net sync, titles collection and activity feed[/color]
+[*][b]2.2.0[/b] — [color=#FFBFFF]WoW arena bracket ratings on the player page[/color]
+[/list]
+
+[color=#21AD36][size=200]Separate track : DKP & Accounting[/size][/color]
+
+Its own roadmap, integrating with bbGuild from 2.1.0 onwards.
+[list]
+[*][color=#088A29]bbAccounts — almost RC ready (double-entry ledger / canonical store) √[/color]
+[*][color=#FF0000]bbDKP v2 — transaction-based points on top of bbAccounts (early stage)[/color]
+[*][color=#FF0000]Raid logging framework + data importer (not started; Raidtracker MOD prior art)[/color]
+[*][color=#BF40FF]bbPoints v2 — rebuilt on bbAccounts[/color]
+[/list]
