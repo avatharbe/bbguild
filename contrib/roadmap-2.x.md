@@ -11,7 +11,7 @@ Feature parity, measured against four benchmarks at once:
 3. **The extension family** — bbAccounts, bbDKP v2, bbPoints, and planned events/Gameworld/Discord.
 4. **Guild-hosting sites** — guildsofwow.com as the external bar.
 
-Releases are a **coordinated train** across bbGuild core + all 9 game plugins (version-locked). **2.0.0 ships stable first (stabilization only); new features start at 2.1.0.** Cadence ~6 weeks.
+Releases are a **coordinated train** across bbGuild core + all 9 game plugins — shipped together and **pairing-locked** (every plugin hard-requires the current core RC), though individual RC numbers differ (as of 2026-07-26: core rc5, WoW rc3, other plugins rc2). **2.0.0 ships stable first (stabilization only); new features start at 2.1.0.** Cadence ~6 weeks.
 
 **Scope of this document:** the **bbGuild family** — core, game plugins, and guild-facing extensions (events/RSVP, Discord, Gameworld). The **DKP & accounting family** (bbAccounts, bbDKP, raid logging) is a **separate roadmap/topic** — summarized at the bottom for context only.
 
@@ -80,9 +80,9 @@ Headline: tabbed portal + character experience + stats.
 - Battle.net API modernization
 - **#286** spec build analysis
 
-## Game plugins (version-locked)
+## Game plugins (milestone-locked)
 
-All 9 plugins (wow, gw2, lotro, eq, eq2, ffxi, ffxiv, swtor, lineage2) release in lockstep with core and now carry the same milestones (2.0.0–2.3.0, same due dates). Per-plugin backlog is allocated as:
+All 9 plugins (wow, gw2, lotro, eq, eq2, ffxi, ffxiv, swtor, lineage2) release in lockstep with core and now carry the same milestones (2.0.0–2.3.0, same due dates) — locked to the milestone, not to identical RC numbers (within 2.0.0 stabilisation, core rc5 / WoW rc3 / rest rc2, each plugin hard-requiring core rc5). Per-plugin backlog is allocated as:
 
 - **2.0.0 (stabilization)** — test suites (EPV / unit / functional / smoke / integration) in every plugin, plus roster/class/race **icon fixes** (eq #7, eq2 #7, ffxiv #4, gw2 #7, lineage2 #7/#3, lotro #3, swtor #3, wow #27).
 - **2.1.0 (features/data)** — **seed specializations** for the 8 non-WoW games (eq #6, eq2 #6, ffxi #5, ffxiv #7, gw2 elite-spec icons #8, lineage2 #6, lotro #6, swtor #6); **LOTRO game-data** update (#7); **GW2 API v2** roster/character sync (gw2 #9 — implements the core sync contract for Guild Wars 2); **WoW** character features — scheduled Battle.net sync (#11, implements core #362), titles collection (#24), activity feed (#10).

@@ -3,11 +3,11 @@
 [color=#BF40FF]Blue : Should have[/color]
 [color=#FFBFFF]Pink : Could have[/color]
 
-[i]Status update (2026-07-26): bbGuild is at [b]2.0.0-rc4[/b]. The extension was rebuilt on the phpBB 3.3 / Symfony architecture with a portal-first guild page, and the game-specific parts were split into 9 separate plugins. Releases are cut as a coordinated train across core + all 9 plugins. The plan now is to ship [b]2.0.0 stable first (stabilisation only)[/b], then start new features at 2.1.0. Project lives at the [b]avatharbe[/b] GitHub organisation.[/i]
+[i]Status update (2026-07-26): bbGuild core is at [b]2.0.0-rc5[/b] (game plugins: WoW rc3, the other 8 at rc2 — all require core rc5). The extension was rebuilt on the phpBB 3.3 / Symfony architecture with a portal-first guild page, and the game-specific parts were split into 9 separate plugins. Releases are cut as a coordinated train across core + all 9 plugins. The plan now is to ship [b]2.0.0 stable first (stabilisation only)[/b], then start new features at 2.1.0. Project lives at the [b]avatharbe[/b] GitHub organisation.[/i]
 
-[color=#21AD36][size=200]Delivered (2.0.0-rc4 and earlier)[/size][/color]
+[color=#21AD36][size=200]Delivered (2.0.0-rc5 and earlier)[/size][/color]
 
-https://github.com/avatharbe/bbguild/milestone/21
+https://github.com/avatharbe/bbguild/milestone/25
 
 [list]
 [*][color=#088A29]Portal-first guild page (3-column layout) with MOTD, Recruitment and Roster modules √[/color]
@@ -65,7 +65,7 @@ https://github.com/avatharbe/bbguild/milestone/18
 [*][url=https://github.com/avatharbe/bbguild/issues/286]#286[/url] [color=#FFBFFF]Player spec build analysis[/color]
 [/list]
 
-[color=#21AD36][size=200]Game plugins (version-locked)[/size][/color]
+[color=#21AD36][size=200]Game plugins (milestone-locked)[/size][/color]
 
 All 9 game plugins (wow, gw2, lotro, eq, eq2, ffxi, ffxiv, swtor, lineage2) ship in lockstep with core and now share the same milestones.
 [list]

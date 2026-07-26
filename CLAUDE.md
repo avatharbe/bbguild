@@ -21,7 +21,7 @@
 
 Full plan: **`contrib/roadmap-2.x.md`** (parity matrix + release plan); BBCode forum status post: `contrib/roadmap-2.x-forum-post.txt`.
 
-- **North star:** feature parity vs. phpBB native / legacy bbDKP MOD / the extension family / guildsofwow.com. Releases are a **coordinated train** across core + all 9 game plugins (version-locked, same milestone dates). **2.0.0 ships stable first (stabilisation only); features start at 2.1.0.**
+- **North star:** feature parity vs. phpBB native / legacy bbDKP MOD / the extension family / guildsofwow.com. Releases are a **coordinated train** across core + all 9 game plugins — shipped together on the same milestone dates and **pairing-locked** (every plugin hard-requires the current core RC via `ext.php::is_enableable()`), but the individual RC numbers are NOT kept identical: stabilisation bugs surface per-component, so as of 2026-07-26 core is `rc5`, WoW `rc3`, and the other 8 plugins `rc2`. More RCs before 2.0.0 stable is expected. **2.0.0 ships stable first (stabilisation only); features start at 2.1.0.**
 - **Milestone scheme (GitHub, milestone-driven versioning — no version labels):**
   - `2.0.0` (due 2026-08-31) — stabilisation + unit tests (#244); plugin test suites + icon fixes.
   - `2.1.0` (due 2026-10-15) — **guild page overhaul**: page-level portal tabs (#360), character-sync scheduler contract (#361) + WoW handler (#362), gear tooltips via bbTips + bonus IDs (#363), character page polish (#364), per-character achievements (#365), guild statistics portal module (#366, subsumes #279), character-based forum avatars (#369, restores pbwowext#10 pt1); plugin spec data (#367) + **GW2 API v2 sync** (bbguildgw2#9).
