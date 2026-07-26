@@ -5,7 +5,7 @@
 **bbGuild** is a Guild Management System for phpBB 3.3+ designed for World of Warcraft gaming communities. It provides guild roster management, character tracking, achievements, recruitment, and integration with the Battle.net API.
 
 - **Author:** Andreas Vandenberghe (Sajaki)
-- **Version:** 2.0.0-rc3 (release candidate; version lives in `ext::BBGUILD_VERSION`, not `phpbb_config`)
+- **Version:** 2.0.0-rc5 (release candidate; version lives in `ext::BBGUILD_VERSION`, not `phpbb_config`)
 - **License:** GPL-2.0-only
 - **Repository:** https://github.com/avatharbe/bbguild
 
@@ -14,8 +14,22 @@
 | Metric | Value |
 |--------|-------|
 | First commit | May 28, 2010 |
-| Status | rc3 track — bug fixes accumulating on `main` since the `v2.0.0-rc2` tag/release |
+| Status | rc5 track — stabilising toward 2.0.0 stable |
 | Tracking issue | [#303](https://github.com/avatharbe/bbguild/issues/303) |
+
+## Roadmap (2.x) — planned 2026-07
+
+Full plan: **`contrib/roadmap-2.x.md`** (parity matrix + release plan); BBCode forum status post: `contrib/roadmap-2.x-forum-post.txt`.
+
+- **North star:** feature parity vs. phpBB native / legacy bbDKP MOD / the extension family / guildsofwow.com. Releases are a **coordinated train** across core + all 9 game plugins (version-locked, same milestone dates). **2.0.0 ships stable first (stabilisation only); features start at 2.1.0.**
+- **Milestone scheme (GitHub, milestone-driven versioning — no version labels):**
+  - `2.0.0` (due 2026-08-31) — stabilisation + unit tests (#244); plugin test suites + icon fixes.
+  - `2.1.0` (due 2026-10-15) — **guild page overhaul**: page-level portal tabs (#360), character-sync scheduler contract (#361) + WoW handler (#362), gear tooltips via bbTips + bonus IDs (#363), character page polish (#364), per-character achievements (#365), guild statistics portal module (#366, subsumes #279), character-based forum avatars (#369, restores pbwowext#10 pt1); plugin spec data (#367) + **GW2 API v2 sync** (bbguildgw2#9).
+  - `2.2.0` (due 2026-11-30) — Events/RSVP calendar (new ext), roster↔profile fields (#231), profile-field character info (#368, pbwowext#10 pt2), professions (#230), player stats (#289).
+  - `2.3.0` (due 2027-01-15) — **bbGuild API surface (#370: phpBB events + read API)** — the integration layer for the family (revives 2012 bbDKP-API idea), Discord (new ext), Gameworld (new ext), Battle.net API modernisation, spec build analysis (#286).
+- **Separate track (own roadmap):** DKP & Accounting — bbAccounts (~RC), bbDKP v2 (~0%), raid logging (0%), bbPoints v2.
+- **Labels:** version labels removed repo-wide; versioning is milestone-only. Functional + MoSCoW (`Must/Should/Could have`) label set replicated across core + all 9 plugin repos.
+- **Game-API docs** (forum f=70, refreshed): only WoW (done) and GW2 (API v2, next) have first-class APIs; FFXIV via fragile third-party parsers; other games have no API path.
 
 ## Requirements
 
@@ -155,6 +169,7 @@ Default grants are a mix of role-based (`ROLE_USER_STANDARD`/`ROLE_USER_FULL`, `
 - **Roster combined class/armor filter** (rc2) - split the legacy single `filter` pulldown (server-side disambiguated by lookup-array match) into independent `class_filter`/`armor_filter` dropdowns
 - **Roster search box CSS** (rc2) - reused phpBB's reserved `search-box` class (oversized); renamed to `roster-search-box` with its own compact sizing and box-model alignment fixes
 - **#354 `getPlayerId()` fatal error** (rc3) - UCP character-add form, UCP character-edit form, and ACP roster's character-edit form all called a nonexistent `player::getPlayerId()` method when resolving the portrait URL; `player` only ever exposed `player_id` as a public property, now read directly
+- **#371 dead ACP game buttons** (rc5) - three buttons on the ACP **Games → List games** page had no POST handler in `listgames()` (it only assigned template vars): "Install from game plugin" (`addgame1`, also redundant — plugins auto-register their game on enable via `migrations/basics/data.php`), "Create custom game" (`addgame2`), and "Default game" Confirm (`upddefaultgame`). Removed the redundant preconfigured-install control, renamed the fieldset "Custom game installation" with Region reordered last, and wired `addgame2` → `game::install_game()` (custom path, form-token + length + duplicate-id guards) and `upddefaultgame` → `game::update_gamedefault()`
 
 ## Incomplete Features (Must Have)
 
@@ -241,10 +256,18 @@ Issue #331. Adds a layer between class and role.
 5. ~~Roster search box CSS (class collision, box-model alignment)~~ Done
 6. ~~Documentation sweep: composer.json, README, CHANGELOG, architecture.md, CLAUDE.md, cleanup.sql~~ Done
 
-### Phase 2.5: RC3 — bug fixes from manual testing, IN PROGRESS (2.0.0-rc3)
+### Phase 2.5: RC3 — bug fixes from manual testing (2.0.0-rc3)
 1. ~~Fatal error `getPlayerId()` undefined method on UCP character-add, UCP character-edit, and ACP roster character-edit forms (#354)~~ Done
 
-### Phase 3: Remaining feature work (post-rc3, milestone 2.1.0/2.2.0)
+### Phase 2.6: RC4 — bug fixes + ACP restructure (2.0.0-rc4)
+1. ~~ACP restructured: new **Game settings** category (`ACP_BBGUILD_GAMESETTINGS`); Game List module moved into it (migration `v200rc4`)~~ Done
+2. ~~Game-settings region silently discarded on save (#357); stale 7-day guild cache; empty-MOTD header error (#28); faction dropdown snap (#29); default roster level 50 → 1~~ Done
+
+### Phase 2.7: RC5 — dead ACP game buttons + plugin dependency gate (2.0.0-rc5)
+1. ~~Wire up / clean up the ACP Games list page: remove redundant "Install from game plugin", wire custom-game Add and Default game Confirm (#371)~~ Done
+2. ~~All 9 game plugins now hard-require bbGuild core ≥ 2.0.0-rc5 — `MIN_BBGUILD_VERSION` check in each plugin's `ext.php::is_enableable()` (the one enforced gate), composer `soft-require` bumped to `>=2.0.0-rc5` (advisory). Migration `depends_on` intentionally left at core `v200b4` (schema-correctness dep, not a version knob)~~ Done
+
+### Phase 3: Remaining feature work (post-rc5, milestone 2.1.0/2.2.0)
 - #288 — Individual player page as a portal module (deferred to 2.1.0; legacy view works and ships in rc3)
 - #331 Phase 3c — Recruitment spec filter (not started, 2.2.0)
 - #331 Phase 5 — Migrate legacy free-text `player_spec` text → `player_spec_id` (not started, 2.2.0)
