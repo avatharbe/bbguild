@@ -309,7 +309,7 @@ class admin_games
 	{
 		$link = '<br /><a href="' . append_sid("index.$this->php_ext", 'i=-avathar-bbguild-acp-game_module&amp;mode=listgames') . '"><h3>' . $this->language->lang('RETURN_GAMELIST') . '</h3></a>';
 		//fetch installed games
-		$games = new game($this->db, $this->cache, $this->config, $this->user, $this->phpbb_extension_manager, $this->bb_classes_table, $this->bb_races_table, $this->bb_language_table, $this->bb_factions_table, $this->bb_games_table);
+		$games = new game($this->db, $this->cache, $this->config, $this->user, $this->phpbb_extension_manager, $this->bb_classes_table, $this->bb_races_table, $this->bb_language_table, $this->bb_factions_table, $this->bb_games_table, $this->game_registry);
 
 		$sort_order = array(
 			0 => array(    'id' , 'id desc') ,
@@ -324,6 +324,60 @@ class admin_games
 		foreach ($this->gamelist as $game)
 		{
 			$installed[$game['game_id']] = $game['name'];
+		}
+
+		// Set the default game
+		if ($this->request->is_set_post('upddefaultgame'))
+		{
+			if (!check_form_key('avathar/bbguild'))
+			{
+				trigger_error($this->language->lang('FORM_INVALID') . $link, E_USER_WARNING);
+			}
+
+			$default_game = $this->request->variable('defaultgame', '');
+			if (!isset($installed[$default_game]))
+			{
+				trigger_error($this->language->lang('ADMIN_INSTALL_GAME_FAILED') . $link, E_USER_WARNING);
+			}
+
+			$games->update_gamedefault($default_game);
+
+			meta_refresh(3, append_sid("index.$this->php_ext", 'i=-avathar-bbguild-acp-game_module&amp;mode=listgames'));
+			trigger_error(sprintf($this->language->lang('ADMIN_UPDATE_DEFAULTGAME_SUCCESS'), $installed[$default_game]) . $link, E_USER_NOTICE);
+		}
+
+		// Add a custom game
+		if ($this->request->is_set_post('addgame2'))
+		{
+			if (!check_form_key('avathar/bbguild'))
+			{
+				trigger_error($this->language->lang('FORM_INVALID') . $link, E_USER_WARNING);
+			}
+
+			$new_game_id   = strtolower($this->request->variable('ngame_id', ''));
+			$new_game_name = $this->request->variable('ngame_name', '', true);
+			$region        = $this->request->variable('region_id', 'eu');
+
+			if (utf8_strlen($new_game_id) < 2)
+			{
+				trigger_error($this->language->lang('FV_REQUIRED_GAME_ID') . $link, E_USER_WARNING);
+			}
+			if (utf8_strlen($new_game_name) < 2)
+			{
+				trigger_error($this->language->lang('FV_REQUIRED_GAME_NAME') . $link, E_USER_WARNING);
+			}
+			if (isset($installed[$new_game_id]))
+			{
+				trigger_error(sprintf($this->language->lang('ERROR_GAME_EXISTS'), $new_game_id) . $link, E_USER_WARNING);
+			}
+
+			$games->game_id = $new_game_id;
+			$games->setName($new_game_name);
+			$games->setRegion($region);
+			$games->install_game();
+
+			meta_refresh(3, append_sid("index.$this->php_ext", 'i=-avathar-bbguild-acp-game_module&amp;mode=listgames'));
+			trigger_error(sprintf($this->language->lang('ADMIN_INSTALLED_GAME_SUCCESS'), $new_game_name) . $link, E_USER_NOTICE);
 		}
 
 		// Installed games table
@@ -369,20 +423,6 @@ class admin_games
 			));
 		}
 
-		// Installable games dropdown (from game plugin registry, excluding already installed)
-		$installable = $this->game_registry->get_installable_games();
-		foreach ($installable as $game_id => $game_name)
-		{
-			if (!isset($installed[$game_id]))
-			{
-				$this->template->assign_block_vars('gamelistrow', array(
-					'VALUE'    => $game_id,
-					'SELECTED' => '',
-					'OPTION'   => $game_name,
-				));
-			}
-		}
-
 		// Region dropdown
 		$regions = array(
 			'eu'  => $this->language->lang('REGIONEU'),
@@ -402,13 +442,8 @@ class admin_games
 
 		$u_list_game = append_sid("index.$this->php_ext", 'i=-avathar-bbguild-acp-game_module&amp;mode=listgames');
 
-		// Build list of available game plugin names for the info text
-		$plugin_names = implode(', ', $installable);
-
 		$this->template->assign_vars(array(
 			'S_INSTALLED'  => !empty($this->gamelist),
-			'CANINSTALL'   => !empty($installable),
-			'PREINSTALLED' => $this->language->lang('PREINSTALLED', $plugin_names ?: $this->language->lang('NA')),
 			'U_ACTION'     => $u_list_game,
 			'U_LIST_GAME'  => $u_list_game,
 			'O_ID'         => $current_order['uri'][0],

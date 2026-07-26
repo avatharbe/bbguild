@@ -34,7 +34,6 @@
 <h1>{{ lang('ACP_NEWGAME') }}</h1>
 <br />
 <p>{{ lang('ACP_NEWGAME_EXPLAIN') }}</p>
-<p>{{ PREINSTALLED }}</p>
 
 {% if S_INSTALLED%}
 <fieldset>
@@ -51,6 +50,7 @@
                     {% endfor %}
                 </select>
                 <input type="submit" name="upddefaultgame" value="{{ lang('CONFIRM') }}" class="button1" />
+                {{ S_FORM_TOKEN }}
             </form>
         </dd>
     </dl>
@@ -59,25 +59,17 @@
 
 <fieldset>
     <legend>{{ lang('ADD_GAME') }}</legend>
-    {% if CANINSTALL == 1 %}
     <form id="acp_listgames" method="post" action="{{ U_ACTION }}">
         <dl>
-            <dt><label for="ngame_id">{{ lang('ADD_PRECONFIGGAME') }}:</label></dt>
+            <dt><label for="ngame_id">{{ lang('ADD_CUSTOMGAME') }}:</label></dt>
             <dd>
-                <select id="ngame_id" name="ngame_id" class="input" >
-                    {% for gamelistrow in loops.gamelistrow %}
-                    <option value="{{ gamelistrow.VALUE }}"{{ gamelistrow.SELECTED }}>{{ gamelistrow.OPTION }}</option>
-                    {% endfor %}
-                </select>
-                &nbsp;
-                <input type="submit" name="addgame1" value="{{ lang('ADD') }}" class="button1"/>
-                {{ S_FORM_TOKEN }}
+                <input type="text" name="ngame_id" size="10" maxlength="10" value="" class="addgame" />
+                <input type="text" name="ngame_name" size="40" maxlength="255" value="" class="addgame" />
             </dd>
         </dl>
 
         <dl>
-            <dt>
-                <label for="region_id">{{ lang('REGION') }}:</label></dt>
+            <dt><label for="region_id">{{ lang('REGION') }}:</label></dt>
             <dd>
                 <select id="region_id" name="region_id" class="input">
                     {% for region_row in loops.region_row %}
@@ -87,22 +79,13 @@
             </dd>
         </dl>
 
-
-    </form>
-    {% endif %}
-    <form id="acp_listgames" method="post" action="{{ U_ACTION }}">
-
         <dl>
-            <dt><label for="ngame_id">{{ lang('ADD_CUSTOMGAME') }}:</label></dt>
+            <dt>&nbsp;</dt>
             <dd>
-                <input type="text" name="ngame_id" size="10" maxlength="10" value="" class="addgame" />
-                <input type="text" name="ngame_name" size="40" maxlength="255" value="" class="addgame" />
                 <input type="submit" name="addgame2" value="{{ lang('ADD') }}" class="button1"/>
                 {{ S_FORM_TOKEN }}
             </dd>
         </dl>
-
-
     </form>
 </fieldset>
 
