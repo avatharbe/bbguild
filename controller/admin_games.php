@@ -1262,10 +1262,24 @@ class admin_games
 			$game_images_web  = $this->ext_path_web . 'images/' . $game_id . '/';
 		}
 
-		// Races
+		// Races (sortable headers via ?o=<col>.<dir>, resolved by util::switch_order)
 		$races_obj = new races($this->db, $this->config, $this->cache, $this->user, $this->bb_language_table, $this->bb_players_table, $this->bb_games_table, $this->bb_races_table, $this->bb_factions_table);
 		$races_obj->game_id = $game_id;
-		$race_list = $races_obj->list_races();
+		$race_sort = array(
+			0 => array('r.race_id', 'r.race_id DESC'),
+			1 => array('race_name', 'race_name DESC'),
+			2 => array('f.faction_name', 'f.faction_name DESC'),
+		);
+		$race_order = $this->util->switch_order($race_sort, constants::URI_ORDER, '0.0');
+		$race_list = $races_obj->list_races($race_order['sql']);
+		$this->template->assign_vars(array(
+			// U_ADD_GAMES is the base URL for every sortable header link on this page;
+			// it was never assigned before, which broke all header links (404).
+			'U_ADD_GAMES'   => $u_edit_game,
+			'O_RACEID'      => $race_order['uri'][0],
+			'O_RACENAME'    => $race_order['uri'][1],
+			'O_FACTIONNAME' => $race_order['uri'][2],
+		));
 		$row_count = 0;
 		foreach ($race_list as $race)
 		{
@@ -1313,10 +1327,25 @@ class admin_games
 		}
 		$this->template->assign_var('LISTROLES_FOOTCOUNT', sprintf($this->language->lang('LISTROLES_FOOTCOUNT'), count($role_list)));
 
-		// Classes
+		// Classes (sortable headers via ?o1=<col>.<dir>, resolved by util::switch_order)
 		$classes_obj = new classes($this->db, $this->config, $this->cache, $this->user, $this->bb_language_table, $this->bb_players_table, $this->bb_games_table, $this->bb_classes_table);
 		$classes_obj->game_id = $game_id;
-		$class_list = $classes_obj->list_classes('class_id', 1);
+		$class_sort = array(
+			0 => array('class_id', 'class_id DESC'),
+			1 => array('class_name', 'class_name DESC'),
+			2 => array('c.class_armor_type', 'c.class_armor_type DESC'),
+			3 => array('c.class_min_level', 'c.class_min_level DESC'),
+			4 => array('c.class_max_level', 'c.class_max_level DESC'),
+		);
+		$class_order = $this->util->switch_order($class_sort, 'o1', '0.0');
+		$class_list = $classes_obj->list_classes($class_order['sql'], 1);
+		$this->template->assign_vars(array(
+			'O_CLASSID'    => $class_order['uri'][0],
+			'O_CLASSNAME'  => $class_order['uri'][1],
+			'O_CLASSARMOR' => $class_order['uri'][2],
+			'O_CLASSMIN'   => $class_order['uri'][3],
+			'O_CLASSMAX'   => $class_order['uri'][4],
+		));
 		$row_count = 0;
 		foreach ($class_list as $cls)
 		{
