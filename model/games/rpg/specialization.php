@@ -124,7 +124,7 @@ class specialization
 
 	/**
 	 * Return all specs for a class (or for a whole game if class_id is null),
-	 * ordered by spec_order then spec_name.
+	 * ordered by class, then role, then spec (spec_order, then spec_name).
 	 *
 	 * @return array<int, array{spec_id:int,game_id:string,class_id:int,role_id:int,spec_name:string,spec_icon:string,spec_order:int}>
 	 */
@@ -138,7 +138,7 @@ class specialization
 
 		$sql = 'SELECT * FROM ' . $this->bb_specializations_table
 			. ' WHERE ' . $where
-			. ' ORDER BY spec_order ASC, spec_name ASC';
+			. ' ORDER BY class_id ASC, role_id ASC, spec_order ASC, spec_name ASC';
 
 		$result = $this->db->sql_query($sql);
 		$rows = [];
