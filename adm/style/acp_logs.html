@@ -18,16 +18,25 @@
         </div>
         {% endif %}
 
+        <div class="pagination" style="margin-bottom: 6px;">
+            {{ lang('LOGS_PER_PAGE') }}
+            <select onchange="if (this.value) { window.location.href = this.value; }">
+            {% for pp in loops.per_page_row %}
+                <option value="{{ pp.URL }}"{% if pp.S_SELECTED %} selected="selected"{% endif %}>{{ pp.VALUE }}</option>
+            {% endfor %}
+            </select>
+        </div>
+
         <table cellspacing="1">
             <thead>
               <tr>
-                <th style="text-align: left, width:5%, white-space: nowrap">{{ lang('ID') }}</th>
+                <th style="text-align: left, width:5%, white-space: nowrap"><a href="{{ U_LOGS_SORT }}&amp;o={{ O_LOG_ID }}">{{ lang('ID') }}</a></th>
                 <th style="text-align: left, width:5%, white-space: nowrap" class="rowhead">{{ lang('VIEW_ACTION') }}</th>
-                <th style="text-align: left, width:15%, white-space: nowrap" >{{ lang('DATE') }}</th>
-                <th style="text-align: left, width:20%, white-space: nowrap">{{ lang('TYPE') }}</th>
-                <th style="text-align: left, width:15%, white-space: nowrap">{{ lang('USER') }}</th>
-                <th style="text-align: left, width:10%, white-space: nowrap">{{ lang('IP_ADDRESS') }}</th>
-                <th style="text-align: left, width:5%, white-space: nowrap">{{ lang('RESULT') }}</th>
+                <th style="text-align: left, width:15%, white-space: nowrap" ><a href="{{ U_LOGS_SORT }}&amp;o={{ O_LOG_DATE }}">{{ lang('DATE') }}</a></th>
+                <th style="text-align: left, width:20%, white-space: nowrap"><a href="{{ U_LOGS_SORT }}&amp;o={{ O_LOG_TYPE }}">{{ lang('TYPE') }}</a></th>
+                <th style="text-align: left, width:15%, white-space: nowrap"><a href="{{ U_LOGS_SORT }}&amp;o={{ O_LOG_USER }}">{{ lang('USER') }}</a></th>
+                <th style="text-align: left, width:10%, white-space: nowrap"><a href="{{ U_LOGS_SORT }}&amp;o={{ O_LOG_IP }}">{{ lang('IP_ADDRESS') }}</a></th>
+                <th style="text-align: left, width:5%, white-space: nowrap"><a href="{{ U_LOGS_SORT }}&amp;o={{ O_LOG_RESULT }}">{{ lang('RESULT') }}</a></th>
                 <th>{{ lang('MARK') }}</th>
               </tr>
             </thead>

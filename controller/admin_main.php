@@ -577,10 +577,29 @@ class admin_main
 		$start = $this->request->variable('start', 0);
 		$verbose = true;
 
+		// Sortable columns (server-side ORDER BY, preserved across pagination via ?o=<col>.<dir>).
+		$log_sort = array(
+			0 => array('log_id', 'log_id DESC'),
+			1 => array('log_date', 'log_date DESC'),
+			2 => array('log_type', 'log_type DESC'),
+			3 => array('u.username', 'u.username DESC'),
+			4 => array('log_ipaddress', 'log_ipaddress DESC'),
+			5 => array('log_result', 'log_result DESC'),
+		);
+		$log_order = $this->util->switch_order($log_sort, constants::URI_ORDER, '0.1');
+
+		// Rows-per-page selector (?per_page=), constrained to a safe whitelist.
+		$allowed_per_page = array(20, 50, 100, 200);
+		$per_page = $this->request->variable('per_page', (int) constants::USER_LLIMIT);
+		if (!in_array($per_page, $allowed_per_page, true))
+		{
+			$per_page = (int) constants::USER_LLIMIT;
+		}
+
 		$logcount = $this->bbguildlog->getTotalLogs();
 
-		$pagination_url = append_sid("index.$this->php_ext", 'i=-avathar-bbguild-acp-main_module&amp;mode=logs&amp;') .  '&amp';
-		$this->pagination->generate_template_pagination($pagination_url, 'pagination', 'page', $logcount, constants::USER_LLIMIT, $start);
+		$pagination_url = append_sid("index.$this->php_ext", 'i=-avathar-bbguild-acp-main_module&amp;mode=logs&amp;o=' . $log_order['uri']['current'] . '&amp;per_page=' . $per_page) .  '&amp';
+		$this->pagination->generate_template_pagination($pagination_url, 'pagination', 'page', $logcount, $per_page, $start);
 
 		//header
 		$this->template->assign_vars(
@@ -591,12 +610,30 @@ class admin_main
 				'U_LOGS'        => append_sid("index.$this->php_ext", 'i=-avathar-bbguild-acp-main_module&amp;mode=logs&amp;') . '&amp;start=' . $start ,
 				'U_LOGS_SEARCH' => append_sid("index.$this->php_ext", 'i=-avathar-bbguild-acp-main_module&amp;mode=logs'),
 				'START'         => $start ,
-				'VIEWLOGS_FOOTCOUNT' => sprintf($this->language->lang('VIEWLOGS_FOOTCOUNT'), $logcount, constants::USER_LLIMIT) ,
-				'PAGE_NUMBER'   => $this->pagination->on_page($logcount, constants::USER_LLIMIT, $start)
+				'VIEWLOGS_FOOTCOUNT' => sprintf($this->language->lang('VIEWLOGS_FOOTCOUNT'), $logcount, $per_page) ,
+				'PAGE_NUMBER'   => $this->pagination->on_page($logcount, $per_page, $start) ,
+					'U_LOGS_SORT'   => append_sid("index.$this->php_ext", 'i=-avathar-bbguild-acp-main_module&amp;mode=logs') ,
+					'CURRENT_ORDER' => $log_order['uri']['current'] ,
+					'O_LOG_ID'      => $log_order['uri'][0] ,
+					'O_LOG_DATE'    => $log_order['uri'][1] ,
+					'O_LOG_TYPE'    => $log_order['uri'][2] ,
+					'O_LOG_USER'    => $log_order['uri'][3] ,
+					'O_LOG_IP'      => $log_order['uri'][4] ,
+					'O_LOG_RESULT'  => $log_order['uri'][5] ,
+					'PER_PAGE'      => $per_page
 			)
 		);
 
-		$listlogs = $this->bbguildlog->read_log('', '', $verbose, '', $start);
+		foreach ($allowed_per_page as $pp)
+		{
+			$this->template->assign_block_vars('per_page_row', array(
+				'VALUE'      => $pp,
+				'URL'        => append_sid("index.$this->php_ext", 'i=-avathar-bbguild-acp-main_module&amp;mode=logs&amp;o=' . $log_order['uri']['current'] . '&amp;per_page=' . $pp),
+				'S_SELECTED' => ($pp == $per_page),
+			));
+		}
+
+		$listlogs = $this->bbguildlog->read_log($log_order['sql'], '', $verbose, '', $start, $per_page);
 		foreach ($listlogs as $key => $log)
 		{
 			$this->template->assign_block_vars(

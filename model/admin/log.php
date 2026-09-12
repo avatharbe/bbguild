@@ -209,7 +209,7 @@ class log
 	 * @param  string $start
 	 * @return array
 	 */
-	public function read_log($order = '', $search = false, $verbose = false, $search_term = '', $start = '')
+	public function read_log($order = '', $search = false, $verbose = false, $search_term = '', $start = '', $limit = 0)
 	{
 		$sql_array = array(
 			'SELECT' => 'l.*, u.username, u.user_colour',
@@ -246,9 +246,9 @@ class log
 		}
 		else
 		{
-			$sql_array['ORDER_BY'] = 'log_id DESC';
+			$sql_array['ORDER_BY'] = ($order !== '') ? $order : 'log_id DESC';
 			$sql = $this->db->sql_build_query('SELECT', $sql_array);
-			$result = $this->db->sql_query_limit($sql, constants::USER_LLIMIT, $start);
+			$result = $this->db->sql_query_limit($sql, ($limit > 0 ? (int) $limit : constants::USER_LLIMIT), $start);
 		}
 
 		$outlog = array();
