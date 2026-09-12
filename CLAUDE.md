@@ -5,7 +5,7 @@
 **bbGuild** is a Guild Management System for phpBB 3.3+ designed for World of Warcraft gaming communities. It provides guild roster management, character tracking, achievements, recruitment, and integration with the Battle.net API.
 
 - **Author:** Andreas Vandenberghe (Sajaki)
-- **Version:** 2.0.0-rc5 (release candidate; version lives in `ext::BBGUILD_VERSION`, not `phpbb_config`)
+- **Version:** 2.0.0 (stable; version lives in `ext::BBGUILD_VERSION`, not `phpbb_config`)
 - **License:** GPL-2.0-only
 - **Repository:** https://github.com/avatharbe/bbguild
 
@@ -14,17 +14,17 @@
 | Metric | Value |
 |--------|-------|
 | First commit | May 28, 2010 |
-| Status | rc5 track — stabilising toward 2.0.0 stable |
+| Status | 2.0.0 stable shipped 2026-09-12; 2.1.0 (guild page overhaul) in progress |
 | Tracking issue | [#303](https://github.com/avatharbe/bbguild/issues/303) |
 
 ## Roadmap (2.x) — planned 2026-07
 
 Full plan: **`contrib/roadmap-2.x.md`** (parity matrix + release plan); BBCode forum status post: `contrib/roadmap-2.x-forum-post.txt`.
 
-- **North star:** feature parity vs. phpBB native / legacy bbDKP MOD / the extension family / guildsofwow.com. Releases are a **coordinated train** across core + all 9 game plugins — shipped together on the same milestone dates and **pairing-locked** (every plugin hard-requires the current core RC via `ext.php::is_enableable()`), but the individual RC numbers are NOT kept identical: stabilisation bugs surface per-component, so as of 2026-07-26 core is `rc5`, WoW `rc3`, and the other 8 plugins `rc2`. More RCs before 2.0.0 stable is expected. **2.0.0 ships stable first (stabilisation only); features start at 2.1.0.**
+- **North star:** feature parity vs. phpBB native / legacy bbDKP MOD / the extension family / guildsofwow.com. Releases are a **coordinated train** across core + all 9 game plugins — shipped together on the same milestone dates and **pairing-locked** (every plugin hard-requires the current core version via `ext.php::is_enableable()`). **2.0.0 shipped stable 2026-09-12** (core `2.0.0`; bbguildwow's pairing bumped to require `>=2.0.0`) — the rc5→stable step was a version-number/pairing-lock bump only, no schema or code change (#244, the sole 2.0.0 blocker, closed 2026-09-12). Other plugins' 2.0.0 status not yet re-verified as part of this pass — see the live roadmap doc. **Features now at 2.1.0.**
 - **Milestone scheme (GitHub, milestone-driven versioning — no version labels):**
-  - `2.0.0` (due 2026-08-31) — stabilisation + unit tests (#244); plugin test suites + icon fixes.
-  - `2.1.0` (due 2026-10-15) — **guild page overhaul**: page-level portal tabs (#360), character-sync scheduler contract (#361) + WoW handler (#362), gear tooltips via bbTips + bonus IDs (#363), character page polish (#364), per-character achievements (#365), guild statistics portal module (#366, subsumes #279), character-based forum avatars (#369, restores pbwowext#10 pt1); plugin spec data (#367) + **GW2 API v2 sync** (bbguildgw2#9).
+  - `2.0.0` (due 2026-08-31, shipped 2026-09-12) — stabilisation + unit tests (#244, closed); plugin test suites + icon fixes.
+  - `2.1.0` (due 2026-10-15, in progress) — **guild page overhaul**: page-level portal tabs (#360, open), character-sync scheduler contract (#361, **shipped**) + WoW handler (#362, **shipped**), gear tooltips via bbTips + bonus IDs (#363, **shipped** — implemented under bbguildwow's `2.1.0-b1` line, closed 2026-09-12), character page polish (#364), per-character achievements (#365), guild statistics portal module (#366, subsumes #279), character-based forum avatars (#369, restores pbwowext#10 pt1); unit test coverage follow-up (#372, split from #244); plugin spec data (#367) + **GW2 API v2 sync** (bbguildgw2#9).
   - `2.2.0` (due 2026-11-30) — Events/RSVP calendar (new ext), roster↔profile fields (#231), profile-field character info (#368, pbwowext#10 pt2), professions (#230), player stats (#289).
   - `2.3.0` (due 2027-01-15) — **bbGuild API surface (#370: phpBB events + read API)** — the integration layer for the family (revives 2012 bbDKP-API idea), Discord (new ext), Gameworld (new ext), Battle.net API modernisation, spec build analysis (#286).
 - **Separate track (own roadmap):** DKP & Accounting — bbAccounts (~RC), bbDKP v2 (~0%), raid logging (0%), bbPoints v2.
@@ -267,8 +267,22 @@ Issue #331. Adds a layer between class and role.
 1. ~~Wire up / clean up the ACP Games list page: remove redundant "Install from game plugin", wire custom-game Add and Default game Confirm (#371)~~ Done
 2. ~~All 9 game plugins now hard-require bbGuild core ≥ 2.0.0-rc5 — `MIN_BBGUILD_VERSION` check in each plugin's `ext.php::is_enableable()` (the one enforced gate), composer `soft-require` bumped to `>=2.0.0-rc5` (advisory). Migration `depends_on` intentionally left at core `v200b4` (schema-correctness dep, not a version knob)~~ Done
 
-### Phase 3: Remaining feature work (post-rc5, milestone 2.1.0/2.2.0)
-- #288 — Individual player page as a portal module (deferred to 2.1.0; legacy view works and ships in rc3)
+### Phase 2.8: 2.0.0 stable — COMPLETE (2.0.0, tagged 2026-09-12)
+1. ~~Close #244 (only remaining 2.0.0-milestone issue) — reduced scope to the essentials already shipped (specialization/roster/player CRUD unit coverage), split the remaining migration/full-CRUD coverage gap into a dedicated follow-up (#372, milestoned 2.1.0)~~ Done
+2. ~~Version bump: `ext::BBGUILD_VERSION` / `composer.json` `2.0.0-rc5` → `2.0.0`~~ Done — version-number/pairing-lock step only, no schema or code change since rc5
+3. ~~`bbguildwow`'s `MIN_BBGUILD_VERSION` / composer `soft-require` pairing bumped to `>=2.0.0`~~ Done
+
+### Phase 3: 2.1.0 in progress (post-2.0.0-stable)
+- #361 — Core character-sync scheduler contract + cron — **shipped**
+- #362 — bbguildwow character-sync handler (armory equipment) — **shipped**
+- #363 — Gear tooltips via bbTips + capture bonus IDs — **shipped** (implemented under bbguildwow's `2.1.0-b1` line; found fully committed but undocumented during this release pass, changelog/issue now reconciled)
+- #360 — Portal: page-level guild tabs (open)
+- #364 — Character page polish (layout + async stats) (open)
+- #365 — Per-character achievements view (open)
+- #366 — Guild statistics portal module, subsumes #279 (open)
+- #367 — Complete plugin spec data for 8 non-WoW games (open)
+- #369 — Character-based forum avatars, restores pbwowext#10 pt1 (open)
+- #372 — Unit test coverage: migrations + remaining guild/player CRUD paths, split from #244 (open)
 - #331 Phase 3c — Recruitment spec filter (not started, 2.2.0)
 - #331 Phase 5 — Migrate legacy free-text `player_spec` text → `player_spec_id` (not started, 2.2.0)
 - 8 of 9 plugin Phase 4 sub-issues open (eq, eq2, ffxi, ffxiv, gw2, lineage2, lotro, swtor) — spec data only, 2.2.0
