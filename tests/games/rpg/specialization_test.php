@@ -174,7 +174,7 @@ class specialization_test extends TestCase
 		$this->assertSame(2, $result[1]['spec_id']);
 		$this->assertStringContainsString("game_id = 'wow'", $capturedSql);
 		$this->assertStringContainsString('class_id = 8', $capturedSql);
-		$this->assertStringContainsString('ORDER BY spec_order ASC, spec_name ASC', $capturedSql);
+		$this->assertStringContainsString('ORDER BY class_id ASC, role_id ASC, spec_order ASC, spec_name ASC', $capturedSql);
 	}
 
 	public function test_get_for_class_omits_class_filter_when_null(): void
@@ -191,7 +191,9 @@ class specialization_test extends TestCase
 		$this->spec->get_for_class('wow');
 
 		$this->assertStringContainsString("game_id = 'wow'", $capturedSql);
-		$this->assertStringNotContainsString('class_id', $capturedSql);
+		// class_id legitimately appears in ORDER BY regardless of the filter;
+		// what must be absent is the WHERE-clause class_id filter fragment.
+		$this->assertStringNotContainsString('AND class_id', $capturedSql);
 	}
 
 	public function test_get_translations_returns_empty_when_language_table_unwired(): void
