@@ -1172,11 +1172,13 @@ Punkty wysiłku gracza 2: 342, stosunek EP/GP 17,1<br />
 	'ACTION_ROSTER_SYNCED' => 'Guild roster synced',
 	'ACTION_SPECS_SYNCED' => 'Specializations synced',
 	'ACTION_PORTRAITS_SYNCED' => 'Portraits synced',
+	'ACTION_CHARACTER_SYNC_FAILED' => 'Character sync failed',
 	'VLOG_ARMORY_DOWN' => '%s: Battle.net API error for %s',
 	'VLOG_BATTLENET_ACCOUNT_INACTIVE' => '%s: Battle.net account inactive for %s',
 	'VLOG_ROSTER_SYNCED' => '%s synced roster for guild %s: %s',
 	'VLOG_SPECS_SYNCED' => '%s synced specializations for guild %s: %s',
 	'VLOG_PORTRAITS_SYNCED' => '%s synced portraits for guild %s: %s',
+	'VLOG_CHARACTER_SYNC_FAILED' => '%s: character sync failed for %s (game: %s)',
 
 	)
 );

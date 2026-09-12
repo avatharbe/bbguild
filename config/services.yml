@@ -241,6 +241,39 @@ services:
         class: avathar\bbguild\model\games\game_registry
         arguments:
             - '@avathar.bbguild.game_provider_collection'
+    avathar.bbguild.character_sync_collection:
+        class: phpbb\di\service_collection
+        arguments:
+            - '@service_container'
+        tags:
+            - { name: service_collection, tag: bbguild.character_sync }
+    avathar.bbguild.character_sync_registry:
+        class: avathar\bbguild\model\games\character_sync_registry
+        arguments:
+            - '@avathar.bbguild.character_sync_collection'
+    avathar.bbguild.cron.task.character_sync:
+        class: avathar\bbguild\cron\task\character_sync
+        arguments:
+            - '@config'
+            - '@avathar.bbguild.character_sync_registry'
+            - '@dbal.conn'
+            - '@cache.driver'
+            - '@user'
+            - '@ext.manager'
+            - '@avathar.bbguild.log'
+            - '@avathar.bbguild.util'
+            - '%avathar.bbguild.tables.bb_players%'
+            - '%avathar.bbguild.tables.bb_ranks%'
+            - '%avathar.bbguild.tables.bb_classes%'
+            - '%avathar.bbguild.tables.bb_races%'
+            - '%avathar.bbguild.tables.bb_language%'
+            - '%avathar.bbguild.tables.bb_guild%'
+            - '%avathar.bbguild.tables.bb_factions%'
+            - '%avathar.bbguild.tables.bb_games%'
+        calls:
+            - [set_name, ['avathar.bbguild.cron.task.character_sync']]
+        tags:
+            - { name: cron.task }
     avathar.bbguild.listener:
         class: avathar\bbguild\event\main_listener
         arguments:

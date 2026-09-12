@@ -73,6 +73,7 @@ class log
 		constants::ROSTER_SYNCED => 'ROSTER_SYNCED',
 		constants::SPECS_SYNCED => 'SPECS_SYNCED',
 		constants::PORTRAITS_SYNCED => 'PORTRAITS_SYNCED',
+		constants::CHARACTER_SYNC_FAILED => 'CHARACTER_SYNC_FAILED',
 	);
 
 	public function __construct($bb_logs_table, \phpbb\db\driver\driver_interface $db, \phpbb\user $user)
