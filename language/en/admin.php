@@ -848,6 +848,7 @@ So the loot would go to player 2 <br />',
 	'ACTION_ROSTER_SYNCED' => 'Guild roster synced',
 	'ACTION_SPECS_SYNCED' => 'Specializations synced',
 	'ACTION_PORTRAITS_SYNCED' => 'Portraits synced',
+	'ACTION_CHARACTER_SYNC_FAILED' => 'Character sync failed',
 
 	// Verbose Log Messages
 	'NEW_ACTIONS' => 'Recent Activity',
@@ -911,6 +912,7 @@ So the loot would go to player 2 <br />',
 	'VLOG_ROSTER_SYNCED' => '%s synced roster for guild %s: %s',
 	'VLOG_SPECS_SYNCED' => '%s synced specializations for guild %s: %s',
 	'VLOG_PORTRAITS_SYNCED' => '%s synced portraits for guild %s: %s',
+	'VLOG_CHARACTER_SYNC_FAILED' => '%s: character sync failed for %s (game: %s)',
 
 	// Log Detail Fields
 	'ADJUSTMENT_BEFORE' => 'Adjustment Before',

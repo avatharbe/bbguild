@@ -263,5 +263,9 @@ class constants {
 	 * character portraits synced from API
 	 */
 	const PORTRAITS_SYNCED = 60;
+	/**
+	 * character-sync cron task failed to sync a character (#361)
+	 */
+	const CHARACTER_SYNC_FAILED = 61;
 
 }
