@@ -37,14 +37,65 @@ class character_sync extends \phpbb\cron\task\base
 	/** @var log */
 	protected $bbguild_log;
 
-	/** @var player */
+	/**
+	 * @var player|null Lazily built by get_player() — see its docblock.
+	 */
 	protected $player;
+
+	/** @var \phpbb\db\driver\driver_interface */
+	protected $db;
+
+	/** @var \phpbb\cache\driver\driver_interface */
+	protected $cache;
+
+	/** @var \phpbb\user */
+	protected $user;
+
+	/** @var \phpbb\extension\manager */
+	protected $ext_manager;
+
+	/** @var util */
+	protected $util;
+
+	/** @var string */
+	protected $bb_players_table;
+
+	/** @var string */
+	protected $bb_ranks_table;
+
+	/** @var string */
+	protected $bb_classes_table;
+
+	/** @var string */
+	protected $bb_races_table;
+
+	/** @var string */
+	protected $bb_language_table;
+
+	/** @var string */
+	protected $bb_guild_table;
+
+	/** @var string */
+	protected $bb_factions_table;
+
+	/** @var string */
+	protected $bb_games_table;
 
 	/**
 	 * Constructor. The trailing block of raw dependencies + table names
 	 * mirrors every other manual `new player(...)` call site in this
 	 * codebase (e.g. acp/player_module.php) — bbGuild has no DI service
 	 * for `player` itself, so each consumer threads its own construction.
+	 *
+	 * `player` itself is NOT built here — only stored as raw arguments.
+	 * phpBB's cron dispatch eagerly instantiates every registered
+	 * `cron.task` service roughly once a minute (via service_collection)
+	 * just to check is_runnable()/should_run(), regardless of whether the
+	 * task is ready to run. player's constructor unconditionally runs DB
+	 * queries and reads $user->lang[...], so building it here would pay
+	 * that cost on every board, every minute, indefinitely — even before
+	 * #362 ships a game plugin that makes this task runnable at all. See
+	 * get_player() for the lazy singleton.
 	 */
 	public function __construct(
 		\phpbb\config\config $config,
@@ -68,11 +119,41 @@ class character_sync extends \phpbb\cron\task\base
 		$this->config = $config;
 		$this->registry = $registry;
 		$this->bbguild_log = $bbguild_log;
-		$this->player = new player(
-			$db, $config, $cache, $user, $ext_manager, $bbguild_log, $util,
-			$bb_players_table, $bb_ranks_table, $bb_classes_table, $bb_races_table,
-			$bb_language_table, $bb_guild_table, $bb_factions_table, $bb_games_table
-		);
+		$this->db = $db;
+		$this->cache = $cache;
+		$this->user = $user;
+		$this->ext_manager = $ext_manager;
+		$this->util = $util;
+		$this->bb_players_table = $bb_players_table;
+		$this->bb_ranks_table = $bb_ranks_table;
+		$this->bb_classes_table = $bb_classes_table;
+		$this->bb_races_table = $bb_races_table;
+		$this->bb_language_table = $bb_language_table;
+		$this->bb_guild_table = $bb_guild_table;
+		$this->bb_factions_table = $bb_factions_table;
+		$this->bb_games_table = $bb_games_table;
+	}
+
+	/**
+	 * Lazily builds (and caches) the `player` instance. Deliberately not
+	 * called from is_runnable() or should_run() — only run() needs it,
+	 * and run() only ever executes once should_run()/is_runnable() have
+	 * already confirmed the task is actually ready to do work.
+	 */
+	private function get_player(): player
+	{
+		if ($this->player === null)
+		{
+			$this->player = new player(
+				$this->db, $this->config, $this->cache, $this->user, $this->ext_manager,
+				$this->bbguild_log, $this->util,
+				$this->bb_players_table, $this->bb_ranks_table, $this->bb_classes_table,
+				$this->bb_races_table, $this->bb_language_table, $this->bb_guild_table,
+				$this->bb_factions_table, $this->bb_games_table
+			);
+		}
+
+		return $this->player;
 	}
 
 	/**
@@ -103,7 +184,9 @@ class character_sync extends \phpbb\cron\task\base
 			return;
 		}
 
-		$stale_players = $this->player->get_stalest_players($game_ids, self::BATCH_SIZE);
+		$player = $this->get_player();
+
+		$stale_players = $player->get_stalest_players($game_ids, self::BATCH_SIZE);
 
 		foreach ($stale_players as $player_row)
 		{
@@ -116,7 +199,7 @@ class character_sync extends \phpbb\cron\task\base
 				{
 					$success = $handler->sync_character($player_row);
 				}
-				catch (\Exception $e)
+				catch (\Throwable $e)
 				{
 					$success = false;
 				}
@@ -131,7 +214,7 @@ class character_sync extends \phpbb\cron\task\base
 				]);
 			}
 
-			$this->player->update_last_synced((int) $player_row['player_id']);
+			$player->update_last_synced((int) $player_row['player_id']);
 		}
 
 		$this->config->set('bbguild_sync_last_run', time());
