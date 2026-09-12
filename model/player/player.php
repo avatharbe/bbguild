@@ -2258,4 +2258,50 @@ class player
 		}
 		return $this->ext_path . 'images/' . $relative_path;
 	}
+
+	/**
+	 * Get the N stalest active characters across the given games, ordered by
+	 * player_last_synced ascending (never-synced characters, at 0, sort first).
+	 *
+	 * @param array $game_ids Game identifiers to include (e.g. from
+	 *                        character_sync_registry::get_supported_game_ids())
+	 * @param int   $limit    Maximum number of characters to return
+	 * @return array Rows from bb_players
+	 */
+	public function get_stalest_players(array $game_ids, int $limit): array
+	{
+		if (empty($game_ids))
+		{
+			return [];
+		}
+
+		$sql = 'SELECT * FROM ' . $this->bb_players_table . '
+			WHERE player_status = 1
+				AND ' . $this->db->sql_in_set('game_id', $game_ids) . '
+			ORDER BY player_last_synced ASC';
+		$result = $this->db->sql_query_limit($sql, $limit);
+
+		$players = [];
+		while ($row = $this->db->sql_fetchrow($result))
+		{
+			$players[] = $row;
+		}
+		$this->db->sql_freeresult($result);
+
+		return $players;
+	}
+
+	/**
+	 * Mark a character as just synced.
+	 *
+	 * @param int $player_id
+	 * @return void
+	 */
+	public function update_last_synced(int $player_id): void
+	{
+		$sql = 'UPDATE ' . $this->bb_players_table . '
+			SET player_last_synced = ' . time() . '
+			WHERE player_id = ' . $player_id;
+		$this->db->sql_query($sql);
+	}
 }
