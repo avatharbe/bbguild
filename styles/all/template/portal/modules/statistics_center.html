@@ -1,0 +1,88 @@
+{{ definition.C_BLOCK_H_L }}
+{{ definition.BLOCK_ICON }}{{ definition.TITLE }}
+{{ definition.C_BLOCK_H_R }}
+
+<div class="bbguild-statistics">
+	<p>{{ lang('STAT_TOTAL_MEMBERS', TOTAL_MEMBERS) }}</p>
+
+	<details open>
+		<summary>{{ lang('STAT_CLASS_DISTRIBUTION') }}</summary>
+		{% if loops.stat_class|length %}
+		<ul>
+			{% for row in loops.stat_class %}
+			<li>{{ row.CLASS_NAME ?: lang('UNKNOWN') }}: {{ row.COUNT }}</li>
+			{% endfor %}
+		</ul>
+		{% else %}
+		<p>{{ lang('STAT_NO_DATA') }}</p>
+		{% endif %}
+	</details>
+
+	<details>
+		<summary>{{ lang('STAT_RACE_DISTRIBUTION') }}</summary>
+		{% if loops.stat_race|length %}
+		<ul>
+			{% for row in loops.stat_race %}
+			<li>{{ row.RACE_NAME ?: lang('UNKNOWN') }}: {{ row.COUNT }}</li>
+			{% endfor %}
+		</ul>
+		{% else %}
+		<p>{{ lang('STAT_NO_DATA') }}</p>
+		{% endif %}
+	</details>
+
+	<details>
+		<summary>{{ lang('STAT_LEVEL_DISTRIBUTION') }}</summary>
+		{% if loops.stat_level|length %}
+		<ul>
+			{% for row in loops.stat_level %}
+			<li>{{ lang('LEVEL') }} {{ row.LEVEL }}: {{ row.COUNT }}</li>
+			{% endfor %}
+		</ul>
+		{% else %}
+		<p>{{ lang('STAT_NO_DATA') }}</p>
+		{% endif %}
+	</details>
+
+	<details>
+		<summary>{{ lang('STAT_RANK_DISTRIBUTION') }}</summary>
+		{% if loops.stat_rank|length %}
+		<ul>
+			{% for row in loops.stat_rank %}
+			<li>{{ row.RANK_NAME }}: {{ row.COUNT }}</li>
+			{% endfor %}
+		</ul>
+		{% else %}
+		<p>{{ lang('STAT_NO_DATA') }}</p>
+		{% endif %}
+	</details>
+
+	<details>
+		<summary>{{ lang('STAT_RECENT_JOINS') }}</summary>
+		{% if loops.stat_recent_join|length %}
+		<ul>
+			{% for row in loops.stat_recent_join %}
+			<li>{{ row.NAME }} &mdash; {{ row.DATE }}</li>
+			{% endfor %}
+		</ul>
+		{% else %}
+		<p>{{ lang('STAT_NO_DATA') }}</p>
+		{% endif %}
+	</details>
+
+	<details>
+		<summary>{{ lang('STAT_RECENT_DEPARTURES') }}</summary>
+		{% if loops.stat_recent_leave|length %}
+		<ul>
+			{% for row in loops.stat_recent_leave %}
+			<li>{{ row.NAME }} &mdash; {{ row.DATE }}</li>
+			{% endfor %}
+		</ul>
+		{% else %}
+		<p>{{ lang('STAT_NO_DATA') }}</p>
+		{% endif %}
+	</details>
+</div>
+
+{{ definition.C_BLOCK_F_L }}
+{{ definition.C_BLOCK_F_R }}

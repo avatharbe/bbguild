@@ -25,10 +25,21 @@ $lang = array_merge($lang, [
 	'BBGUILD_PORTAL_MOTD'            => 'Message of the Day',
 	'BBGUILD_PORTAL_RECRUITMENT'     => 'Recruitment',
 	'BBGUILD_PORTAL_ROSTER'          => 'Guild Roster',
+	'BBGUILD_PORTAL_STATISTICS'      => 'Guild Statistics',
 
 	// Module content
 	'NO_RECRUITS'                    => 'No open recruitment positions.',
 	'BBGUILD_NO_PORTAL_MODULES'      => 'No portal modules configured for this guild.',
+
+	// Statistics module
+	'STAT_CLASS_DISTRIBUTION'        => 'Classes',
+	'STAT_RACE_DISTRIBUTION'         => 'Races',
+	'STAT_LEVEL_DISTRIBUTION'        => 'Levels',
+	'STAT_RANK_DISTRIBUTION'         => 'Ranks',
+	'STAT_TOTAL_MEMBERS'             => 'Total active members: %d',
+	'STAT_RECENT_JOINS'              => 'Recently Joined',
+	'STAT_RECENT_DEPARTURES'         => 'Recently Departed',
+	'STAT_NO_DATA'                   => 'No data yet.',
 
 	// ACP portal management
 	'ACP_PORTAL_EXPLAIN'             => 'Manage portal modules for each guild. Add, remove, reorder, and enable/disable blocks.',

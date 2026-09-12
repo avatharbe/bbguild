@@ -1,5 +1,8 @@
 # Changelog
 
+## Unreleased (2.1.0)
+  - [NEW] Guild statistics portal module (#366) — new game-agnostic `portal\modules\statistics` block showing class distribution, race distribution, level distribution, rank/active-member counts, and recent joins/departures for the current guild, all read from core's own `bb_players`/`bb_ranks`/`bb_classes`/`bb_races`/`bb_language` tables. Item level distribution and DKP/raid stats are deliberately out of scope — ilvl only exists for WoW (via bbguildwow's own equipment-sync table, breaking game-agnosticism) and DKP/raid stats are bbDKP v2's territory.
+
 ## 2.0.0-rc5 26/07/2026
   - [FIX] Three non-functional buttons on the ACP **Games → List games** page — "Create custom game" (`addgame2`) and the "Default game" Confirm (`upddefaultgame`) had no POST handler in `listgames()` (which only assigned template vars and never inspected the request), so both silently did nothing; they are now wired to `game::install_game()` (custom-install path, with form-token check, length validation, and a duplicate-id guard via `ERROR_GAME_EXISTS`) and `game::update_gamedefault()` respectively, and `{{ S_FORM_TOKEN }}` was added to the default-game form (#371)
   - [CHG] Removed the redundant "Install from game plugin" control from the same page — game plugins already register their game automatically on extension enable (each plugin's `migrations/basics/data.php` seeds the `bb_games` row via its installer), so the separate ACP "install" step was duplicate work and its `addgame1` button was itself dead; the fieldset is renamed **"Custom game installation"** with the Region dropdown reordered last, and the now-unused `gamelistrow`/`CANINSTALL`/`PREINSTALLED` code was dropped (#371)

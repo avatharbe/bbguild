@@ -100,6 +100,21 @@ services:
             - { name: bbguild.portal.module }
 
 
+    avathar.bbguild.portal.module.statistics:
+        class: avathar\bbguild\portal\modules\statistics
+        arguments:
+            - '@dbal.conn'
+            - '@template'
+            - '@config'
+            - '%avathar.bbguild.tables.bb_guild%'
+            - '%avathar.bbguild.tables.bb_players%'
+            - '%avathar.bbguild.tables.bb_races%'
+            - '%avathar.bbguild.tables.bb_ranks%'
+            - '%avathar.bbguild.tables.bb_language%'
+        tags:
+            - { name: bbguild.portal.module }
+
+
     avathar.bbguild.portal.module.roster:
         class: avathar\bbguild\portal\modules\roster
         arguments:
