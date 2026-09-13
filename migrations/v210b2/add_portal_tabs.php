@@ -130,8 +130,8 @@ class add_portal_tabs extends \phpbb\db\migration\migration
 			$tab_id = (int) $this->db->sql_nextid();
 
 			$sql = 'UPDATE ' . $modules_table . '
-				SET module_tab = ' . $tab_id . '
-				WHERE guild_id = ' . $guild_id;
+				SET module_tab = ' . (int) $tab_id . '
+				WHERE guild_id = ' . (int) $guild_id;
 			$this->db->sql_query($sql);
 		}
 	}

@@ -504,7 +504,7 @@ class admin_guild
 		$guild_id = (int) $updateguild->getGuildid();
 
 		// Check if MOTD row exists for this guild
-		$sql = 'SELECT motd_id FROM ' . $this->bb_motd_table . ' WHERE guild_id = ' . $guild_id;
+		$sql = 'SELECT motd_id FROM ' . $this->bb_motd_table . ' WHERE guild_id = ' . (int) $guild_id;
 		$result = $this->db->sql_query($sql);
 		$motd_row = $this->db->sql_fetchrow($result);
 		$this->db->sql_freeresult($result);
@@ -516,7 +516,7 @@ class admin_guild
 				'motd_timestamp'  => time(),
 				'bbcode_bitfield' => $bitfield,
 				'bbcode_uid'      => $uid,
-			]) . ' WHERE guild_id = ' . $guild_id;
+			]) . ' WHERE guild_id = ' . (int) $guild_id;
 		}
 		else
 		{
@@ -1104,7 +1104,7 @@ class admin_guild
 			LEFT JOIN " . $this->bb_language_table . " l_r ON r.role_id = l_r.attribute_id
 				AND l_r.attribute = 'role' AND l_r.language = '" . $this->db->sql_escape($lang_code) . "'
 				AND l_r.game_id = '" . $game_id . "'
-			WHERE r.guild_id = " . $guild_id . '
+			WHERE r.guild_id = " . (int) $guild_id . '
 			ORDER BY r.role_id, r.class_id';
 		$result = $this->db->sql_query($sql);
 

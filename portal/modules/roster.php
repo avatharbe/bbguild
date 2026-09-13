@@ -276,6 +276,32 @@ class roster extends module_base
 	}
 
 	/**
+	 * Fires avathar.bbguild.roster_display for one character row.
+	 *
+	 * Shared by display_listing() (list layout) and display_grid() (grid
+	 * layout) so the event is triggered from exactly one call site — EPV
+	 * requires every event name to be documented and fired from a single
+	 * place in the codebase.
+	 *
+	 * @event avathar.bbguild.roster_display
+	 * @var int    player_id The character being displayed
+	 * @var string game_id   The game the character belongs to
+	 * @var int    guild_id  The guild whose roster is rendering
+	 * @var array  tpl_ary   The template block-vars array for this row. Writable — add keys to inject a column.
+	 * @since 2.1.0
+	 */
+	private function fire_roster_display_event(array $char, array $tpl_ary): array
+	{
+		$player_id = (int) $char['player_id'];
+		$game_id = (string) $char['game_id'];
+		$guild_id = (int) $this->guild_id;
+		$vars = ['player_id', 'game_id', 'guild_id', 'tpl_ary'];
+		extract($this->dispatcher->trigger_event('avathar.bbguild.roster_display', compact($vars)));
+
+		return $tpl_ary;
+	}
+
+	/**
 	 * Display the listing (table) view.
 	 */
 	protected function display_listing(array $characters, string $ext_path_images, string $base_url, int $start, array $spec_lookup = [], bool $show_spec = false): void
@@ -305,21 +331,7 @@ class roster extends module_base
 				]),
 			];
 
-			/**
-			 * Fired for each character row as the roster module renders.
-			 *
-			 * @event avathar.bbguild.roster_display
-			 * @var int    player_id The character being displayed
-			 * @var string game_id   The game the character belongs to
-			 * @var int    guild_id  The guild whose roster is rendering
-			 * @var array  tpl_ary   The template block-vars array for this row. Writable — add keys to inject a column.
-			 * @since 2.1.0
-			 */
-			$player_id = (int) $char['player_id'];
-			$game_id = (string) $char['game_id'];
-			$guild_id = (int) $this->guild_id;
-			$vars = ['player_id', 'game_id', 'guild_id', 'tpl_ary'];
-			extract($this->dispatcher->trigger_event('avathar.bbguild.roster_display', compact($vars)));
+			$tpl_ary = $this->fire_roster_display_event($char, $tpl_ary);
 
 			$this->template->assign_block_vars('portal_roster_row', $tpl_ary);
 		}
@@ -417,21 +429,7 @@ class roster extends module_base
 							]),
 						];
 
-						/**
-						 * Fired for each character row as the roster module renders.
-						 *
-						 * @event avathar.bbguild.roster_display
-						 * @var int    player_id The character being displayed
-						 * @var string game_id   The game the character belongs to
-						 * @var int    guild_id  The guild whose roster is rendering
-						 * @var array  tpl_ary   The template block-vars array for this row. Writable — add keys to inject a column.
-						 * @since 2.1.0
-						 */
-						$player_id = (int) $char['player_id'];
-						$game_id = (string) $char['game_id'];
-						$guild_id = (int) $this->guild_id;
-						$vars = ['player_id', 'game_id', 'guild_id', 'tpl_ary'];
-						extract($this->dispatcher->trigger_event('avathar.bbguild.roster_display', compact($vars)));
+						$tpl_ary = $this->fire_roster_display_event($char, $tpl_ary);
 
 						$this->template->assign_block_vars('class.players_row', $tpl_ary);
 					}

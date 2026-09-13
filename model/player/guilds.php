@@ -737,7 +737,7 @@ class guilds
 				'faction'           => $this->faction,
 			)
 		);
-		$this->db->sql_query('UPDATE ' . $this->bb_guild_table . ' SET ' . $query . ' WHERE id= ' . $this->guildid);
+		$this->db->sql_query('UPDATE ' . $this->bb_guild_table . ' SET ' . $query . ' WHERE id= ' . (int) $this->guildid);
 
 		// Let the provider's API persist game-specific guild fields
 		$api->save_guild_extension($this->guildid, $processed);
@@ -874,7 +874,7 @@ class guilds
 			)
 		);
 
-		$this->db->sql_query('UPDATE ' . $this->bb_guild_table . ' SET ' . $query . ' WHERE id= ' . $this->guildid);
+		$this->db->sql_query('UPDATE ' . $this->bb_guild_table . ' SET ' . $query . ' WHERE id= ' . (int) $this->guildid);
 		return true;
 	}
 
@@ -906,7 +906,7 @@ class guilds
 		$this->cache->destroy('sql', $this->bb_guild_table);
 		// check if guild has players
 		$sql = 'SELECT COUNT(*) as mcount FROM ' . $this->bb_players_table . '
-           WHERE player_guild_id = ' . $this->guildid;
+           WHERE player_guild_id = ' . (int) $this->guildid;
 		$result = $this->db->sql_query($sql);
 		if ((int) $this->db->sql_fetchfield('mcount') >= 1)
 		{
@@ -914,7 +914,7 @@ class guilds
 		}
 		$this->db->sql_freeresult($result);
 
-		$sql = 'DELETE FROM ' . $this->bb_ranks_table . ' WHERE guild_id = ' .  $this->guildid;
+		$sql = 'DELETE FROM ' . $this->bb_ranks_table . ' WHERE guild_id = ' .  (int) $this->guildid;
 		$this->db->sql_query($sql);
 
 		$sql = 'DELETE FROM ' . $this->bb_guild_table . ' WHERE id = ' .  $this->guildid;
@@ -978,7 +978,7 @@ class guilds
 				g.faction, f.faction_name
 				FROM ' . $this->bb_guild_table . ' g
 				LEFT JOIN '  . $this->bb_factions_table . ' f ON f.game_id=g.game_id and f.faction_id=g.faction
-				WHERE id = ' . $this->guildid;
+				WHERE id = ' . (int) $this->guildid;
 		// Not cached: this per-guild row is edited interactively in the ACP and
 		// written by several paths (update_guild, update_guild_battleNet), not all
 		// of which invalidate the cache. A stale 7-day cache here made ACP edits
@@ -1047,16 +1047,16 @@ class guilds
 					'ON' => 'u.user_id = m.phpbb_user_id ')) ,
 			'WHERE' => " (m.player_rank_id = r.rank_id)
 			    				and m.game_id = l.game_id
-			    				AND l.attribute_id = c.class_id and l.game_id = c.game_id AND l.language= '" . $this->config['bbguild_lang'] . "' AND l.attribute = 'class'
+			    				AND l.attribute_id = c.class_id and l.game_id = c.game_id AND l.language= '" . $this->db->sql_escape($this->config['bbguild_lang']) . "' AND l.attribute = 'class'
 								AND (m.player_guild_id = g.id)
 								AND (m.player_guild_id = r.guild_id)
-								AND (m.player_guild_id = " . $this->guildid . ')
+								AND (m.player_guild_id = " . (int) $this->guildid . ')
 								AND m.game_id =  a.game_id
 								AND m.game_id =  c.game_id
 								AND m.player_race_id =  a.race_id
 								AND (m.player_class_id = c.class_id)
-								AND m.player_level >= ' . $minlevel . '
-								AND m.player_level <= ' . $maxlevel,
+								AND m.player_level >= ' . (int) $minlevel . '
+								AND m.player_level <= ' . (int) $maxlevel,
 			'ORDER_BY' => $order);
 
 		if ($selectactive == 0 && $selectnonactive == 1)
@@ -1113,12 +1113,12 @@ class guilds
 		$sql .= ' Count(m.player_class_id) AS classcount ';
 		$sql .= ' FROM  ' . $this->bb_classes_table . ' c ';
 		$sql .= ' INNER JOIN ' . $this->bb_guild_table . ' g ON c.game_id = g.game_id ';
-		$sql .= ' LEFT OUTER JOIN (SELECT * FROM ' . $this->bb_players_table . ' WHERE player_level >= ' . $this->min_armory . ') m';
+		$sql .= ' LEFT OUTER JOIN (SELECT * FROM ' . $this->bb_players_table . ' WHERE player_level >= ' . (int) $this->min_armory . ') m';
 		$sql .= '   ON m.game_id = c.game_id  AND m.player_class_id = c.class_id  ';
 		$sql .= ' INNER JOIN ' . $this->bb_language_table . ' l ON  l.attribute_id = c.class_id AND l.game_id = c.game_id ';
 		$sql .= ' WHERE  1=1 ';
-		$sql .= " AND l.language = '" . $this->config['bbguild_lang']."' AND l.attribute = 'class' ";
-		$sql .= ' AND g.id =  ' . $this->guildid;
+		$sql .= " AND l.language = '" . $this->db->sql_escape($this->config['bbguild_lang'])."' AND l.attribute = 'class' ";
+		$sql .= ' AND g.id =  ' . (int) $this->guildid;
 		$sql .= ' GROUP  BY c.class_id, l.name ';
 		$sql .= ' ORDER  BY c.class_id ASC ';
 
@@ -1157,10 +1157,10 @@ class guilds
 					'ON' => 'u.user_id = m.phpbb_user_id ')) ,
 			'WHERE' => " (m.player_rank_id = r.rank_id)
 				    				and m.game_id = l.game_id
-				    				AND l.attribute_id = c.class_id and l.game_id = c.game_id AND l.language= '" . $this->config['bbguild_lang'] . "' AND l.attribute = 'class'
+				    				AND l.attribute_id = c.class_id and l.game_id = c.game_id AND l.language= '" . $this->db->sql_escape($this->config['bbguild_lang']) . "' AND l.attribute = 'class'
 									AND (m.player_guild_id = g.id)
 									AND (m.player_guild_id = r.guild_id)
-									AND (m.player_guild_id = " . $this->guildid . ')
+									AND (m.player_guild_id = " . (int) $this->guildid . ')
 									AND m.game_id =  a.game_id
 									AND m.game_id =  c.game_id
 									AND m.player_race_id =  a.race_id
@@ -1206,7 +1206,7 @@ class guilds
 					'ON'    => 'a.id = c.player_guild_id '
 				)
 			),
-			'WHERE' => ' a.id = b.guild_id AND b.rank_id != 90 and b.guild_id >= ' . $guild_id,
+			'WHERE' => ' a.id = b.guild_id AND b.rank_id != 90 and b.guild_id >= ' . (int) $guild_id,
 			'GROUP_BY' => ' a.game_id, a.guilddefault, a.id, a.name, a.realm, a.region ',
 			'ORDER_BY' => ' a.guilddefault desc,  count(c.player_id) desc, a.id asc'
 		);

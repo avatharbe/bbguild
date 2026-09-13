@@ -130,7 +130,7 @@ class roles
 							AND l.attribute='role'
 							AND l.game_id = '" . $this->db->sql_escape($this->game_id) . "'
 							AND r.game_id = l.game_id
-							AND l.language= '" . $this->config['bbguild_lang'] . "'
+							AND l.language= '" . $this->db->sql_escape($this->config['bbguild_lang']) . "'
 							AND r.role_id = " . ( int ) $this->role_id);
 
 		$sql = $this->db->sql_build_query('SELECT', $sql_array);
@@ -216,7 +216,7 @@ class roles
 
 		$sql = 'UPDATE ' . $this->bb_language_table  . ' SET ' . $this->db->sql_build_array('UPDATE', $names) . '
              WHERE attribute_id = ' . ( int ) $oldrole->role_id . " AND attribute='role'
-             AND language= '" . $this->config['bbguild_lang'] . "' AND game_id = '" . $this->db->sql_escape($this->game_id) . "'";
+             AND language= '" . $this->db->sql_escape($this->config['bbguild_lang']) . "' AND game_id = '" . $this->db->sql_escape($this->game_id) . "'";
 		$this->db->sql_query($sql);
 
 		$this->db->sql_transaction('commit');
@@ -237,7 +237,7 @@ class roles
 		$sql = 'DELETE FROM ' . $this->bb_gameroles_table . ' WHERE role_id  = ' . ( int ) $this->role_id . " and game_id = '" . $this->db->sql_escape($this->game_id) . "'";
 		$this->db->sql_query($sql);
 
-		$sql = 'DELETE FROM ' . $this->bb_language_table  . " WHERE language= '" . $this->config['bbguild_lang'] . "' AND attribute = 'role'
+		$sql = 'DELETE FROM ' . $this->bb_language_table  . " WHERE language= '" . $this->db->sql_escape($this->config['bbguild_lang']) . "' AND attribute = 'role'
                 and attribute_id= " . ( int ) $this->role_id . " and game_id = '" . $this->db->sql_escape($this->game_id) . "'";
 		$this->db->sql_query($sql);
 
@@ -277,7 +277,7 @@ class roles
 				$this->bb_games_table => 'g' ),
 			'WHERE' => " r.role_id = l.attribute_id AND r.game_id = g.game_id
                             AND r.game_id = l.game_id AND l.game_id = '" . $this->db->sql_escape($this->game_id) . "'
-							AND l.attribute='role' AND l.language= '" . $this->config['bbguild_lang'] . "'",
+							AND l.attribute='role' AND l.language= '" . $this->db->sql_escape($this->config['bbguild_lang']) . "'",
 			'ORDER_BY' => $order);
 
 		$sql = $this->db->sql_build_query('SELECT', $sql_array);

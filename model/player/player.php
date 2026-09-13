@@ -1138,10 +1138,10 @@ class player
 						$this->bb_language_table => 'c1') ,
 					'ON' => "c1.attribute_id = c.class_id
 						AND c1.game_id = c.game_id
-						AND c1.language= '" . $this->config['bbguild_lang'] . "'
+						AND c1.language= '" . $this->db->sql_escape($this->config['bbguild_lang']) . "'
 						AND c1.attribute = 'class'")) ,
 			'WHERE' => "
-					l1.attribute_id = r.race_id AND l1.game_id = r.game_id AND l1.language= '" . $this->config['bbguild_lang'] . "' AND l1.attribute = 'race'
+					l1.attribute_id = r.race_id AND l1.game_id = r.game_id AND l1.language= '" . $this->db->sql_escape($this->config['bbguild_lang']) . "' AND l1.attribute = 'race'
 					AND m.game_id = c.game_id
 					AND m.player_class_id = c.class_id
 					AND m.game_id = r.game_id
@@ -1328,7 +1328,7 @@ class player
 		{
 			$sql = 'SELECT count(*) as playerexists
 				FROM ' . $this->bb_players_table . '
-				WHERE player_id <> ' . $this->player_id . "
+				WHERE player_id <> ' . (int) $this->player_id . "
 				AND UPPER(player_name) = UPPER('" . $this->db->sql_escape($this->player_name) . "')";
 			$result = $this->db->sql_query($sql);
 			$countm = $this->db->sql_fetchfield('playerexists');
@@ -1342,7 +1342,7 @@ class player
 		// check if rank exists
 		$sql = 'SELECT count(*) as rankccount
 				FROM ' . $this->bb_ranks_table . '
-				WHERE rank_id=' . (int) $this->player_rank_id . ' and guild_id = ' . $this->player_guild_id;
+				WHERE rank_id=' . (int) $this->player_rank_id . ' and guild_id = ' . (int) $this->player_guild_id;
 		$result = $this->db->sql_query($sql);
 		$countm = $this->db->sql_fetchfield('rankccount');
 		$this->db->sql_freeresult($result);
@@ -1481,7 +1481,7 @@ class player
 				FROM ' . $this->bb_players_table . "
 				WHERE player_name= '" . $this->db->sql_escape(ucwords($this->player_name)) . "'
 				AND player_realm= '" . $this->db->sql_escape(ucwords($this->player_realm)) . "'
-				AND player_guild_id = " . $this->player_guild_id;
+				AND player_guild_id = " . (int) $this->player_guild_id;
 		$result = $this->db->sql_query($sql);
 		$countm = $this->db->sql_fetchfield('playerexists');
 		$this->db->sql_freeresult($result);
@@ -2008,7 +2008,7 @@ class player
 				'ON'    => 'u.user_id = m.phpbb_user_id '),
 			array(
 				'FROM'  => array($this->bb_language_table => 'c1'),
-				'ON'    => "c1.attribute_id = c.class_id AND c1.language= '" . $this->config['bbguild_lang'] . "' AND c1.attribute = 'class'  and c1.game_id = c.game_id "
+				'ON'    => "c1.attribute_id = c.class_id AND c1.language= '" . $this->db->sql_escape($this->config['bbguild_lang']) . "' AND c1.attribute = 'class'  and c1.game_id = c.game_id "
 			));
 
 		$sql_array['WHERE'] = ' c.class_id = m.player_class_id
