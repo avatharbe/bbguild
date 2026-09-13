@@ -24,7 +24,7 @@ Full plan: **`contrib/roadmap-2.x.md`** (parity matrix + release plan); BBCode f
 - **North star:** feature parity vs. phpBB native / legacy bbDKP MOD / the extension family / guildsofwow.com. Releases are a **coordinated train** across core + all 9 game plugins — shipped together on the same milestone dates and **pairing-locked** (every plugin hard-requires the current core version via `ext.php::is_enableable()`). **2.0.0 shipped stable 2026-09-12** (core `2.0.0`; bbguildwow's pairing bumped to require `>=2.0.0`) — the rc5→stable step was a version-number/pairing-lock bump only, no schema or code change (#244, the sole 2.0.0 blocker, closed 2026-09-12). Other plugins' 2.0.0 status not yet re-verified as part of this pass — see the live roadmap doc. **Features now at 2.1.0.**
 - **Milestone scheme (GitHub, milestone-driven versioning — no version labels):**
   - `2.0.0` (due 2026-08-31, shipped 2026-09-12) — stabilisation + unit tests (#244, closed); plugin test suites + icon fixes.
-  - `2.1.0` (due 2026-10-15, in progress) — **guild page overhaul**: page-level portal tabs (#360, **shipped**, closed 2026-09-13), character-sync scheduler contract (#361, **shipped**) + WoW handler (#362, **shipped**), gear tooltips via bbTips + bonus IDs (#363, **shipped** — implemented under bbguildwow's `2.1.0-b1` line, closed 2026-09-12), character page polish (#364), per-character achievements (#365), guild statistics portal module (#366, subsumes #279), character-based forum avatars (#369, restores pbwowext#10 pt1, **shipped**); unit test coverage follow-up (#372, split from #244); plugin spec data (#367) + **GW2 API v2 sync** (bbguildgw2#9).
+  - `2.1.0` (due 2026-10-15, in progress) — **guild page overhaul**: page-level portal tabs (#360, **shipped**, closed 2026-09-13), character-sync scheduler contract (#361, **shipped**) + WoW handler (#362, **shipped**), gear tooltips via bbTips + bonus IDs (#363, **shipped** — implemented under bbguildwow's `2.1.0-b1` line, closed 2026-09-12), character page polish (#364, PR open), per-character achievements (#365), guild statistics portal module (#366, subsumes #279, **shipped**), character-based forum avatars (#369, restores pbwowext#10 pt1, **shipped**); unit test coverage follow-up (#372, split from #244); plugin spec data (#367) + **GW2 API v2 sync** (bbguildgw2#9).
   - `2.2.0` (due 2026-11-30) — Events/RSVP calendar (new ext), roster↔profile fields (#231), profile-field character info (#368, pbwowext#10 pt2), professions (#230), player stats (#289).
   - `2.3.0` (due 2027-01-15) — **bbGuild API surface (#370: phpBB events + read API)** — the integration layer for the family (revives 2012 bbDKP-API idea), Discord (new ext), Gameworld (new ext), Battle.net API modernisation, spec build analysis (#286).
 - **Separate track (own roadmap):** DKP & Accounting — bbAccounts (~RC), bbDKP v2 (~0%), raid logging (0%), bbPoints v2.
@@ -80,11 +80,11 @@ bbguild/
 | `ajax_controller.php` | AJAX endpoints (faction, rank, player, class/race selectors) |
 | `validator.php` | Input validation |
 
-### Database Tables (16 in core)
+### Database Tables (17 in core — see `contrib/database.md` for the full Mermaid ER diagram)
 
 **Core:** bb_games, bb_guild, bb_players, bb_ranks, bb_logs, bb_news, bb_motd, bb_recruit, bb_specializations
 
-**Portal:** bb_portal_modules, bb_portal_config
+**Portal:** bb_portal_modules, bb_portal_config, bb_portal_tabs (#360, added v210b2)
 
 **Game Content:** bb_classes, bb_races, bb_factions, bb_gameroles, bb_language
 
@@ -279,7 +279,7 @@ Issue #331. Adds a layer between class and role.
 - #360 — Portal: page-level guild tabs — **shipped** (merged ffeb450d, closed 2026-09-13)
 - #364 — Character page polish (layout + async stats) (open)
 - #365 — Per-character achievements view (open)
-- #366 — Guild statistics portal module, subsumes #279 (open)
+- #366 — Guild statistics portal module, subsumes #279 — **shipped** (5b04fe69, closed 2026-09-12; `portal.module.statistics` tagged as a built-in module in `config/portal_services.yml`)
 - #367 — Complete plugin spec data for 8 non-WoW games (open)
 - #369 — Character-based forum avatars, restores pbwowext#10 pt1 — **shipped**
 - #372 — Unit test coverage: migrations + remaining guild/player CRUD paths, split from #244 (open)
