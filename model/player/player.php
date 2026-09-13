@@ -1505,6 +1505,11 @@ class player
 			$this->player_title = ' ';
 		}
 
+		if ($this->deactivate_reason === null )
+		{
+			$this->deactivate_reason = '';
+		}
+
 		// check if rank exists
 		$sql = 'SELECT count(*) as rankccount
 			FROM ' . $this->bb_ranks_table . '
