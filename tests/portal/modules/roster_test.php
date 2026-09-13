@@ -59,11 +59,34 @@ class roster_test extends TestCase
 			->method('trigger_event')
 			->with(
 				'avathar.bbguild.roster_display',
-				$this->callback(fn ($vars) => in_array($vars['player_id'], [10, 11], true))
+				$this->callback(function ($vars) {
+					return in_array($vars['player_id'], [10, 11], true)
+						&& $vars['game_id'] === 'wow'
+						&& $vars['guild_id'] === 42
+						&& is_array($vars['tpl_ary'])
+						&& $vars['tpl_ary']['PLAYER_ID'] === $vars['player_id'];
+				})
 			)
-			->willReturnArgument(1);
+			->willReturnCallback(function ($event_name, $vars) {
+				// Mutate tpl_ary to prove the write-back is actually consumed
+				// by the subsequent assign_block_vars() call.
+				$vars['tpl_ary']['LISTENER_INJECTED'] = 'yes-' . $vars['player_id'];
+				return $vars;
+			});
 
 		$roster = $this->make_roster($dispatcher);
+		$roster_reflection = new \ReflectionProperty($roster, 'guild_id');
+		$roster_reflection->setAccessible(true);
+		$roster_reflection->setValue($roster, 42);
+
+		$template = $this->getprivateproperty($roster, 'template');
+		$captured = [];
+		$template->expects($this->exactly(2))
+			->method('assign_block_vars')
+			->with('portal_roster_row', $this->callback(function ($tpl_ary) use (&$captured) {
+				$captured[] = $tpl_ary;
+				return true;
+			}));
 
 		$characters = [
 			0 => [
@@ -76,5 +99,80 @@ class roster_test extends TestCase
 		$reflection = new \ReflectionMethod($roster, 'display_listing');
 		$reflection->setAccessible(true);
 		$reflection->invoke($roster, $characters, 'images/', '/guild/1/roster', 0, [], false);
+
+		// The listener's mutation to tpl_ary must have reached assign_block_vars().
+		$this->assertSame('yes-10', $captured[0]['LISTENER_INJECTED']);
+		$this->assertSame('yes-11', $captured[1]['LISTENER_INJECTED']);
+	}
+
+	public function test_display_grid_fires_roster_display_per_character(): void
+	{
+		$dispatcher = $this->createMock(\phpbb\event\dispatcher_interface::class);
+		$dispatcher->expects($this->once())
+			->method('trigger_event')
+			->with(
+				'avathar.bbguild.roster_display',
+				$this->callback(function ($vars) {
+					return $vars['player_id'] === 20
+						&& $vars['game_id'] === 'wow'
+						&& $vars['guild_id'] === 42
+						&& is_array($vars['tpl_ary'])
+						&& $vars['tpl_ary']['PLAYER_ID'] === 20;
+				})
+			)
+			->willReturnCallback(function ($event_name, $vars) {
+				$vars['tpl_ary']['LISTENER_INJECTED'] = 'grid-yes';
+				return $vars;
+			});
+
+		$roster = $this->make_roster($dispatcher);
+		$roster_reflection = new \ReflectionProperty($roster, 'guild_id');
+		$roster_reflection->setAccessible(true);
+		$roster_reflection->setValue($roster, 42);
+
+		$template = $this->getprivateproperty($roster, 'template');
+		$captured = [];
+		$template->method('assign_block_vars')
+			->willReturnCallback(function ($block, $vars) use (&$captured) {
+				if ($block === 'class.players_row')
+				{
+					$captured[] = $vars;
+				}
+			});
+
+		$players = $this->getMockBuilder(\avathar\bbguild\model\player\player::class)
+			->disableOriginalConstructor()
+			->onlyMethods(['get_classes'])
+			->getMock();
+		$players->game_id = 'wow';
+		$players->method('get_classes')->willReturn([
+			['class_id' => 1, 'class_name' => 'Warrior', 'imagename' => 'warrior', 'colorcode' => '#fff'],
+		]);
+
+		$characters = [
+			0 => [
+				['player_id' => 20, 'game_id' => 'wow', 'colorcode' => '#fff', 'class_name' => 'Warrior', 'player_name' => 'Carol', 'race_name' => 'Human', 'player_rank' => 'Member', 'player_level' => 60, 'player_armory_url' => '', 'username' => 'carol', 'player_achiev' => 0, 'class_image' => 'x.png', 'race_image' => 'y.png', 'player_class_id' => 1],
+			],
+			2 => 1,
+		];
+
+		$reflection = new \ReflectionMethod($roster, 'display_grid');
+		$reflection->setAccessible(true);
+		$reflection->invoke($roster, $players, $characters, 'images/', '/guild/1/roster', 0, '', false, 0, []);
+
+		$this->assertCount(1, $captured);
+		$this->assertSame('grid-yes', $captured[0]['LISTENER_INJECTED']);
+	}
+
+	/**
+	 * Reflect a protected property off an object under test.
+	 *
+	 * @return mixed
+	 */
+	private function getprivateproperty(object $object, string $property)
+	{
+		$reflection = new \ReflectionProperty($object, $property);
+		$reflection->setAccessible(true);
+		return $reflection->getValue($object);
 	}
 }

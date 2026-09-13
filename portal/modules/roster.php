@@ -282,23 +282,8 @@ class roster extends module_base
 	{
 		foreach ($characters[0] as $char)
 		{
-			/**
-			 * Fired for each character row as the roster module renders.
-			 *
-			 * @event avathar.bbguild.roster_display
-			 * @var int    player_id The character being displayed
-			 * @var string game_id   The game the character belongs to
-			 * @var int    guild_id  The guild whose roster is rendering
-			 * @since 2.3.0
-			 */
-			$player_id = (int) $char['player_id'];
-			$game_id = (string) $char['game_id'];
-			$guild_id = (int) $this->guild_id;
-			$vars = ['player_id', 'game_id', 'guild_id'];
-			extract($this->dispatcher->trigger_event('avathar.bbguild.roster_display', compact($vars)));
-
 			$spec = $this->resolve_spec($char, $spec_lookup, $ext_path_images);
-			$this->template->assign_block_vars('portal_roster_row', [
+			$tpl_ary = [
 				'PLAYER_ID'   => $char['player_id'],
 				'GAME'        => $char['game_id'],
 				'COLORCODE'   => $char['colorcode'],
@@ -318,7 +303,25 @@ class roster extends module_base
 					'guild_id'  => $this->guild_id,
 					'player_id' => $char['player_id'],
 				]),
-			]);
+			];
+
+			/**
+			 * Fired for each character row as the roster module renders.
+			 *
+			 * @event avathar.bbguild.roster_display
+			 * @var int    player_id The character being displayed
+			 * @var string game_id   The game the character belongs to
+			 * @var int    guild_id  The guild whose roster is rendering
+			 * @var array  tpl_ary   The template block-vars array for this row. Writable — add keys to inject a column.
+			 * @since 2.1.0
+			 */
+			$player_id = (int) $char['player_id'];
+			$game_id = (string) $char['game_id'];
+			$guild_id = (int) $this->guild_id;
+			$vars = ['player_id', 'game_id', 'guild_id', 'tpl_ary'];
+			extract($this->dispatcher->trigger_event('avathar.bbguild.roster_display', compact($vars)));
+
+			$this->template->assign_block_vars('portal_roster_row', $tpl_ary);
 		}
 
 		// Pagination
@@ -390,23 +393,8 @@ class roster extends module_base
 				{
 					if ($char['player_class_id'] == $classid)
 					{
-						/**
-						 * Fired for each character row as the roster module renders.
-						 *
-						 * @event avathar.bbguild.roster_display
-						 * @var int    player_id The character being displayed
-						 * @var string game_id   The game the character belongs to
-						 * @var int    guild_id  The guild whose roster is rendering
-						 * @since 2.3.0
-						 */
-						$player_id = (int) $char['player_id'];
-						$game_id = (string) $char['game_id'];
-						$guild_id = (int) $this->guild_id;
-						$vars = ['player_id', 'game_id', 'guild_id'];
-						extract($this->dispatcher->trigger_event('avathar.bbguild.roster_display', compact($vars)));
-
 						$grid_spec = $this->resolve_spec($char, $spec_lookup, $ext_path_images);
-						$this->template->assign_block_vars('class.players_row', [
+						$tpl_ary = [
 							'PLAYER_ID' => $char['player_id'],
 							'GAME'      => $char['game_id'],
 							'COLORCODE' => $char['colorcode'],
@@ -423,11 +411,29 @@ class roster extends module_base
 							'ACHIEVPTS' => $char['player_achiev'],
 							'CLASS_IMAGE' => $ext_path_images . 'class_images/' . basename($char['class_image']),
 							'RACE_IMAGE'  => $ext_path_images . 'race_images/' . basename($char['race_image']),
-						'U_PLAYER_DETAIL' => $this->helper->route('avathar_bbguild_player', [
-							'guild_id'  => $this->guild_id,
-							'player_id' => $char['player_id'],
-						]),
-						]);
+							'U_PLAYER_DETAIL' => $this->helper->route('avathar_bbguild_player', [
+								'guild_id'  => $this->guild_id,
+								'player_id' => $char['player_id'],
+							]),
+						];
+
+						/**
+						 * Fired for each character row as the roster module renders.
+						 *
+						 * @event avathar.bbguild.roster_display
+						 * @var int    player_id The character being displayed
+						 * @var string game_id   The game the character belongs to
+						 * @var int    guild_id  The guild whose roster is rendering
+						 * @var array  tpl_ary   The template block-vars array for this row. Writable — add keys to inject a column.
+						 * @since 2.1.0
+						 */
+						$player_id = (int) $char['player_id'];
+						$game_id = (string) $char['game_id'];
+						$guild_id = (int) $this->guild_id;
+						$vars = ['player_id', 'game_id', 'guild_id', 'tpl_ary'];
+						extract($this->dispatcher->trigger_event('avathar.bbguild.roster_display', compact($vars)));
+
+						$this->template->assign_block_vars('class.players_row', $tpl_ary);
 					}
 				}
 			}

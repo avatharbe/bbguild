@@ -228,7 +228,7 @@ class character_sync extends \phpbb\cron\task\base
 			 * @var int    player_id The character that was synced
 			 * @var string game_id   The game the character belongs to
 			 * @var bool   success   Whether the sync succeeded
-			 * @since 2.3.0
+			 * @since 2.1.0
 			 */
 			extract($this->dispatcher->trigger_event('avathar.bbguild.character_sync_completed', [
 				'player_id' => (int) $player_row['player_id'],

@@ -110,7 +110,7 @@ class portal_renderer
 			 * @var int   guild_id       The guild whose portal is rendering
 			 * @var array row            The portal module's database row (module_id, module_type, etc.)
 			 * @var mixed template_module The resolved template file/name for this module — writable
-			 * @since 2.3.0
+			 * @since 2.1.0
 			 */
 			$vars = ['guild_id', 'row', 'template_module'];
 			extract($this->dispatcher->trigger_event('avathar.bbguild.portal_module_display', compact($vars)));

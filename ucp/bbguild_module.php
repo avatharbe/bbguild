@@ -266,7 +266,7 @@ class bbguild_module
 							 * @var int player_id The character that was unclaimed
 							 * @var int guild_id  The guild the character belongs to
 							 * @var int user_id   The forum user who performed the unclaim
-							 * @since 2.3.0
+							 * @since 2.1.0
 							 */
 							extract($dispatcher->trigger_event('avathar.bbguild.character_unclaim', [
 								'player_id' => $player_id,
@@ -311,7 +311,7 @@ class bbguild_module
 					 * @var int player_id The character that was claimed
 					 * @var int guild_id  The guild the character belongs to
 					 * @var int user_id   The forum user who claimed it
-					 * @since 2.3.0
+					 * @since 2.1.0
 					 */
 					extract($dispatcher->trigger_event('avathar.bbguild.character_claim', [
 						'player_id' => $player_id,
@@ -430,7 +430,7 @@ class bbguild_module
 							 * @var int player_id The character that was deleted
 							 * @var int guild_id  The guild the character belonged to
 							 * @var int user_id   The forum user account it was linked to (0 if unclaimed)
-							 * @since 2.3.0
+							 * @since 2.1.0
 							 */
 							extract($dispatcher->trigger_event('avathar.bbguild.character_delete', [
 								'player_id' => $deleted_player_id,
@@ -515,7 +515,7 @@ class bbguild_module
 							 * @var int player_id The newly created character's id
 							 * @var int guild_id  The guild the character belongs to
 							 * @var int user_id   The forum user who added it
-							 * @since 2.3.0
+							 * @since 2.1.0
 							 */
 							extract($dispatcher->trigger_event('avathar.bbguild.character_add', [
 								'player_id' => $newplayer->player_id,
@@ -557,7 +557,7 @@ class bbguild_module
 						 * @var int player_id The character that was updated
 						 * @var int guild_id  The guild the character belongs to
 						 * @var int user_id   The forum user who owns it
-						 * @since 2.3.0
+						 * @since 2.1.0
 						 */
 						extract($dispatcher->trigger_event('avathar.bbguild.character_edit', [
 							'player_id' => $updateplayer->player_id,

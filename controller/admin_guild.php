@@ -535,7 +535,7 @@ class admin_guild
 		 *
 		 * @event avathar.bbguild.motd_updated
 		 * @var int guild_id The guild whose MOTD was updated
-		 * @since 2.3.0
+		 * @since 2.1.0
 		 */
 		extract($this->dispatcher->trigger_event('avathar.bbguild.motd_updated', [
 			'guild_id' => $guild_id,
@@ -1003,7 +1003,7 @@ class admin_guild
 				 * @event avathar.bbguild.recruitment_deleted
 				 * @var int recruit_id The deleted recruitment posting's id
 				 * @var int guild_id   The guild it belonged to
-				 * @since 2.3.0
+				 * @since 2.1.0
 				 */
 				extract($this->dispatcher->trigger_event('avathar.bbguild.recruitment_deleted', [
 					'recruit_id' => (int) $recruit_id,
@@ -1042,7 +1042,7 @@ class admin_guild
 				 * @event avathar.bbguild.recruitment_posted
 				 * @var int recruit_id The newly created recruitment posting's id
 				 * @var int guild_id   The guild it belongs to
-				 * @since 2.3.0
+				 * @since 2.1.0
 				 */
 				extract($this->dispatcher->trigger_event('avathar.bbguild.recruitment_posted', [
 					'recruit_id' => (int) $new_id,
@@ -1065,7 +1065,7 @@ class admin_guild
 				 * @event avathar.bbguild.recruitment_updated
 				 * @var int recruit_id The updated recruitment posting's id
 				 * @var int guild_id   The guild it belongs to
-				 * @since 2.3.0
+				 * @since 2.1.0
 				 */
 				extract($this->dispatcher->trigger_event('avathar.bbguild.recruitment_updated', [
 					'recruit_id' => (int) $recruit_id,

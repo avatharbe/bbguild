@@ -115,11 +115,11 @@ This section is the **public API contract** for the bbGuild extension. These are
 **Example use case:** bbAccounts could listen to `character_claim`/`character_unclaim` to keep its own account-linking table in sync without bbGuild knowing bbAccounts exists.
 
 - **Placement:** `ucp/bbguild_module.php::main()`
-- **Since:** 2.3.0
+- **Since:** 2.1.0
 - **Arguments:**
   - `player_id` (int) — The character involved
   - `guild_id` (int) — The guild it belongs/belonged to
-  - `user_id` (int) — The forum user who performed the action (0 for `character_delete` if the character was never claimed)
+  - `user_id` (int) — **For `character_claim`, `character_unclaim`, and `character_add`:** the actor — the forum user performing the action (the current session user). **For `character_edit` and `character_delete`:** the owner — the forum user account the character is linked to, which can differ from the actor (e.g. an admin editing or deleting another member's character). 0 for `character_delete` if the character was never claimed.
 - **Known listeners:** none
 
 ---
@@ -129,7 +129,7 @@ This section is the **public API contract** for the bbGuild extension. These are
 **What this event is for:** Fires after a game-API sync attempt finishes for one character, whether it succeeded or failed. Lets game plugins or a Discord integration react to fresh data (e.g. detect a gear change) without polling.
 
 - **Placement:** `cron/task/character_sync.php::run()`
-- **Since:** 2.3.0
+- **Since:** 2.1.0
 - **Arguments:**
   - `player_id` (int) — The character that was synced
   - `game_id` (string) — The game it belongs to
@@ -140,12 +140,15 @@ This section is the **public API contract** for the bbGuild extension. These are
 
 ### 1.9 `avathar.bbguild.roster_display`
 
-**What this event is for:** Fires once per character row as the roster portal module renders (both listing and grid layouts). Lets a game plugin inject a game-specific column.
+**What this event is for:** Fires once per character row as the roster portal module renders (both listing and grid layouts), after that row's template block-vars array has been built but before it is assigned to the template. Lets a game plugin inject a game-specific column.
 
 - **Placement:** `portal/modules/roster.php::display_listing()` and `::display_grid()`
-- **Since:** 2.3.0
+- **Since:** 2.1.0
 - **Arguments:**
-  - `player_id` (int), `game_id` (string), `guild_id` (int)
+  - `player_id` (int) — The character being displayed
+  - `game_id` (string) — The game the character belongs to
+  - `guild_id` (int) — The guild whose roster is rendering
+  - `tpl_ary` (array) — The template block-vars array for this row (`portal_roster_row` in the listing view, `class.players_row` in the grid view). Writable — add keys here to inject a column.
 - **Known listeners:** none
 
 ---
@@ -155,10 +158,10 @@ This section is the **public API contract** for the bbGuild extension. These are
 **What this event is for:** Fires once per portal module as the guild portal renders, after the module's template has been resolved. A listener can read or override which template is used for a given module.
 
 - **Placement:** `portal/portal_renderer.php::render()`
-- **Since:** 2.3.0
+- **Since:** 2.1.0
 - **Arguments:**
   - `guild_id` (int) — The guild whose portal is rendering
-  - `row` (array) — The portal module's database row (`module_id`, `module_type`, etc.)
+  - `row` (array) — The portal module's database row (`module_id`, `module_type`, etc.). Writable — passed on to `assign_module_vars()` afterward.
   - `template_module` (mixed) — The resolved template file/name for this module. Writable.
 - **Known listeners:** none
 
@@ -169,7 +172,7 @@ This section is the **public API contract** for the bbGuild extension. These are
 **What this event is for:** Fire on the corresponding recruitment-posting action in the ACP. Intended primarily for a future Discord integration to announce recruitment changes.
 
 - **Placement:** `controller/admin_guild.php::show_editguildrecruitment()`
-- **Since:** 2.3.0
+- **Since:** 2.1.0
 - **Arguments:**
   - `recruit_id` (int), `guild_id` (int)
 - **Known listeners:** none
@@ -178,13 +181,26 @@ This section is the **public API contract** for the bbGuild extension. These are
 
 ### 1.12 `avathar.bbguild.motd_updated`
 
-**What this event is for:** Fires when a guild's Message of the Day is saved. Intended primarily for a future Discord integration.
+**What this event is for:** Fires whenever a guild's settings are saved via the ACP edit-guild form — not only when the MOTD text itself changes. Intended primarily for a future Discord integration.
 
 - **Placement:** `controller/admin_guild.php::UpdateGuild()`
-- **Since:** 2.3.0
+- **Since:** 2.1.0
 - **Arguments:**
   - `guild_id` (int)
 - **Known listeners:** none
+
+---
+
+### 1.13 Template Events Fired
+
+In addition to the PHP events above, bbGuild fires a handful of template events directly in its Twig templates. A sibling extension hooks into these the same way phpBB core template events work — by dropping a file at `styles/all/template/event/<event_name>.html` — no PHP code required.
+
+| Template Event | Where it fires | Purpose |
+|---|---|---|
+| `bbguild_guild_header_details_after` | `main.html`, inside `.guild-header-details`, after the faction/realm/member-count line | Lets a sibling extension append extra guild header details (e.g. a Discord-member-count badge) |
+| `bbguild_main_after_content` | `main.html`, after the portal content include (MOTD, roster, recruitment, etc.), before the closing wrapper divs | Injection point for content that should appear below the entire guild portal page |
+| `bbguild_player_detail_after_content` | `player_detail.html`, after the last player-detail fieldset | Lets a game plugin append extra content to the player detail page |
+| `bbguild_welcome_after_portal` | `view/welcome.html`, after the portal module loop (or the "no portal modules" placeholder) | Injection point at the end of the portal's module rendering, before control returns to `main.html` |
 
 ---
 
@@ -208,3 +224,14 @@ This section lists every phpBB core event that bbGuild subscribes to in order to
 | `core.user_setup` | `load_language_on_setup()` | Loads bbGuild's language files on every page |
 | `core.page_header` | `add_page_header_link()` | Builds the guild-switcher nav dropdown and the about-page footer link/version, on every page |
 | `core.permissions` | `add_permission_cat()` | Registers bbGuild's permission category and ACL entries |
+
+### 3.2 Template Events Used
+
+phpBB (and, potentially, another extension) fires template events at fixed points inside its own Twig templates. bbGuild hooks into these by placing files at `styles/all/template/event/`.
+
+| Template Event | File | Purpose |
+|---|---|---|
+| `overall_header_head_append` | `overall_header_head_append.html` | Includes bbGuild's own CSS files (`bbguild.css`, `portal.css`) on every page, when bbGuild is enabled |
+| `overall_footer_copyright_append` | `overall_footer_copyright_append.html` | Adds the "About bbGuild" footer link and version number, when bbGuild is enabled |
+| `overall_header_breadcrumb_prepend` | `overall_header_breadcrumb_prepend.html` | Adds the guild-switcher breadcrumb dropdown to the header breadcrumb trail |
+| `overall_footer_breadcrumb_prepend` | `overall_footer_breadcrumb_prepend.html` | Adds the same guild-switcher breadcrumb dropdown (plus any DKP nav links) to the footer breadcrumb trail |
