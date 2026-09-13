@@ -56,6 +56,7 @@ services:
             - '@avathar.bbguild.player_detail'
             - '@dispatcher'
             - '@language'
+            - '@avathar.bbguild.player_detail_tab_registry'
     avathar.bbguild.admin.controller:
         class: avathar\bbguild\controller\ajax_controller
         arguments:
@@ -252,6 +253,16 @@ services:
         class: avathar\bbguild\model\games\character_sync_registry
         arguments:
             - '@avathar.bbguild.character_sync_collection'
+    avathar.bbguild.player_detail_tab_collection:
+        class: phpbb\di\service_collection
+        arguments:
+            - '@service_container'
+        tags:
+            - { name: service_collection, tag: bbguild.player_detail_tab }
+    avathar.bbguild.player_detail_tab_registry:
+        class: avathar\bbguild\model\games\player_detail_tab_registry
+        arguments:
+            - '@avathar.bbguild.player_detail_tab_collection'
     avathar.bbguild.cron.task.character_sync:
         class: avathar\bbguild\cron\task\character_sync
         arguments:

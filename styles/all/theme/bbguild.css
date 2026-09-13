@@ -144,12 +144,14 @@ table.table1.bbguild th {
 }
 
 /* Guild portal tab bar — sits directly below the guild header */
-.guild-portal-tabs {
+.guild-portal-tabs,
+.player-detail-tabs {
     margin-bottom: 10px;
     border-bottom: 1px solid rgba(128, 128, 128, 0.3);
 }
 
-.guild-portal-tabs ul {
+.guild-portal-tabs ul,
+.player-detail-tabs ul {
     display: flex;
     flex-wrap: wrap;
     list-style: none;
@@ -157,11 +159,13 @@ table.table1.bbguild th {
     padding: 0;
 }
 
-.guild-portal-tabs li {
+.guild-portal-tabs li,
+.player-detail-tabs li {
     margin: 0 4px -1px 0;
 }
 
-.guild-portal-tabs li a {
+.guild-portal-tabs li a,
+.player-detail-tabs li a {
     display: block;
     padding: 8px 14px;
     font-size: 1.1em;
@@ -171,7 +175,8 @@ table.table1.bbguild th {
     border-radius: 4px 4px 0 0;
 }
 
-.guild-portal-tabs li.activetab a {
+.guild-portal-tabs li.activetab a,
+.player-detail-tabs li.activetab a {
     font-weight: bold;
     background: rgba(0, 0, 0, 0.08);
     border-color: rgba(128, 128, 128, 0.3);

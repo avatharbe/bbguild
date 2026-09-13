@@ -3,8 +3,8 @@ avathar_bbguild_about:
     path: /about
     defaults: { _controller: avathar.bbguild.controller:about }
 avathar_bbguild_player:
-    path: /guild/{guild_id}/player/{player_id}
-    defaults: { _controller: avathar.bbguild.controller:playerdetail }
+    path: /guild/{guild_id}/player/{player_id}/{tab_slug}
+    defaults: { _controller: avathar.bbguild.controller:playerdetail, tab_slug: '' }
     requirements:
         guild_id: \d+
         player_id: \d+

@@ -74,6 +74,9 @@ class player_detail
 	/** @var string Loaded player name */
 	protected $player_name = '';
 
+	/** @var string Loaded player's game id */
+	protected $game_id = '';
+
 	public function __construct(
 		driver_interface $db,
 		user $user,
@@ -145,6 +148,7 @@ class player_detail
 		}
 
 		$this->player_name = $p->getPlayerName();
+		$this->game_id = $p->getGameId();
 
 		// Resolve rank name
 		$rank_display = $this->get_rank_display($p->getPlayerRankId(), $p->getPlayerGuildId());
@@ -247,6 +251,14 @@ class player_detail
 	public function get_player_name(): string
 	{
 		return $this->player_name;
+	}
+
+	/**
+	 * @return string The loaded player's game id
+	 */
+	public function get_game_id(): string
+	{
+		return $this->game_id;
 	}
 
 	/**

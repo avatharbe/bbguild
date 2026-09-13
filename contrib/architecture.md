@@ -189,7 +189,7 @@ Defined in `config/routing.yml`:
 |---|---|---|
 | `avathar_bbguild_guild` | `/guild/{guild_id}` | `view_controller::handleview` |
 | `avathar_bbguild_00` | `/guild/{page}/{guild_id}` | `view_controller::handleview` (`$page` doubles as the initial tab slug) |
-| `avathar_bbguild_player` | `/guild/{guild_id}/player/{player_id}` | `view_controller::playerdetail` |
+| `avathar_bbguild_player` | `/guild/{guild_id}/player/{player_id}/{tab_slug}` | `view_controller::playerdetail` (`$tab_slug` is an optional trailing segment, defaulting to empty, which resolves to the Character tab) |
 | `avathar_bbguild_01` | `/getfaction` | AJAX: faction selector |
 | `avathar_bbguild_02` | `/getguildrank/{guild_id}` | AJAX: rank selector |
 | `avathar_bbguild_03` | `/getplayerList/{game_id}` | AJAX: player list |
