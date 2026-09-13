@@ -314,7 +314,7 @@ $lang = array_merge(
 
    You should have received a copy of the GNU General Public License
    along with bbGuild.  If not, see http://www.gnu.org/licenses',
-	'LICENSE2' => 'Powered by bbDKP (c) 2009 The bbDKP Project Team. If you use this software and find it to be useful, we ask that you retain the copyright notice below. While not required for free use, it will help build interest in the bbDKP project and is <strong>required for obtaining support</strong>.',
+	'LICENSE2' => 'Powered by bbGuild. If you use this software and find it to be useful, we ask that you retain the copyright notice below. While not required for free use, it will help build interest in the bbGuild project and is <strong>required for obtaining support</strong>.',
 	'COPYRIGHT3' => 'bbDKP (c) 2010 Sajaki, Malfate, Blazeflack <br />
 bbDKP (c) 2008, 2009 Sajaki, Malfate, Kapli, Hroar',
 	'COPYRIGHT2' => 'bbDKP (c) 2007 Ippeh, Teksonic, Monkeytech, DWKN',
