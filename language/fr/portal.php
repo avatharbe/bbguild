@@ -48,6 +48,19 @@ $lang = array_merge($lang, [
 	'ACP_PORTAL_MOVE_RIGHT'          => 'Déplacer vers la colonne suivante',
 	'ACP_PORTAL_COLUMN_BOTTOM'       => 'Bas',
 
+	'ACP_PORTAL_TABS'                => 'Onglets',
+	'ACP_PORTAL_TAB'                 => 'Onglet',
+	'ACP_PORTAL_TAB_NAME'            => 'Nom de l\'onglet',
+	'ACP_PORTAL_TAB_SLUG'            => 'Slug',
+	'ACP_PORTAL_TAB_SLUG_EXPLAIN'    => 'Utilisé dans l\'URL de la page, par ex. <samp>raids</samp>. Lettres, chiffres, tirets et underscores uniquement.',
+	'ACP_PORTAL_ADD_TAB'             => 'Ajouter un onglet',
+	'ACP_PORTAL_TAB_ADDED'           => 'L\'onglet a été ajouté.',
+	'ACP_PORTAL_TAB_ADD_FAILED'      => 'Impossible d\'ajouter l\'onglet. Un onglet avec ce slug existe déjà pour cette guilde.',
+	'ACP_PORTAL_TAB_UPDATED'         => 'L\'onglet a été mis à jour.',
+	'ACP_PORTAL_TAB_UPDATE_FAILED'   => 'Impossible de mettre à jour l\'onglet. Un onglet avec ce slug existe déjà pour cette guilde.',
+	'ACP_PORTAL_TAB_DELETED'         => 'L\'onglet a été supprimé.',
+	'ACP_PORTAL_TAB_DELETE_FAILED'   => 'Impossible de supprimer l\'onglet. Une guilde doit toujours avoir au moins un onglet.',
+
 	// Module configuration
 	'ACP_PORTAL_MODULE_CONFIG'        => 'Configuration du module',
 	'ACP_PORTAL_MODULE_CONFIG_EXPLAIN' => 'Configurez le nom d\'affichage, l\'icône, la visibilité et les paramètres spécifiques de ce bloc portail. Les modifications s\'appliquent à la page d\'accueil de la guilde.',

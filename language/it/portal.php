@@ -48,6 +48,19 @@ $lang = array_merge($lang, [
 	'ACP_PORTAL_MOVE_RIGHT'          => 'Sposta nella colonna successiva',
 	'ACP_PORTAL_COLUMN_BOTTOM'       => 'In basso',
 
+	'ACP_PORTAL_TABS'                => 'Schede',
+	'ACP_PORTAL_TAB'                 => 'Scheda',
+	'ACP_PORTAL_TAB_NAME'            => 'Nome scheda',
+	'ACP_PORTAL_TAB_SLUG'            => 'Slug',
+	'ACP_PORTAL_TAB_SLUG_EXPLAIN'    => 'Utilizzato nell\'URL della pagina, es. <samp>raids</samp>. Solo lettere, numeri, trattini e underscore.',
+	'ACP_PORTAL_ADD_TAB'             => 'Aggiungi scheda',
+	'ACP_PORTAL_TAB_ADDED'           => 'La scheda è stata aggiunta.',
+	'ACP_PORTAL_TAB_ADD_FAILED'      => 'Impossibile aggiungere la scheda. Esiste già una scheda con questo slug per questa gilda.',
+	'ACP_PORTAL_TAB_UPDATED'         => 'La scheda è stata aggiornata.',
+	'ACP_PORTAL_TAB_UPDATE_FAILED'   => 'Impossibile aggiornare la scheda. Esiste già una scheda con questo slug per questa gilda.',
+	'ACP_PORTAL_TAB_DELETED'         => 'La scheda è stata rimossa.',
+	'ACP_PORTAL_TAB_DELETE_FAILED'   => 'Impossibile rimuovere la scheda. Una gilda deve avere sempre almeno una scheda.',
+
 	// Module configuration
 	'ACP_PORTAL_MODULE_CONFIG'        => 'Configurazione modulo',
 	'ACP_PORTAL_MODULE_CONFIG_EXPLAIN' => 'Configura il nome visualizzato, l\'icona, la visibilità e le impostazioni specifiche per questo blocco del portale. Le modifiche si applicano alla pagina di benvenuto della gilda.',

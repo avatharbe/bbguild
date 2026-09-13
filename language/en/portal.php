@@ -60,6 +60,19 @@ $lang = array_merge($lang, [
 	'ACP_PORTAL_MOVE_RIGHT'          => 'Move to next column',
 	'ACP_PORTAL_COLUMN_BOTTOM'       => 'Bottom',
 
+	'ACP_PORTAL_TABS'                => 'Tabs',
+	'ACP_PORTAL_TAB'                 => 'Tab',
+	'ACP_PORTAL_TAB_NAME'            => 'Tab name',
+	'ACP_PORTAL_TAB_SLUG'            => 'Slug',
+	'ACP_PORTAL_TAB_SLUG_EXPLAIN'    => 'Used in the page URL, e.g. <samp>raids</samp>. Letters, numbers, hyphens and underscores only.',
+	'ACP_PORTAL_ADD_TAB'             => 'Add Tab',
+	'ACP_PORTAL_TAB_ADDED'           => 'Tab has been added.',
+	'ACP_PORTAL_TAB_ADD_FAILED'      => 'Could not add tab. A tab with that slug already exists for this guild.',
+	'ACP_PORTAL_TAB_UPDATED'         => 'Tab has been updated.',
+	'ACP_PORTAL_TAB_UPDATE_FAILED'   => 'Could not update tab. A tab with that slug already exists for this guild.',
+	'ACP_PORTAL_TAB_DELETED'         => 'Tab has been removed.',
+	'ACP_PORTAL_TAB_DELETE_FAILED'   => 'Could not remove tab. A guild must always have at least one tab.',
+
 	// Module configuration
 	'ACP_PORTAL_MODULE_CONFIG'        => 'Module Configuration',
 	'ACP_PORTAL_MODULE_CONFIG_EXPLAIN' => 'Configure the display name, icon, visibility and module-specific settings for this portal block. Changes apply to the guild welcome page.',

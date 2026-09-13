@@ -48,6 +48,19 @@ $lang = array_merge($lang, [
 	'ACP_PORTAL_MOVE_RIGHT'          => 'Verplaats naar volgende kolom',
 	'ACP_PORTAL_COLUMN_BOTTOM'       => 'Onder',
 
+	'ACP_PORTAL_TABS'                => 'Tabbladen',
+	'ACP_PORTAL_TAB'                 => 'Tabblad',
+	'ACP_PORTAL_TAB_NAME'            => 'Tabbladnaam',
+	'ACP_PORTAL_TAB_SLUG'            => 'Slug',
+	'ACP_PORTAL_TAB_SLUG_EXPLAIN'    => 'Wordt gebruikt in de pagina-URL, bijv. <samp>raids</samp>. Alleen letters, cijfers, koppeltekens en underscores.',
+	'ACP_PORTAL_ADD_TAB'             => 'Tabblad toevoegen',
+	'ACP_PORTAL_TAB_ADDED'           => 'Tabblad is toegevoegd.',
+	'ACP_PORTAL_TAB_ADD_FAILED'      => 'Tabblad kon niet worden toegevoegd. Er bestaat al een tabblad met deze slug voor deze gilde.',
+	'ACP_PORTAL_TAB_UPDATED'         => 'Tabblad is bijgewerkt.',
+	'ACP_PORTAL_TAB_UPDATE_FAILED'   => 'Tabblad kon niet worden bijgewerkt. Er bestaat al een tabblad met deze slug voor deze gilde.',
+	'ACP_PORTAL_TAB_DELETED'         => 'Tabblad is verwijderd.',
+	'ACP_PORTAL_TAB_DELETE_FAILED'   => 'Tabblad kon niet worden verwijderd. Een gilde moet altijd minstens één tabblad hebben.',
+
 	// Module configuration
 	'ACP_PORTAL_MODULE_CONFIG'        => 'Moduleconfiguratie',
 	'ACP_PORTAL_MODULE_CONFIG_EXPLAIN' => 'Configureer de weergavenaam, het icoon, de zichtbaarheid en modulespecifieke instellingen voor dit portaalblok. Wijzigingen zijn van toepassing op de gildewelkomstpagina.',

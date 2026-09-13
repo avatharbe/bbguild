@@ -92,9 +92,10 @@ class admin_portal
 		$guild_id = $this->request->variable('guild_id', 0);
 		$action = $this->request->variable($action_param, '');
 		$module_id = $this->request->variable('module_id', 0);
+		$tab_id = $this->request->variable('tab_id', 0);
 
 		// Handle actions
-		$redirect_url = $this->u_action . '&guild_id=' . $guild_id;
+		$redirect_url = $this->u_action . '&guild_id=' . $guild_id . '&tab_id=' . $tab_id;
 		switch ($action)
 		{
 			case 'move_up':
@@ -110,6 +111,12 @@ class admin_portal
 			case 'move_to_column':
 				$target_column = $this->request->variable('target_column', 0);
 				$this->module_manager->move_module_to_column($module_id, $target_column);
+				redirect($redirect_url);
+				break;
+
+			case 'move_to_tab':
+				$target_tab = $this->request->variable('target_tab', 0);
+				$this->module_manager->move_module_to_tab($module_id, $target_tab);
 				redirect($redirect_url);
 				break;
 
@@ -154,9 +161,10 @@ class admin_portal
 				}
 				$classname = $this->request->variable('module_classname', '');
 				$column = $this->request->variable('module_column', 2);
-				if ($classname && $guild_id)
+				$module_tab = $this->request->variable('module_tab', 0);
+				if ($classname && $guild_id && $module_tab)
 				{
-					$new_id = $this->module_manager->add_module($classname, $column, $guild_id);
+					$new_id = $this->module_manager->add_module($classname, $column, $guild_id, $module_tab);
 					if ($new_id)
 					{
 						trigger_error($this->language->lang('ACP_PORTAL_MODULE_ADDED') . adm_back_link($this->u_action . '&guild_id=' . $guild_id), E_USER_NOTICE);
@@ -167,18 +175,80 @@ class admin_portal
 					}
 				}
 				break;
+
+			case 'add_tab':
+				if (!check_form_key('acp_bbguild_portal'))
+				{
+					trigger_error('FORM_INVALID', E_USER_WARNING);
+				}
+				$this->handle_add_tab($guild_id);
+				break;
+
+			case 'edit_tab':
+				if (!check_form_key('acp_bbguild_portal'))
+				{
+					trigger_error('FORM_INVALID', E_USER_WARNING);
+				}
+				$this->handle_edit_tab($guild_id);
+				break;
+
+			case 'delete_tab':
+				if (confirm_box(true))
+				{
+					$deleted_tab_id = $this->request->variable('delete_tab_id', 0);
+					if ($this->module_manager->delete_tab($deleted_tab_id, $guild_id))
+					{
+						trigger_error($this->language->lang('ACP_PORTAL_TAB_DELETED') . adm_back_link($this->u_action . '&guild_id=' . $guild_id), E_USER_NOTICE);
+					}
+					else
+					{
+						trigger_error($this->language->lang('ACP_PORTAL_TAB_DELETE_FAILED') . adm_back_link($this->u_action . '&guild_id=' . $guild_id), E_USER_WARNING);
+					}
+				}
+				else
+				{
+					confirm_box(false, $this->language->lang('CONFIRM_OPERATION'), build_hidden_fields([
+						$this->action_param => 'delete_tab',
+						'delete_tab_id' => $this->request->variable('delete_tab_id', 0),
+						'guild_id'  => $guild_id,
+					]));
+				}
+				break;
+
+			case 'move_tab_up':
+				$this->module_manager->move_tab_vertical($this->request->variable('move_tab_id', 0), database_handler::MOVE_DIRECTION_UP);
+				redirect($this->u_action . '&guild_id=' . $guild_id);
+				break;
+
+			case 'move_tab_down':
+				$this->module_manager->move_tab_vertical($this->request->variable('move_tab_id', 0), database_handler::MOVE_DIRECTION_DOWN);
+				redirect($this->u_action . '&guild_id=' . $guild_id);
+				break;
 		}
 
-		// Show modules for selected guild
+		// Show modules for selected guild + tab
 		if ($guild_id)
 		{
-			$this->build_module_list($guild_id);
-			$this->build_add_module_form($guild_id);
+			$tabs = $this->database_handler->get_tabs($guild_id);
+			if (!$tab_id)
+			{
+				$default_tab = $tabs[0] ?? null;
+				$tab_id = $default_tab ? (int) $default_tab['tab_id'] : 0;
+			}
+
+			$this->build_tab_list($tabs, $tab_id, $guild_id);
+
+			if ($tab_id)
+			{
+				$this->build_module_list($guild_id, $tab_id);
+				$this->build_add_module_form($guild_id, $tabs, $tab_id);
+			}
 		}
 
 		$this->template->assign_vars([
 			'U_ACTION'         => $this->u_action,
 			'GUILD_ID'         => $guild_id,
+			'TAB_ID'           => $tab_id,
 			'S_BBGUILD'        => true,
 			'ACTION_PARAM'     => $this->action_param,
 		]);
@@ -187,15 +257,37 @@ class admin_portal
 	}
 
 	/**
-	 * Build the list of modules for a guild.
+	 * Build the tab switcher + tab management list for a guild.
 	 */
-	protected function build_module_list(int $guild_id): void
+	protected function build_tab_list(array $tabs, int $active_tab_id, int $guild_id): void
 	{
-		$modules = $this->database_handler->get_modules($guild_id);
+		$ap = $this->action_param;
+
+		foreach ($tabs as $row)
+		{
+			$this->template->assign_block_vars('tab_row', [
+				'TAB_ID'       => $row['tab_id'],
+				'TAB_NAME'     => $row['tab_name'],
+				'TAB_SLUG'     => $row['tab_slug'],
+				'S_ACTIVE'     => (int) $row['tab_id'] === $active_tab_id,
+				'U_SELECT'     => $this->u_action . '&amp;guild_id=' . $guild_id . '&amp;tab_id=' . $row['tab_id'],
+				'U_MOVE_UP'    => $this->u_action . '&amp;' . $ap . '=move_tab_up&amp;move_tab_id=' . $row['tab_id'] . '&amp;guild_id=' . $guild_id,
+				'U_MOVE_DOWN'  => $this->u_action . '&amp;' . $ap . '=move_tab_down&amp;move_tab_id=' . $row['tab_id'] . '&amp;guild_id=' . $guild_id,
+				'U_DELETE'     => $this->u_action . '&amp;' . $ap . '=delete_tab&amp;delete_tab_id=' . $row['tab_id'] . '&amp;guild_id=' . $guild_id,
+			]);
+		}
+	}
+
+	/**
+	 * Build the list of modules for a guild's active tab.
+	 */
+	protected function build_module_list(int $guild_id, int $tab_id): void
+	{
+		$modules = $this->database_handler->get_modules($guild_id, $tab_id);
+		$tabs = $this->database_handler->get_tabs($guild_id);
 
 		foreach ($modules as $row)
 		{
-			$column_name = $this->portal_columns->number_to_string((int) $row['module_column']);
 			$module_obj = $this->module_registry->get_module($row['module_classname']);
 			$display_name = $module_obj
 				? ($this->language->lang($module_obj->get_name()) ?: $row['module_name'])
@@ -210,11 +302,12 @@ class admin_portal
 				'MODULE_STATUS' => (int) $row['module_status'],
 				'S_ENABLED'     => (int) $row['module_status'] === 1,
 				'U_CONFIGURE'   => $this->u_action . '&amp;' . $ap . '=configure&amp;module_id=' . $row['module_id'] . '&amp;guild_id=' . $guild_id,
-				'U_MOVE_UP'     => $this->u_action . '&amp;' . $ap . '=move_up&amp;module_id=' . $row['module_id'] . '&amp;guild_id=' . $guild_id,
-				'U_MOVE_DOWN'   => $this->u_action . '&amp;' . $ap . '=move_down&amp;module_id=' . $row['module_id'] . '&amp;guild_id=' . $guild_id,
-				'U_MOVE_COLUMN' => $this->u_action . '&amp;' . $ap . '=move_to_column&amp;module_id=' . $row['module_id'] . '&amp;guild_id=' . $guild_id,
+				'U_MOVE_UP'     => $this->u_action . '&amp;' . $ap . '=move_up&amp;module_id=' . $row['module_id'] . '&amp;guild_id=' . $guild_id . '&amp;tab_id=' . $tab_id,
+				'U_MOVE_DOWN'   => $this->u_action . '&amp;' . $ap . '=move_down&amp;module_id=' . $row['module_id'] . '&amp;guild_id=' . $guild_id . '&amp;tab_id=' . $tab_id,
+				'U_MOVE_COLUMN' => $this->u_action . '&amp;' . $ap . '=move_to_column&amp;module_id=' . $row['module_id'] . '&amp;guild_id=' . $guild_id . '&amp;tab_id=' . $tab_id,
+				'U_MOVE_TAB'    => $this->u_action . '&amp;' . $ap . '=move_to_tab&amp;module_id=' . $row['module_id'] . '&amp;guild_id=' . $guild_id . '&amp;tab_id=' . $tab_id,
 				'U_DELETE'      => $this->u_action . '&amp;' . $ap . '=delete&amp;module_id=' . $row['module_id'] . '&amp;guild_id=' . $guild_id,
-				'U_TOGGLE'      => $this->u_action . '&amp;' . $ap . '=toggle&amp;module_id=' . $row['module_id'] . '&amp;guild_id=' . $guild_id,
+				'U_TOGGLE'      => $this->u_action . '&amp;' . $ap . '=toggle&amp;module_id=' . $row['module_id'] . '&amp;guild_id=' . $guild_id . '&amp;tab_id=' . $tab_id,
 			]);
 
 			// Add allowed column options for this module
@@ -232,13 +325,23 @@ class admin_portal
 					]);
 				}
 			}
+
+			// Add tab options for this module (move-to-tab dropdown)
+			foreach ($tabs as $tab_row)
+			{
+				$this->template->assign_block_vars('module_row.tab_option', [
+					'VALUE'    => $tab_row['tab_id'],
+					'LABEL'    => $tab_row['tab_name'],
+					'SELECTED' => ((int) $tab_row['tab_id'] === $tab_id),
+				]);
+			}
 		}
 	}
 
 	/**
 	 * Build the add-module dropdown with available modules.
 	 */
-	protected function build_add_module_form(int $guild_id): void
+	protected function build_add_module_form(int $guild_id, array $tabs, int $active_tab_id): void
 	{
 		$available = $this->module_registry->get_all_modules();
 
@@ -259,6 +362,63 @@ class admin_portal
 				'LABEL' => $this->language->lang('ACP_PORTAL_COLUMN_' . strtoupper($name)),
 			]);
 		}
+
+		// Tab options
+		foreach ($tabs as $tab_row)
+		{
+			$this->template->assign_block_vars('tab_options', [
+				'VALUE'    => $tab_row['tab_id'],
+				'LABEL'    => $tab_row['tab_name'],
+				'SELECTED' => ((int) $tab_row['tab_id'] === $active_tab_id),
+			]);
+		}
+	}
+
+	/**
+	 * Handle the add_tab action: validate + create.
+	 */
+	protected function handle_add_tab(int $guild_id): void
+	{
+		$name = $this->request->variable('tab_name', '', true);
+		$slug = $this->sanitize_slug($this->request->variable('tab_slug', ''));
+
+		if (!$guild_id || $name === '' || $slug === '' || $this->database_handler->get_tab_by_slug($guild_id, $slug) !== null)
+		{
+			trigger_error($this->language->lang('ACP_PORTAL_TAB_ADD_FAILED') . adm_back_link($this->u_action . '&guild_id=' . $guild_id), E_USER_WARNING);
+		}
+
+		$this->module_manager->add_tab($name, $slug, $guild_id);
+		trigger_error($this->language->lang('ACP_PORTAL_TAB_ADDED') . adm_back_link($this->u_action . '&guild_id=' . $guild_id), E_USER_NOTICE);
+	}
+
+	/**
+	 * Handle the edit_tab action: validate + update.
+	 */
+	protected function handle_edit_tab(int $guild_id): void
+	{
+		$tab_id = $this->request->variable('edit_tab_id', 0);
+		$name = $this->request->variable('tab_name', '', true);
+		$slug = $this->sanitize_slug($this->request->variable('tab_slug', ''));
+
+		$existing = $this->database_handler->get_tab_by_slug($guild_id, $slug);
+		$slug_taken_by_other = $existing !== null && (int) $existing['tab_id'] !== $tab_id;
+
+		if (!$tab_id || $name === '' || $slug === '' || $slug_taken_by_other)
+		{
+			trigger_error($this->language->lang('ACP_PORTAL_TAB_UPDATE_FAILED') . adm_back_link($this->u_action . '&guild_id=' . $guild_id), E_USER_WARNING);
+		}
+
+		$this->module_manager->edit_tab($tab_id, $name, $slug);
+		trigger_error($this->language->lang('ACP_PORTAL_TAB_UPDATED') . adm_back_link($this->u_action . '&guild_id=' . $guild_id), E_USER_NOTICE);
+	}
+
+	/**
+	 * Reduce a user-entered slug to the URL-safe charset the widened
+	 * avathar_bbguild_00 route requirement accepts.
+	 */
+	protected function sanitize_slug(string $slug): string
+	{
+		return preg_replace('/[^a-zA-Z0-9_\-]/', '', $slug);
 	}
 
 	/**

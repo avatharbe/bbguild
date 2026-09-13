@@ -48,6 +48,19 @@ $lang = array_merge($lang, [
 	'ACP_PORTAL_MOVE_RIGHT'          => 'In nächste Spalte verschieben',
 	'ACP_PORTAL_COLUMN_BOTTOM'       => 'Unten',
 
+	'ACP_PORTAL_TABS'                => 'Reiter',
+	'ACP_PORTAL_TAB'                 => 'Reiter',
+	'ACP_PORTAL_TAB_NAME'            => 'Reitername',
+	'ACP_PORTAL_TAB_SLUG'            => 'Slug',
+	'ACP_PORTAL_TAB_SLUG_EXPLAIN'    => 'Wird in der Seiten-URL verwendet, z.B. <samp>raids</samp>. Nur Buchstaben, Zahlen, Bindestriche und Unterstriche.',
+	'ACP_PORTAL_ADD_TAB'             => 'Reiter hinzufügen',
+	'ACP_PORTAL_TAB_ADDED'           => 'Reiter wurde hinzugefügt.',
+	'ACP_PORTAL_TAB_ADD_FAILED'      => 'Reiter konnte nicht hinzugefügt werden. Ein Reiter mit diesem Slug existiert bereits für diese Gilde.',
+	'ACP_PORTAL_TAB_UPDATED'         => 'Reiter wurde aktualisiert.',
+	'ACP_PORTAL_TAB_UPDATE_FAILED'   => 'Reiter konnte nicht aktualisiert werden. Ein Reiter mit diesem Slug existiert bereits für diese Gilde.',
+	'ACP_PORTAL_TAB_DELETED'         => 'Reiter wurde entfernt.',
+	'ACP_PORTAL_TAB_DELETE_FAILED'   => 'Reiter konnte nicht entfernt werden. Eine Gilde muss immer mindestens einen Reiter haben.',
+
 	// Module configuration
 	'ACP_PORTAL_MODULE_CONFIG'        => 'Modulkonfiguration',
 	'ACP_PORTAL_MODULE_CONFIG_EXPLAIN' => 'Konfiguriere den Anzeigenamen, das Symbol, die Sichtbarkeit und modulspezifische Einstellungen für diesen Portalblock. Änderungen gelten für die Gildenwillkommensseite.',
