@@ -37,8 +37,8 @@ Status: ✅ have · ◑ partial · ⬜ gap. "Owner" = which repo delivers it.
 | Professions | ⬜ | ⬜ | ✅ | ⬜ | core+wow | 2.2.0 (#230) |
 | Player statistics | ⬜ | ✅(DKP) | ✅ | ⬜ | core | 2.2.0 (#289) |
 | Events / RSVP calendar | ◑ | ⬜(Raidplanner) | ✅ | ⬜ | **new ext** | 2.2.0 |
-| Discord integration | ⬜ | ⬜ | ✅ | ⬜ | **new ext** | 2.3.0 |
-| Boss / raid progress (Gameworld) | ⬜ | ◑(Gameworld MOD) | ✅ | ⬜ stub | **new ext** | 2.3.0 |
+| Discord integration | ⬜ | ⬜ | ✅ | ⬜ | **new ext** | 2.3.0 — open question, not decided |
+| Boss / raid progress (Gameworld) | ⬜ | ◑(Gameworld MOD) | ✅ | ⬜ old phpBB 3.0 MOD | Gameworld (existing repo) | 2.3.0 (Gameworld#16 — port to 3.3 extension) |
 | Battle.net API modernization | — | ◑ | — | ◑ working | wow | 2.3.0 |
 | bbGuild API surface (events + read API) | — | ◑ bbDKP-api idea | ◑ | ⬜ | core | 2.3.0 (#370) |
 | Spec build analysis | ⬜ | ⬜ | ◑ | ⬜ | wow | 2.3.0 (#286) |
@@ -68,7 +68,7 @@ Headline: tabbed portal + character experience + stats.
 - **#372** unit test coverage: migrations + remaining guild/player CRUD paths (split from #244) — open
 
 ### 2.2.0 — events + roster depth · due 2026-11-30
-- **Events / RSVP calendar** — new extension (top GoW gap; Raidplanner MOD prior art)
+- **Events / RSVP calendar** — new extension (top GoW gap; Raidplanner MOD prior art — Raidplanner's guild-specific raid signup/roster management, bbDKP raid-event integration, and portal blocks go beyond what a generic third-party calendar extension covers, so it's still being built)
 - **#231** roster ↔ custom profile fields
 - **#368** profile-field character info (restores pbwowext#10, part 2; companion to #231)
 - **#230** professions
@@ -76,8 +76,8 @@ Headline: tabbed portal + character experience + stats.
 
 ### 2.3.0 — integrations · due 2027-01-15
 - **#370** expose a bbGuild API surface (phpBB events + read API) — the decoupling/integration layer for the whole family; revives the 2012 bbDKP-API idea; Discord/Gameworld are its first consumers
-- **Discord integration** — new extension
-- **Gameworld** — new extension (boss/zone progress)
+- **Discord integration** — new extension; **open question, not decided**
+- **Gameworld#16** — port existing `avatharbe/Gameworld` repo from its old phpBB 3.0 MOD to a 3.3 extension (boss/zone progress); milestoned 2.3.0
 - Battle.net API modernization
 - **#286** spec build analysis
 
@@ -104,7 +104,8 @@ Gets its own parity matrix + release plan in a separate document.
 - Item data depth: base ID **+ bonus IDs** minimum *(recommended)*.
 
 ## Cross-repo notes
-- New extensions (events, Discord, Gameworld) are **separate repos** — they need their own milestones/epics; tracked here only as roadmap line items.
+- New extensions (events, Discord) are **separate repos** — they need their own milestones/epics; tracked here only as roadmap line items. Discord is an **open question, not decided**.
+- Gameworld is an **existing repo**, not a new one — still the old phpBB 3.0 MOD, needs porting to a 3.3 extension (`Gameworld#16`, milestoned 2.3.0).
 - bbTips (`bonus=` attribute, #363) is a **separate extension** from the 9-plugin train — coordinate its release with 2.1.0.
 
 ## Next steps
