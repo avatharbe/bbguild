@@ -800,6 +800,7 @@ $lang = array_merge(
 	'LISTATTENDEES_FOOTCOUNT' => '...  %d Teilnehmer gefunden',
 	'MANAGE_PLAYERS_FOOTCOUNT' => '... %d Mitglied(er) gefunden',
 	'VIEWLOGS_FOOTCOUNT' => '... %d Protokoll(e) gefunden / %d pro Seite',
+	'LOGS_PER_PAGE' => 'Pro Seite anzeigen:',
 	'GUILD_FOOTCOUNT' => '... %d Gilde(n) gefunden',
 	'NEWS_FOOTCOUNT' => '...  %d Nachricht(en) gefunden',
 	'LISTADJ_FOOTCOUNT' => '... %d Punkteanpassung(en) gefunden / %d pro Seite',
