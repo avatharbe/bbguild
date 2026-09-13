@@ -21,6 +21,7 @@ use phpbb\cache\driver\driver_interface as cache_interface;
 use phpbb\config\config;
 use phpbb\controller\helper;
 use phpbb\db\driver\driver_interface;
+use phpbb\event\dispatcher_interface;
 use phpbb\extension\manager;
 use phpbb\pagination;
 use phpbb\path_helper;
@@ -48,6 +49,7 @@ class roster extends module_base
 	protected helper $helper;
 	protected game_registry $game_registry;
 	protected asset_url_resolver $asset_resolver;
+	protected dispatcher_interface $dispatcher;
 	protected string $players_table;
 	protected string $ranks_table;
 	protected string $classes_table;
@@ -73,6 +75,7 @@ class roster extends module_base
 		helper $helper,
 		game_registry $game_registry,
 		asset_url_resolver $asset_resolver,
+		dispatcher_interface $dispatcher,
 		string $players_table,
 		string $ranks_table,
 		string $classes_table,
@@ -98,6 +101,7 @@ class roster extends module_base
 		$this->helper = $helper;
 		$this->game_registry = $game_registry;
 		$this->asset_resolver = $asset_resolver;
+		$this->dispatcher = $dispatcher;
 		$this->players_table = $players_table;
 		$this->ranks_table = $ranks_table;
 		$this->classes_table = $classes_table;
@@ -278,6 +282,21 @@ class roster extends module_base
 	{
 		foreach ($characters[0] as $char)
 		{
+			/**
+			 * Fired for each character row as the roster module renders.
+			 *
+			 * @event avathar.bbguild.roster_display
+			 * @var int    player_id The character being displayed
+			 * @var string game_id   The game the character belongs to
+			 * @var int    guild_id  The guild whose roster is rendering
+			 * @since 2.3.0
+			 */
+			$player_id = (int) $char['player_id'];
+			$game_id = (string) $char['game_id'];
+			$guild_id = (int) $this->guild_id;
+			$vars = ['player_id', 'game_id', 'guild_id'];
+			extract($this->dispatcher->trigger_event('avathar.bbguild.roster_display', compact($vars)));
+
 			$spec = $this->resolve_spec($char, $spec_lookup, $ext_path_images);
 			$this->template->assign_block_vars('portal_roster_row', [
 				'PLAYER_ID'   => $char['player_id'],
@@ -371,6 +390,21 @@ class roster extends module_base
 				{
 					if ($char['player_class_id'] == $classid)
 					{
+						/**
+						 * Fired for each character row as the roster module renders.
+						 *
+						 * @event avathar.bbguild.roster_display
+						 * @var int    player_id The character being displayed
+						 * @var string game_id   The game the character belongs to
+						 * @var int    guild_id  The guild whose roster is rendering
+						 * @since 2.3.0
+						 */
+						$player_id = (int) $char['player_id'];
+						$game_id = (string) $char['game_id'];
+						$guild_id = (int) $this->guild_id;
+						$vars = ['player_id', 'game_id', 'guild_id'];
+						extract($this->dispatcher->trigger_event('avathar.bbguild.roster_display', compact($vars)));
+
 						$grid_spec = $this->resolve_spec($char, $spec_lookup, $ext_path_images);
 						$this->template->assign_block_vars('class.players_row', [
 							'PLAYER_ID' => $char['player_id'],
