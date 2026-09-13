@@ -62,7 +62,7 @@ class view_controller
 	 * Main view handler — builds guild context and renders portal.
 	 *
 	 * @param  int    $guild_id
-	 * @param  string $page  Kept for route compatibility (unused)
+	 * @param  string $page  Tab slug to render (falls back to the guild's default tab)
 	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
 	public function handleview($guild_id, $page = 'welcome')
@@ -73,7 +73,7 @@ class view_controller
 		}
 
 		$this->guild_context->init((int) $guild_id);
-		$this->portal_renderer->render($this->guild_context->guild_id);
+		$this->portal_renderer->render($this->guild_context->guild_id, (string) $page);
 		$this->template->assign_vars(['S_DISPLAY_WELCOME' => true]);
 
 		return $this->helper->render('main.html', $this->guild_context->guild->getName());
