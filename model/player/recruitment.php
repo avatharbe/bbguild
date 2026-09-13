@@ -319,7 +319,7 @@ class recruitment extends roles
                 AND u.guild_id = g.id
                 AND u.role_id = r.role_id
                 AND l.attribute='role'
-                AND r.game_id=l.game_id AND l.attribute_id = r.role_id  AND l.language = '" . $config['bbguild_lang'] . "' and l.attribute='role'
+                AND r.game_id=l.game_id AND l.attribute_id = r.role_id  AND l.language = '" . $db->sql_escape($config['bbguild_lang']) . "' and l.attribute='role'
                 AND u.id = " . (int) $this->id,
 			'ORDER_BY' => ' u.role_id '
 		);
@@ -398,7 +398,7 @@ class recruitment extends roles
 			'applytemplate_id' => $this->applytemplate_id,
 			)
 		);
-		$db->sql_query('UPDATE ' . $this->bb_recruit_table . ' SET ' . $query . ' WHERE id = ' . $this->id);
+		$db->sql_query('UPDATE ' . $this->bb_recruit_table . ' SET ' . $query . ' WHERE id = ' . (int) $this->id);
 	}
 
 	/**
@@ -407,7 +407,7 @@ class recruitment extends roles
 	public function delete_role()
 	{
 		global $db;
-		$sql = 'DELETE FROM ' . $this->bb_recruit_table . ' WHERE id = ' . $this->id;
+		$sql = 'DELETE FROM ' . $this->bb_recruit_table . ' WHERE id = ' . (int) $this->id;
 		$db->sql_query($sql);
 	}
 
@@ -449,7 +449,7 @@ class recruitment extends roles
                 AND u.role_id = r.role_id
                 AND r.game_id= g.game_id
                 AND r1.attribute = 'role'
-                AND r.game_id = r1.game_id AND r1.attribute_id = r.role_id  AND r1.language = '" . $config['bbguild_lang'] . "' and r1.attribute='role'
+                AND r.game_id = r1.game_id AND r1.attribute_id = r.role_id  AND r1.language = '" . $db->sql_escape($config['bbguild_lang']) . "' and r1.attribute='role'
                 AND c.class_id > 0 AND c.class_id = u.class_id AND c.game_id = g.game_id
                 AND g.id =  " . (int) $this->guild_id,
 			'ORDER_BY' => 'c.game_id, c.class_id '

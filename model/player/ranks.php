@@ -208,7 +208,7 @@ class ranks extends guilds
 
 		// hardcoded exclusion of ranks 90/99
 		$sql = 'DELETE FROM ' . $this->bb_ranks_table . ' WHERE rank_id != 90 and rank_id != 99 and rank_id= ' .
-		$this->RankId . ' and guild_id = ' . $this->RankGuild;
+		(int) $this->RankId . ' and guild_id = ' . (int) $this->RankGuild;
 		$this->db->sql_query($sql);
 
 		// log the action
@@ -270,7 +270,7 @@ class ranks extends guilds
 	{
 		// rank 99 is the out-rank
 		$sql = 'SELECT rank_id, rank_name, rank_hide, rank_prefix, rank_suffix, guild_id FROM ' . $this->bb_ranks_table . '
-	        		WHERE guild_id = ' . $this->RankGuild . '
+	        		WHERE guild_id = ' . (int) $this->RankGuild . '
 	        		ORDER BY rank_id, rank_hide  ASC ';
 
 		return $this->db->sql_query($sql);
@@ -283,7 +283,7 @@ class ranks extends guilds
 	public function countplayers()
 	{
 		$sql = 'SELECT count(*) as countm FROM ' . $this->bb_players_table . '
-			WHERE player_rank_id = ' . $this->RankId . ' and player_guild_id = ' . $this->RankGuild;
+			WHERE player_rank_id = ' . (int) $this->RankId . ' and player_guild_id = ' . (int) $this->RankGuild;
 		$result = $this->db->sql_query($sql);
 		$countm = (int) $this->db->sql_fetchfield('countm');
 		$this->db->sql_freeresult($result);

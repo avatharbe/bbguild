@@ -750,7 +750,7 @@ class bbguild_module
 				$this->bb_language_table        => 'l',
 			),
 			'WHERE'        => " r.race_id = l.attribute_id
-						AND r.game_id = '" . $guilds->game_id . "'
+						AND r.game_id = '" . $this->db->sql_escape($guilds->game_id) . "'
 						AND l.attribute='race'
 						AND l.game_id = r.game_id
 						AND l.language= '" . $this->config['bbguild_lang'] ."'",
@@ -796,7 +796,7 @@ class bbguild_module
 				$this->bb_classes_table        => 'c',
 				$this->bb_language_table        => 'l',
 			),
-			'WHERE'        => " l.game_id = c.game_id  AND c.game_id = '" . $guilds->game_id . "'
+			'WHERE'        => " l.game_id = c.game_id  AND c.game_id = '" . $this->db->sql_escape($guilds->game_id) . "'
 			AND l.attribute_id = c.class_id  AND l.language= '" . $this->config['bbguild_lang'] . "' AND l.attribute = 'class' ",
 			'ORDER_BY'    => 'l.name asc'
 		);
@@ -1064,7 +1064,7 @@ class bbguild_module
 						DKPSYS_TABLE         => 'd',
 						$this->bb_players_table     => 'l',
 					),
-					'WHERE'     => "l.player_id = m.player_id and l.player_status = 1 and m.player_dkpid = d.dkpsys_id and d.dkpsys_status='Y' and m.player_id = " . $char['player_id'],
+					'WHERE'     => "l.player_id = m.player_id and l.player_status = 1 and m.player_dkpid = d.dkpsys_id and d.dkpsys_status='Y' and m.player_id = " . (int) $char['player_id'],
 					'GROUP_BY'  => ' d.dkpsys_id, d.dkpsys_name ',
 					'ORDER_BY'    => ' d.dkpsys_name ',
 				);

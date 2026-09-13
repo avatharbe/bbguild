@@ -162,15 +162,15 @@ class database_handler
 		$sql = 'UPDATE ' . $this->modules_table . '
 			SET module_order = module_order + 1
 			WHERE module_order >= ' . (int) $module_data['module_order'] . '
-				AND module_column = ' . $new_column . '
-				AND module_tab = ' . $tab_id . '
-				AND guild_id = ' . $guild_id;
+				AND module_column = ' . (int) $new_column . '
+				AND module_tab = ' . (int) $tab_id . '
+				AND guild_id = ' . (int) $guild_id;
 		$this->db->sql_query($sql);
 		$updated = $this->db->sql_affectedrows();
 
 		// Move module to target column
 		$sql = 'UPDATE ' . $this->modules_table . '
-			SET module_column = ' . $new_column . '
+			SET module_column = ' . (int) $new_column . '
 			WHERE module_id = ' . (int) $module_id;
 		$this->db->sql_query($sql);
 
@@ -179,8 +179,8 @@ class database_handler
 			SET module_order = module_order - 1
 			WHERE module_order >= ' . (int) $module_data['module_order'] . '
 				AND module_column = ' . (int) $module_data['module_column'] . '
-				AND module_tab = ' . $tab_id . '
-				AND guild_id = ' . $guild_id;
+				AND module_tab = ' . (int) $tab_id . '
+				AND guild_id = ' . (int) $guild_id;
 		$this->db->sql_query($sql);
 
 		// If module was appended at the end
@@ -189,9 +189,9 @@ class database_handler
 			$sql = 'SELECT MAX(module_order) as new_order
 				FROM ' . $this->modules_table . '
 				WHERE module_order < ' . (int) $module_data['module_order'] . '
-					AND module_column = ' . $new_column . '
-					AND module_tab = ' . $tab_id . '
-					AND guild_id = ' . $guild_id;
+					AND module_column = ' . (int) $new_column . '
+					AND module_tab = ' . (int) $tab_id . '
+					AND guild_id = ' . (int) $guild_id;
 			$this->db->sql_query($sql);
 			$new_order = (int) $this->db->sql_fetchfield('new_order') + 1;
 
@@ -212,9 +212,9 @@ class database_handler
 
 		$sql = 'SELECT MAX(module_order) as new_order
 			FROM ' . $this->modules_table . '
-			WHERE module_column = ' . $column . '
+			WHERE module_column = ' . (int) $column . '
 				AND module_tab = ' . (int) $target_tab . '
-				AND guild_id = ' . $guild_id;
+				AND guild_id = ' . (int) $guild_id;
 		$this->db->sql_query($sql);
 		$new_order = (int) $this->db->sql_fetchfield('new_order') + 1;
 
@@ -228,9 +228,9 @@ class database_handler
 		$sql = 'UPDATE ' . $this->modules_table . '
 			SET module_order = module_order - 1
 			WHERE module_order > ' . (int) $module_data['module_order'] . '
-				AND module_column = ' . $column . '
+				AND module_column = ' . (int) $column . '
 				AND module_tab = ' . (int) $module_data['module_tab'] . '
-				AND guild_id = ' . $guild_id;
+				AND guild_id = ' . (int) $guild_id;
 		$this->db->sql_query($sql);
 	}
 
@@ -461,8 +461,8 @@ class database_handler
 				{
 					$sql = 'SELECT MAX(module_order) as max_order
 						FROM ' . $this->modules_table . '
-						WHERE module_column = ' . $column . '
-							AND module_tab = ' . $fallback_id . '
+						WHERE module_column = ' . (int) $column . '
+							AND module_tab = ' . (int) $fallback_id . '
 							AND guild_id = ' . (int) $guild_id;
 					$this->db->sql_query($sql);
 					$column_max_order[$column] = (int) $this->db->sql_fetchfield('max_order');
@@ -471,7 +471,7 @@ class database_handler
 				$column_max_order[$column]++;
 
 				$sql = 'UPDATE ' . $this->modules_table . '
-					SET module_tab = ' . $fallback_id . ',
+					SET module_tab = ' . (int) $fallback_id . ',
 						module_order = ' . $column_max_order[$column] . '
 					WHERE module_id = ' . (int) $module['module_id'];
 				$this->db->sql_query($sql);
@@ -487,7 +487,7 @@ class database_handler
 		{
 			$sql = 'UPDATE ' . $this->tabs_table . '
 				SET tab_order = tab_order - 1
-				WHERE tab_order > ' . $deleted_order . '
+				WHERE tab_order > ' . (int) $deleted_order . '
 					AND guild_id = ' . (int) $guild_id;
 			$this->db->sql_query($sql);
 		}
