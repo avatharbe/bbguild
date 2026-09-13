@@ -60,7 +60,7 @@ class character_sync_test extends TestCase
 		};
 	}
 
-	private function make_task(character_sync_registry $registry): character_sync
+	private function make_task(character_sync_registry $registry, $dispatcher = null): character_sync
 	{
 		$cache = $this->createMock(\phpbb\cache\driver\driver_interface::class);
 		$user = $this->createMock(\phpbb\user::class);
@@ -89,6 +89,8 @@ class character_sync_test extends TestCase
 		$util = $this->getMockBuilder(\avathar\bbguild\model\admin\util::class)
 			->disableOriginalConstructor()
 			->getMock();
+		$dispatcher = $dispatcher ?? $this->createMock(\phpbb\event\dispatcher_interface::class);
+		$dispatcher->method('trigger_event')->willReturnArgument(1);
 
 		$task = new character_sync(
 			$this->config,
@@ -99,6 +101,7 @@ class character_sync_test extends TestCase
 			$ext_manager,
 			$this->bbguild_log,
 			$util,
+			$dispatcher,
 			'bb_players', 'bb_ranks', 'bb_classes', 'bb_races', 'bb_language', 'bb_guild', 'bb_factions', 'bb_games'
 		);
 		$task->set_name('avathar.bbguild.cron.task.character_sync');
@@ -279,5 +282,31 @@ class character_sync_test extends TestCase
 		$this->config->expects($this->never())->method('set');
 
 		$task->run();
+	}
+
+	public function test_run_dispatches_character_sync_completed_event_on_success(): void
+	{
+		$registry = new character_sync_registry([
+			$this->make_handler('wow', fn ($row) => true),
+		]);
+
+		$dispatcher = $this->createMock(\phpbb\event\dispatcher_interface::class);
+		$dispatcher->expects($this->once())
+			->method('trigger_event')
+			->with(
+				'avathar.bbguild.character_sync_completed',
+				$this->callback(function ($vars) {
+					return $vars['player_id'] === 1 && $vars['game_id'] === 'wow' && $vars['success'] === true;
+				})
+			)
+			->willReturnArgument(1);
+
+		$task = $this->make_task($registry, $dispatcher);
+
+		$get_update = $this->stub_db_for_run(['player_id' => 1, 'game_id' => 'wow', 'player_name' => 'Alice']);
+		$task->run();
+
+		[$update_calls] = $get_update();
+		$this->assertSame(1, $update_calls);
 	}
 }
