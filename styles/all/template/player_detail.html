@@ -49,11 +49,13 @@
         <div class="player-detail">
             <div class="player-detail-header">
                 <div class="player-detail-portrait">
+                    {% if S_HAS_ARMORY %}<a href="{{ PLAYER_ARMORY_URL }}" target="_blank" rel="noopener">{% endif %}
                     {% if S_HAS_PORTRAIT %}
                     <img src="{{ PLAYER_PORTRAIT }}" alt="{{ PLAYER_NAME }}" onerror="this.onerror=null;{% if PLAYER_CLASS_IMAGE %}this.src='{{ PLAYER_CLASS_IMAGE }}';{% else %}this.style.display='none';{% endif %}" />
                     {% elseif PLAYER_CLASS_IMAGE %}
                     <img src="{{ PLAYER_CLASS_IMAGE }}" alt="{{ PLAYER_CLASS }}" />
                     {% endif %}
+                    {% if S_HAS_ARMORY %}</a>{% endif %}
                 </div>
                 <div class="player-detail-title-block">
                     <h2 class="player-detail-name" style="color: {{ PLAYER_COLORCODE }}">{{ PLAYER_NAME }}</h2>
@@ -84,10 +86,6 @@
             <div class="player-detail-body">
                 <fieldset>
                     <dl>
-                        <dt>{{ lang('GUILD') }}:</dt>
-                        <dd>{{ PLAYER_GUILD_NAME }}</dd>
-                    </dl>
-                    <dl>
                         <dt>{{ lang('RANK') }}:</dt>
                         <dd>{{ PLAYER_RANK }}</dd>
                     </dl>
@@ -104,10 +102,6 @@
                     <dl>
                         <dt>{{ lang('REALM') }}:</dt>
                         <dd>{% if PLAYER_REGION %}{{ PLAYER_REGION }}-{% endif %}{{ PLAYER_REALM }}</dd>
-                    </dl>
-                    <dl>
-                        <dt>{{ lang('GAME') }}:</dt>
-                        <dd>{{ PLAYER_GAME_NAME }}</dd>
                     </dl>
                     {% if S_SHOWACH %}
                     <dl>
@@ -150,22 +144,21 @@
                         <dd>{{ PLAYER_PHPBB_USER }}</dd>
                     </dl>
                     {% endif %}
-                    {% if PLAYER_COMMENT %}
-                    <dl>
-                        <dt>{{ lang('COMMENT') }}:</dt>
-                        <dd>{{ PLAYER_COMMENT }}</dd>
-                    </dl>
-                    {% endif %}
-                    {% if S_HAS_ARMORY %}
-                    <dl>
-                        <dt>{{ lang('ARMORY') }}:</dt>
-                        <dd><a href="{{ PLAYER_ARMORY_URL }}" target="_blank" rel="noopener">{{ PLAYER_ARMORY_URL }}</a></dd>
-                    </dl>
-                    {% endif %}
                 </fieldset>
             </div>
 
             {% EVENT bbguild_player_detail_after_content %}
+
+            {% if PLAYER_COMMENT %}
+            <div class="player-detail-body">
+                <fieldset>
+                    <dl>
+                        <dt>{{ lang('COMMENT') }}:</dt>
+                        <dd>{{ PLAYER_COMMENT }}</dd>
+                    </dl>
+                </fieldset>
+            </div>
+            {% endif %}
             {% endif %}
 
         </div>
