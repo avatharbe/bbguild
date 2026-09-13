@@ -1,4 +1,4 @@
-{% INCLUDE 'overall_header.html' %}
+{% INCLUDE 'simple_header.html' %}
 
 <div class="panel">
 	<div class="inner">
@@ -12,19 +12,27 @@
 			<dt>{{ lang('VERSION') }}</dt>
 			<dd>{{ BBGUILD_VERSION }}</dd>
 
+			<dt>{{ lang('CREATED') }}</dt>
+			<dd>{{ lang('AUTHNAME') }}</dd>
+
 			<dt>{{ lang('DEVELOPEDBY') }}</dt>
-			<dd><a href="https://www.avathar.be" rel="nofollow">Sajaki</a></dd>
+			<dd>{{ lang('DEVTEAM') }}</dd>
 
 			<dt>{{ lang('SVNNAME') }}</dt>
 			<dd><a href="{{ lang('SVNURL') }}" rel="nofollow">{{ lang('SVNURL') }}</a></dd>
-
-			<dt>{{ lang('TCREDITS') }}</dt>
-			<dd><a href="https://github.com/avatharbe/bbguild/graphs/contributors" rel="nofollow">{{ lang('BBGUILD_ABOUT_CONTRIBUTORS') }}</a></dd>
 		</dl>
+
+		<h3>{{ lang('TCOPYRIGHT') }}</h3>
+		<p>{{ lang('LICENSE2') }}</p>
+		<p>
+			{{ lang('COPYRIGHT3')|raw }}<br />
+			{{ lang('COPYRIGHT2') }}<br />
+			{{ lang('COPYRIGHT1') }}
+		</p>
 
 		<p class="bbguild-about-license">&copy; {{ BBGUILD_YEAR }} avathar.be &mdash; {{ lang('BBGUILD_ABOUT_LICENSE') }}</p>
 
 	</div>
 </div>
 
-{% INCLUDE 'overall_footer.html' %}
+{% INCLUDE 'simple_footer.html' %}
