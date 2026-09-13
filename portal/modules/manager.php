@@ -18,8 +18,8 @@ use phpbb\request\request_interface;
 use phpbb\user;
 
 /**
- * Module management: add, delete, move, reset modules in a guild's portal.
- * Used by the ACP portal module.
+ * Module and tab management: add, delete, move, reset modules and tabs
+ * in a guild's portal. Used by the ACP portal module.
  */
 class manager
 {
@@ -34,6 +34,7 @@ class manager
 	protected request_interface $request;
 	protected user $user;
 	protected string $modules_table;
+	protected string $tabs_table;
 
 	protected ?module_interface $module = null;
 	protected string $u_action = '';
@@ -49,7 +50,8 @@ class manager
 		portal_config $portal_config,
 		request_interface $request,
 		user $user,
-		string $modules_table
+		string $modules_table,
+		string $tabs_table
 	)
 	{
 		$this->cache = $cache;
@@ -63,6 +65,7 @@ class manager
 		$this->request = $request;
 		$this->user = $user;
 		$this->modules_table = $modules_table;
+		$this->tabs_table = $tabs_table;
 	}
 
 	/**
@@ -194,9 +197,31 @@ class manager
 	}
 
 	/**
-	 * Add a module to a guild's portal.
+	 * Move a module to a different tab.
 	 */
-	public function add_module(string $classname, int $column, int $guild_id): int
+	public function move_module_to_tab(int $module_id, int $target_tab): bool
+	{
+		$module_data = $this->get_move_module_data($module_id);
+		if ($module_data === false)
+		{
+			return false;
+		}
+
+		if ((int) $module_data['module_tab'] === $target_tab)
+		{
+			return true;
+		}
+
+		$this->database_handler->move_module_to_tab($module_id, $module_data, $target_tab);
+		$this->cache->destroy('sql', $this->modules_table);
+
+		return true;
+	}
+
+	/**
+	 * Add a module to a guild's portal tab.
+	 */
+	public function add_module(string $classname, int $column, int $guild_id, int $tab_id): int
 	{
 		$module = $this->module_registry->get_module($classname);
 		if (!$module instanceof module_interface)
@@ -209,8 +234,8 @@ class manager
 			return 0;
 		}
 
-		// Get last order in this column for this guild
-		$modules = $this->database_handler->get_modules($guild_id);
+		// Get last order in this column for this guild's tab
+		$modules = $this->database_handler->get_modules($guild_id, $tab_id);
 		$last_order = 0;
 		foreach ($modules as $row)
 		{
@@ -225,6 +250,7 @@ class manager
 			$column,
 			$last_order + 1,
 			$guild_id,
+			$tab_id,
 			$module->get_name(),
 			$module->get_image()
 		);
@@ -286,5 +312,82 @@ class manager
 		$this->cache->purge();
 
 		return true;
+	}
+
+	/**
+	 * Get all tabs for a guild.
+	 */
+	public function get_tabs(int $guild_id): array
+	{
+		return $this->database_handler->get_tabs($guild_id);
+	}
+
+	/**
+	 * Add a new tab to a guild, appended after its existing tabs.
+	 */
+	public function add_tab(string $name, string $slug, int $guild_id): int
+	{
+		$tabs = $this->database_handler->get_tabs($guild_id);
+		$order = count($tabs);
+
+		$tab_id = $this->database_handler->add_tab($guild_id, $name, $slug, $order);
+		if ($tab_id)
+		{
+			$this->cache->destroy('sql', $this->tabs_table);
+		}
+
+		return $tab_id;
+	}
+
+	/**
+	 * Rename a tab / change its slug.
+	 */
+	public function edit_tab(int $tab_id, string $name, string $slug): bool
+	{
+		$result = $this->database_handler->edit_tab($tab_id, $name, $slug);
+		if ($result)
+		{
+			$this->cache->destroy('sql', $this->tabs_table);
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Delete a tab. Refuses if it is the guild's only remaining tab.
+	 */
+	public function delete_tab(int $tab_id, int $guild_id): bool
+	{
+		$tabs = $this->database_handler->get_tabs($guild_id);
+		if (count($tabs) <= 1)
+		{
+			return false;
+		}
+
+		$this->database_handler->delete_tab($tab_id, $guild_id);
+		$this->cache->destroy('sql', $this->modules_table);
+		$this->cache->destroy('sql', $this->tabs_table);
+
+		return true;
+	}
+
+	/**
+	 * Move a tab vertically (up or down) within a guild's tab list.
+	 */
+	public function move_tab_vertical(int $tab_id, int $direction): bool
+	{
+		$tab_data = $this->database_handler->get_tab_data($tab_id);
+		if ($tab_data === false)
+		{
+			return false;
+		}
+
+		$result = $this->database_handler->move_tab_vertical($tab_id, $tab_data, $direction);
+		if ($result)
+		{
+			$this->cache->destroy('sql', $this->tabs_table);
+		}
+
+		return $result;
 	}
 }

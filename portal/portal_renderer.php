@@ -10,12 +10,13 @@ namespace avathar\bbguild\portal;
 
 use avathar\bbguild\portal\modules\database_handler;
 use phpbb\config\config;
+use phpbb\controller\helper;
 use phpbb\template\template;
 use phpbb\user;
 
 /**
  * Renders the portal page by loading and assembling all enabled modules
- * for a given guild. Called from view_controller::handleview().
+ * for a given guild's active tab. Called from view_controller::handleview().
  */
 class portal_renderer
 {
@@ -25,6 +26,7 @@ class portal_renderer
 	protected config $config;
 	protected template $template;
 	protected user $user;
+	protected helper $helper;
 
 	/** @var array Module count per column */
 	protected array $module_count = [];
@@ -35,7 +37,8 @@ class portal_renderer
 		database_handler $database_handler,
 		config $config,
 		template $template,
-		user $user
+		user $user,
+		helper $helper
 	)
 	{
 		$this->portal_columns = $portal_columns;
@@ -44,12 +47,14 @@ class portal_renderer
 		$this->config = $config;
 		$this->template = $template;
 		$this->user = $user;
+		$this->helper = $helper;
 	}
 
 	/**
-	 * Render all portal modules for a guild.
+	 * Render all portal modules for a guild's tab (resolved from $tab_slug,
+	 * falling back to the guild's default tab when empty or unknown).
 	 */
-	public function render(int $guild_id): void
+	public function render(int $guild_id, string $tab_slug = ''): void
 	{
 		$this->module_count = [
 			'top'    => 0,
@@ -58,7 +63,18 @@ class portal_renderer
 			'bottom' => 0,
 		];
 
-		$portal_modules = $this->database_handler->get_modules($guild_id);
+		$tabs = $this->database_handler->get_tabs($guild_id);
+		$active_tab = $this->resolve_tab($tabs, $tab_slug);
+
+		$this->assign_tab_bar($tabs, $active_tab, $guild_id);
+
+		if ($active_tab === null)
+		{
+			$this->assign_column_vars();
+			return;
+		}
+
+		$portal_modules = $this->database_handler->get_modules($guild_id, (int) $active_tab['tab_id']);
 
 		foreach ($portal_modules as $row)
 		{
@@ -87,6 +103,65 @@ class portal_renderer
 
 		// Assign column visibility vars
 		$this->assign_column_vars();
+	}
+
+	/**
+	 * Resolve which tab is active: an unknown/empty slug falls back to the
+	 * guild's default tab (lowest tab_order).
+	 *
+	 * @return array|null
+	 */
+	protected function resolve_tab(array $tabs, string $tab_slug)
+	{
+		if ($tab_slug !== '')
+		{
+			foreach ($tabs as $tab)
+			{
+				if ($tab['tab_slug'] === $tab_slug)
+				{
+					return $tab;
+				}
+			}
+		}
+
+		return $tabs[0] ?? null;
+	}
+
+	/**
+	 * Assign the tab bar template loop.
+	 *
+	 * A tab whose slug can't satisfy the avathar_bbguild_00 route's `page`
+	 * requirement (e.g. a digit-leading slug left over from before the
+	 * ACP's sanitize_slug() guard existed) would make route() throw
+	 * InvalidParameterException under Symfony's default strict URL
+	 * generation. Skip that one tab rather than let it take down the
+	 * whole tab bar / whole page.
+	 */
+	protected function assign_tab_bar(array $tabs, $active_tab, int $guild_id): void
+	{
+		$active_tab_id = $active_tab['tab_id'] ?? null;
+
+		foreach ($tabs as $tab)
+		{
+			try
+			{
+				$url = $this->helper->route('avathar_bbguild_00', [
+					'guild_id' => $guild_id,
+					'page'     => $tab['tab_slug'],
+				]);
+			}
+			catch (\Exception $e)
+			{
+				continue;
+			}
+
+			$this->template->assign_block_vars('tabs', [
+				'TAB_NAME'   => $tab['tab_name'],
+				'TAB_SLUG'   => $tab['tab_slug'],
+				'TAB_ACTIVE' => $active_tab_id !== null && (int) $tab['tab_id'] === (int) $active_tab_id,
+				'U_TAB'      => $url,
+			]);
+		}
 	}
 
 	/**

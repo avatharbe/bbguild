@@ -48,6 +48,19 @@ $lang = array_merge($lang, [
 	'ACP_PORTAL_MOVE_RIGHT'          => 'Przenieś do następnej kolumny',
 	'ACP_PORTAL_COLUMN_BOTTOM'       => 'Dół',
 
+	'ACP_PORTAL_TABS'                => 'Zakładki',
+	'ACP_PORTAL_TAB'                 => 'Zakładka',
+	'ACP_PORTAL_TAB_NAME'            => 'Nazwa zakładki',
+	'ACP_PORTAL_TAB_SLUG'            => 'Slug',
+	'ACP_PORTAL_TAB_SLUG_EXPLAIN'    => 'Używany w adresie URL strony, np. <samp>raids</samp>. Tylko litery, cyfry, myślniki i podkreślenia; nie może zaczynać się od cyfry.',
+	'ACP_PORTAL_ADD_TAB'             => 'Dodaj zakładkę',
+	'ACP_PORTAL_TAB_ADDED'           => 'Zakładka została dodana.',
+	'ACP_PORTAL_TAB_ADD_FAILED'      => 'Nie można dodać zakładki. Zakładka z tym slugiem już istnieje dla tej gildii.',
+	'ACP_PORTAL_TAB_UPDATED'         => 'Zakładka została zaktualizowana.',
+	'ACP_PORTAL_TAB_UPDATE_FAILED'   => 'Nie można zaktualizować zakładki. Zakładka z tym slugiem już istnieje dla tej gildii.',
+	'ACP_PORTAL_TAB_DELETED'         => 'Zakładka została usunięta.',
+	'ACP_PORTAL_TAB_DELETE_FAILED'   => 'Nie można usunąć zakładki. Gildia musi zawsze mieć co najmniej jedną zakładkę.',
+
 	// Module configuration
 	'ACP_PORTAL_MODULE_CONFIG'        => 'Konfiguracja modułu',
 	'ACP_PORTAL_MODULE_CONFIG_EXPLAIN' => 'Skonfiguruj nazwę wyświetlaną, ikonę, widoczność i ustawienia specyficzne dla tego bloku portalu. Zmiany dotyczą strony powitalnej gildii.',

@@ -20,6 +20,62 @@
         <div class="tablewrap">
 
         <fieldset>
+            <legend>{{ lang('ACP_PORTAL_TABS') }}</legend>
+
+            {% if loops.tab_row|length %}
+            <div class="tablewrap">
+                <table class="table1">
+                    <thead>
+                    <tr>
+                        <th style="width:10%">{{ lang('ID') }}</th>
+                        <th style="width:30%">{{ lang('ACP_PORTAL_TAB_NAME') }}</th>
+                        <th style="width:20%">{{ lang('ACP_PORTAL_TAB_SLUG') }}</th>
+                        <th style="width:40%">{{ lang('ACTION') }}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for tab_row in loops.tab_row %}
+                    <tr class="{% if tab_row.S_ROW_COUNT is even %}row1{% else %}row2{% endif %}{% if tab_row.S_ACTIVE %} activetab{% endif %}">
+                        <td>{{ tab_row.TAB_ID }}</td>
+                        <td><a href="{{ tab_row.U_SELECT }}">{{ tab_row.TAB_NAME }}</a></td>
+                        <td>{{ tab_row.TAB_SLUG }}</td>
+                        <td style="text-align:center; white-space:nowrap">
+                            <a href="{{ tab_row.U_MOVE_UP }}" title="{{ lang('MOVE_UP') }}">{{ ICON_MOVE_UP }}</a>
+                            <a href="{{ tab_row.U_MOVE_DOWN }}" title="{{ lang('MOVE_DOWN') }}">{{ ICON_MOVE_DOWN }}</a>
+                            &nbsp;
+                            <a href="#" onclick="document.getElementById('edit_tab_id').value='{{ tab_row.TAB_ID|e('js') }}';document.getElementById('tab_name_input').value='{{ tab_row.TAB_NAME|e('js') }}';document.getElementById('tab_slug_input').value='{{ tab_row.TAB_SLUG|e('js') }}';return false;">{{ lang('EDIT') }}</a>
+                            &nbsp;
+                            <a href="{{ tab_row.U_DELETE }}" title="{{ lang('DELETE') }}">{{ ICON_DELETE }}</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+
+            <form method="post" action="{{ U_EDIT_GUILDPORTAL }}" id="tab_form">
+                <input type="hidden" name="guild_id" value="{{ GUILD_ID }}" />
+                <input type="hidden" name="edit_tab_id" id="edit_tab_id" value="0" />
+                <dl>
+                    <dt>{{ lang('ACP_PORTAL_TAB_NAME') }}:</dt>
+                    <dd><input type="text" id="tab_name_input" name="tab_name" value="" maxlength="100" /></dd>
+                </dl>
+                <dl>
+                    <dt>{{ lang('ACP_PORTAL_TAB_SLUG') }}:</dt>
+                    <dd>
+                        <input type="text" id="tab_slug_input" name="tab_slug" value="" maxlength="100" />
+                        <p class="explain">{{ lang('ACP_PORTAL_TAB_SLUG_EXPLAIN') }}</p>
+                    </dd>
+                </dl>
+                <fieldset class="quick" style="float: {{ S_CONTENT_FLOW_END }};">
+                    {{ S_FORM_TOKEN }}
+                    <input type="submit" name="{{ ACTION_PARAM }}" value="{{ lang('ACP_PORTAL_ADD_TAB') }}" onclick="this.form.elements['{{ ACTION_PARAM }}'].value = (document.getElementById('edit_tab_id').value == '0') ? 'add_tab' : 'edit_tab';" class="button1" />
+                </fieldset>
+            </form>
+        </fieldset>
+
+        <fieldset>
             <legend>{{ lang('ACP_PORTAL_MODULES') }}</legend>
 
             {% if loops.module_row|length %}
@@ -29,7 +85,8 @@
                     <tr>
                         <th style="width:5%">{{ lang('ID') }}</th>
                         <th style="width:25%">{{ lang('ACP_PORTAL_MODULE_NAME') }}</th>
-                        <th style="width:20%">{{ lang('ACP_PORTAL_COLUMN') }}</th>
+                        <th style="width:15%">{{ lang('ACP_PORTAL_COLUMN') }}</th>
+                        <th style="width:15%">{{ lang('ACP_PORTAL_TAB') }}</th>
                         <th style="width:10%">{{ lang('ACP_PORTAL_ORDER') }}</th>
                         <th style="width:10%">{{ lang('STATUS') }}</th>
                         <th style="width:30%">{{ lang('ACTION') }}</th>
@@ -44,6 +101,13 @@
                             <select onchange="if(this.value != {{ module_row.MODULE_COLUMN }}) window.location='{{ module_row.U_MOVE_COLUMN }}&amp;target_column='+this.value;">
                                 {% for column_option in module_row.column_option %}
                                 <option value="{{ column_option.VALUE }}"{% if column_option.SELECTED %} selected="selected"{% endif %}>{{ column_option.LABEL }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td>
+                            <select onchange="window.location='{{ module_row.U_MOVE_TAB }}&amp;target_tab='+this.value;">
+                                {% for tab_option in module_row.tab_option %}
+                                <option value="{{ tab_option.VALUE }}"{% if tab_option.SELECTED %} selected="selected"{% endif %}>{{ tab_option.LABEL }}</option>
                                 {% endfor %}
                             </select>
                         </td>
@@ -99,6 +163,16 @@
                         <select name="module_column">
                             {% for column_options in loops.column_options %}
                             <option value="{{ column_options.VALUE }}">{{ column_options.LABEL }}</option>
+                            {% endfor %}
+                        </select>
+                    </dd>
+                </dl>
+                <dl>
+                    <dt>{{ lang('ACP_PORTAL_TAB') }}:</dt>
+                    <dd>
+                        <select name="module_tab">
+                            {% for tab_options in loops.tab_options %}
+                            <option value="{{ tab_options.VALUE }}"{% if tab_options.SELECTED %} selected="selected"{% endif %}>{{ tab_options.LABEL }}</option>
                             {% endfor %}
                         </select>
                     </dd>

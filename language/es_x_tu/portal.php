@@ -48,6 +48,19 @@ $lang = array_merge($lang, [
 	'ACP_PORTAL_MOVE_RIGHT'          => 'Mover a columna siguiente',
 	'ACP_PORTAL_COLUMN_BOTTOM'       => 'Abajo',
 
+	'ACP_PORTAL_TABS'                => 'Pestañas',
+	'ACP_PORTAL_TAB'                 => 'Pestaña',
+	'ACP_PORTAL_TAB_NAME'            => 'Nombre de la pestaña',
+	'ACP_PORTAL_TAB_SLUG'            => 'Slug',
+	'ACP_PORTAL_TAB_SLUG_EXPLAIN'    => 'Se usa en la URL de la página, p. ej. <samp>raids</samp>. Solo letras, números, guiones y guiones bajos; no puede empezar por un número.',
+	'ACP_PORTAL_ADD_TAB'             => 'Añadir pestaña',
+	'ACP_PORTAL_TAB_ADDED'           => 'La pestaña ha sido añadida.',
+	'ACP_PORTAL_TAB_ADD_FAILED'      => 'No se pudo añadir la pestaña. Ya existe una pestaña con ese slug para este gremio.',
+	'ACP_PORTAL_TAB_UPDATED'         => 'La pestaña ha sido actualizada.',
+	'ACP_PORTAL_TAB_UPDATE_FAILED'   => 'No se pudo actualizar la pestaña. Ya existe una pestaña con ese slug para este gremio.',
+	'ACP_PORTAL_TAB_DELETED'         => 'La pestaña ha sido eliminada.',
+	'ACP_PORTAL_TAB_DELETE_FAILED'   => 'No se pudo eliminar la pestaña. Un gremio siempre debe tener al menos una pestaña.',
+
 	// Module configuration
 	'ACP_PORTAL_MODULE_CONFIG'        => 'Configuración del módulo',
 	'ACP_PORTAL_MODULE_CONFIG_EXPLAIN' => 'Configura el nombre de visualización, el icono, la visibilidad y los ajustes específicos de este bloque del portal. Los cambios se aplican a la página de bienvenida del gremio.',

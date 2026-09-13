@@ -41,6 +41,7 @@ services:
         arguments:
             - '@dbal.conn'
             - '%avathar.bbguild.tables.bb_portal_modules%'
+            - '%avathar.bbguild.tables.bb_portal_tabs%'
 
     avathar.bbguild.portal.modules.constraints_handler:
         class: avathar\bbguild\portal\modules\constraints_handler
@@ -61,6 +62,7 @@ services:
             - '@request'
             - '@user'
             - '%avathar.bbguild.tables.bb_portal_modules%'
+            - '%avathar.bbguild.tables.bb_portal_tabs%'
 
     avathar.bbguild.portal.renderer:
         class: avathar\bbguild\portal\portal_renderer
@@ -71,6 +73,7 @@ services:
             - '@config'
             - '@template'
             - '@user'
+            - '@controller.helper'
 
     # --- Portal modules ---
 
