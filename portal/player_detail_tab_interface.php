@@ -40,7 +40,10 @@ interface player_detail_tab_interface
 	/**
 	 * Template path to render this tab's content (e.g.
 	 * '@avathar_bbguildwow/portal/talents_tab.html'), or null if there is
-	 * nothing to show for this player.
+	 * nothing to show for this player. The path MUST use phpBB's Twig
+	 * namespace format (`@namespace/...`), not a relative path, so it
+	 * resolves correctly via Twig's loader regardless of which template
+	 * is including it.
 	 */
 	public function render(int $player_id): ?string;
 }

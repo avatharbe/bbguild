@@ -33,7 +33,7 @@
         </div>
         {% endif %}
 
-        {% if loops.player_tabs %}
+        {% if loops.player_tabs|length > 1 %}
         <div class="player-detail-tabs">
             <ul>
                 {% for tab in loops.player_tabs %}
@@ -79,7 +79,7 @@
             </div>
 
             {% if S_PLAYER_TAB_TEMPLATE %}
-            {% include S_PLAYER_TAB_TEMPLATE %}
+            {% include S_PLAYER_TAB_TEMPLATE ignore missing %}
             {% else %}
             <div class="player-detail-body">
                 <fieldset>

@@ -95,8 +95,9 @@ class view_controller
 	/**
 	 * Individual player detail page.
 	 *
-	 * @param  int $guild_id
-	 * @param  int $player_id
+	 * @param  int    $guild_id
+	 * @param  int    $player_id
+	 * @param  string $tab_slug Tab slug to render (empty resolves to the built-in Character tab)
 	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
 	public function playerdetail($guild_id, $player_id, $tab_slug = '')
@@ -124,6 +125,17 @@ class view_controller
 		// default; anything else comes from a registered tab provider)
 		$game_id = $this->player_detail->get_game_id();
 		$available_tabs = $this->player_detail_tab_registry->get_available_tabs($player_id, $game_id);
+		$active_tab = $tab_slug !== '' ? $this->player_detail_tab_registry->find($tab_slug, $player_id, $game_id) : null;
+
+		$this->template->assign_block_vars('player_tabs', [
+			'TAB_NAME'   => $this->language->lang('PLAYER_TAB_CHARACTER'),
+			'TAB_SLUG'   => '',
+			'TAB_ACTIVE' => $active_tab === null,
+			'U_TAB'      => $this->helper->route('avathar_bbguild_player', [
+				'guild_id'  => $guild_id,
+				'player_id' => $player_id,
+			]),
+		]);
 
 		foreach ($available_tabs as $tab)
 		{
@@ -138,8 +150,6 @@ class view_controller
 				]),
 			]);
 		}
-
-		$active_tab = $tab_slug !== '' ? $this->player_detail_tab_registry->find($tab_slug, $player_id, $game_id) : null;
 		$this->template->assign_vars([
 			'S_PLAYER_TAB_TEMPLATE' => $active_tab !== null ? $active_tab->render($player_id) : null,
 		]);
