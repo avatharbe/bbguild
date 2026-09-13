@@ -10,6 +10,7 @@
 namespace avathar\bbguild\controller;
 
 use avathar\bbguild\ext;
+use avathar\bbguild\model\games\player_detail_tab_registry;
 use avathar\bbguild\portal\guild_context;
 use avathar\bbguild\portal\portal_renderer;
 use avathar\bbguild\views\player_detail;
@@ -44,6 +45,9 @@ class view_controller
 	/** @var language */
 	protected $language;
 
+	/** @var player_detail_tab_registry */
+	protected $player_detail_tab_registry;
+
 	public function __construct(
 		\phpbb\controller\helper $helper,
 		\phpbb\template\template $template,
@@ -52,7 +56,8 @@ class view_controller
 		portal_renderer $portal_renderer,
 		player_detail $player_detail,
 		\phpbb\event\dispatcher_interface $dispatcher,
-		language $language
+		language $language,
+		player_detail_tab_registry $player_detail_tab_registry
 	)
 	{
 		$this->helper = $helper;
@@ -63,6 +68,7 @@ class view_controller
 		$this->player_detail = $player_detail;
 		$this->dispatcher = $dispatcher;
 		$this->language = $language;
+		$this->player_detail_tab_registry = $player_detail_tab_registry;
 	}
 
 	/**
@@ -93,7 +99,7 @@ class view_controller
 	 * @param  int $player_id
 	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
-	public function playerdetail($guild_id, $player_id)
+	public function playerdetail($guild_id, $player_id, $tab_slug = '')
 	{
 		if (!$this->auth->acl_get('u_bbguild'))
 		{
@@ -102,6 +108,7 @@ class view_controller
 
 		$guild_id = (int) $guild_id;
 		$player_id = (int) $player_id;
+		$tab_slug = (string) $tab_slug;
 
 		// Build guild context (header, guild dropdown)
 		$this->guild_context->init($guild_id);
@@ -112,6 +119,30 @@ class view_controller
 		{
 			throw new \phpbb\exception\http_exception(404, 'NO_PLAYER');
 		}
+
+		// Resolve player-detail sub-tabs (Character is core's built-in
+		// default; anything else comes from a registered tab provider)
+		$game_id = $this->player_detail->get_game_id();
+		$available_tabs = $this->player_detail_tab_registry->get_available_tabs($player_id, $game_id);
+
+		foreach ($available_tabs as $tab)
+		{
+			$this->template->assign_block_vars('player_tabs', [
+				'TAB_NAME'   => $this->language->lang($tab->get_tab_name()),
+				'TAB_SLUG'   => $tab->get_tab_slug(),
+				'TAB_ACTIVE' => $tab->get_tab_slug() === $tab_slug,
+				'U_TAB'      => $this->helper->route('avathar_bbguild_player', [
+					'guild_id'  => $guild_id,
+					'player_id' => $player_id,
+					'tab_slug'  => $tab->get_tab_slug(),
+				]),
+			]);
+		}
+
+		$active_tab = $tab_slug !== '' ? $this->player_detail_tab_registry->find($tab_slug, $player_id, $game_id) : null;
+		$this->template->assign_vars([
+			'S_PLAYER_TAB_TEMPLATE' => $active_tab !== null ? $active_tab->render($player_id) : null,
+		]);
 
 		/**
 		 * Event dispatched when the individual player detail page is rendered.
