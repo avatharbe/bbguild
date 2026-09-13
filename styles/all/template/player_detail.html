@@ -21,6 +21,18 @@
             </div>
         </div>
 
+        {% if loops.tabs|length > 1 %}
+        <div class="guild-portal-tabs">
+            <ul>
+                {% for tabs in loops.tabs %}
+                <li class="{% if tabs.TAB_ACTIVE %}activetab{% endif %}">
+                    <a href="{{ tabs.U_TAB }}">{{ tabs.TAB_NAME }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
         <!-- Player detail card -->
         <div class="player-detail">
             <div class="player-detail-header">

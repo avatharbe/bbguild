@@ -105,6 +105,7 @@ class view_controller
 
 		// Build guild context (header, guild dropdown)
 		$this->guild_context->init($guild_id);
+		$this->portal_renderer->render_tab_bar($guild_id);
 
 		// Load player data
 		if (!$this->player_detail->load($player_id, $this->template))

@@ -106,6 +106,22 @@ class portal_renderer
 	}
 
 	/**
+	 * Render just the tab bar for a guild, without loading portal modules.
+	 * Used by pages that live under a guild (e.g. player detail) but aren't
+	 * portal content themselves — keeps them visually inside the guild's
+	 * tab navigation instead of stranding the visitor on an island page.
+	 * No slug is resolved against the current page, so the guild's default
+	 * tab is shown as active.
+	 */
+	public function render_tab_bar(int $guild_id): void
+	{
+		$tabs = $this->database_handler->get_tabs($guild_id);
+		$active_tab = $this->resolve_tab($tabs, '');
+
+		$this->assign_tab_bar($tabs, $active_tab, $guild_id);
+	}
+
+	/**
 	 * Resolve which tab is active: an unknown/empty slug falls back to the
 	 * guild's default tab (lowest tab_order).
 	 *
