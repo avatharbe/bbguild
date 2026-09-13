@@ -117,4 +117,41 @@ class portal_renderer_test extends TestCase
 
 		$renderer->render(5, '');
 	}
+
+	/**
+	 * Final whole-branch review fix #1(c): a tab whose slug can't satisfy
+	 * the avathar_bbguild_00 route's `page` requirement (e.g. a
+	 * digit-leading slug left in the DB from before sanitize_slug()'s
+	 * fix #1(a)) makes helper->route() throw under Symfony's default
+	 * strictRequirements. That one tab must be skipped, not take down the
+	 * whole tab bar.
+	 */
+	public function test_tab_whose_route_generation_throws_is_skipped_not_fatal()
+	{
+		$renderer = $this->get_renderer();
+		$this->database_handler->method('get_tabs')->willReturn([
+			['tab_id' => 1, 'tab_name' => 'Overview', 'tab_slug' => 'welcome'],
+			['tab_id' => 2, 'tab_name' => '2026', 'tab_slug' => '2026'],
+			['tab_id' => 3, 'tab_name' => 'Raids', 'tab_slug' => 'raids'],
+		]);
+
+		$this->helper->method('route')
+			->willReturnCallback(function ($route, $params) {
+				if ($params['page'] === '2026')
+				{
+					throw new \Symfony\Component\Routing\Exception\InvalidParameterException('page must not start with a digit');
+				}
+				return '/guild/' . $params['page'] . '/' . $params['guild_id'];
+			});
+
+		$renderer->render(5, '');
+
+		$tabs = $this->blocks('tabs');
+
+		// Only the two valid tabs were assigned to the template; the
+		// digit-leading one was skipped, and rendering did not throw.
+		$this->assertCount(2, $tabs);
+		$this->assertSame('welcome', $tabs[0]['TAB_SLUG']);
+		$this->assertSame('raids', $tabs[1]['TAB_SLUG']);
+	}
 }

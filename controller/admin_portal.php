@@ -174,6 +174,10 @@ class admin_portal
 						trigger_error($this->language->lang('ACP_PORTAL_MODULE_ADD_FAILED') . adm_back_link($this->u_action . '&guild_id=' . $guild_id), E_USER_WARNING);
 					}
 				}
+				else
+				{
+					trigger_error($this->language->lang('ACP_PORTAL_MODULE_ADD_FAILED') . adm_back_link($this->u_action . '&guild_id=' . $guild_id), E_USER_WARNING);
+				}
 				break;
 
 			case 'add_tab':
@@ -414,11 +418,17 @@ class admin_portal
 
 	/**
 	 * Reduce a user-entered slug to the URL-safe charset the widened
-	 * avathar_bbguild_00 route requirement accepts.
+	 * avathar_bbguild_00 route requirement accepts. The route's `page`
+	 * requirement also forbids a leading digit (to avoid colliding with
+	 * the numeric guild_id segment), so reject (empty-string) any slug
+	 * that would fail that requirement — the caller's existing empty-slug
+	 * validation then rejects it via ACP_PORTAL_TAB_ADD_FAILED /
+	 * ACP_PORTAL_TAB_UPDATE_FAILED.
 	 */
 	protected function sanitize_slug(string $slug): string
 	{
-		return preg_replace('/[^a-zA-Z0-9_\-]/', '', $slug);
+		$slug = preg_replace('/[^a-zA-Z0-9_\-]/', '', $slug);
+		return preg_match('/^[^\d]/', $slug) ? $slug : '';
 	}
 
 	/**

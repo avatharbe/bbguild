@@ -43,7 +43,7 @@
                             <a href="{{ tab_row.U_MOVE_UP }}" title="{{ lang('MOVE_UP') }}">{{ ICON_MOVE_UP }}</a>
                             <a href="{{ tab_row.U_MOVE_DOWN }}" title="{{ lang('MOVE_DOWN') }}">{{ ICON_MOVE_DOWN }}</a>
                             &nbsp;
-                            <a href="#" onclick="document.getElementById('edit_tab_id').value='{{ tab_row.TAB_ID }}';document.getElementById('tab_name_input').value='{{ tab_row.TAB_NAME }}';document.getElementById('tab_slug_input').value='{{ tab_row.TAB_SLUG }}';return false;">{{ lang('EDIT') }}</a>
+                            <a href="#" onclick="document.getElementById('edit_tab_id').value='{{ tab_row.TAB_ID|e('js') }}';document.getElementById('tab_name_input').value='{{ tab_row.TAB_NAME|e('js') }}';document.getElementById('tab_slug_input').value='{{ tab_row.TAB_SLUG|e('js') }}';return false;">{{ lang('EDIT') }}</a>
                             &nbsp;
                             <a href="{{ tab_row.U_DELETE }}" title="{{ lang('DELETE') }}">{{ ICON_DELETE }}</a>
                         </td>

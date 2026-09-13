@@ -129,6 +129,13 @@ class portal_renderer
 
 	/**
 	 * Assign the tab bar template loop.
+	 *
+	 * A tab whose slug can't satisfy the avathar_bbguild_00 route's `page`
+	 * requirement (e.g. a digit-leading slug left over from before the
+	 * ACP's sanitize_slug() guard existed) would make route() throw
+	 * InvalidParameterException under Symfony's default strict URL
+	 * generation. Skip that one tab rather than let it take down the
+	 * whole tab bar / whole page.
 	 */
 	protected function assign_tab_bar(array $tabs, $active_tab, int $guild_id): void
 	{
@@ -136,14 +143,23 @@ class portal_renderer
 
 		foreach ($tabs as $tab)
 		{
+			try
+			{
+				$url = $this->helper->route('avathar_bbguild_00', [
+					'guild_id' => $guild_id,
+					'page'     => $tab['tab_slug'],
+				]);
+			}
+			catch (\Exception $e)
+			{
+				continue;
+			}
+
 			$this->template->assign_block_vars('tabs', [
 				'TAB_NAME'   => $tab['tab_name'],
 				'TAB_SLUG'   => $tab['tab_slug'],
 				'TAB_ACTIVE' => $active_tab_id !== null && (int) $tab['tab_id'] === (int) $active_tab_id,
-				'U_TAB'      => $this->helper->route('avathar_bbguild_00', [
-					'guild_id' => $guild_id,
-					'page'     => $tab['tab_slug'],
-				]),
+				'U_TAB'      => $url,
 			]);
 		}
 	}

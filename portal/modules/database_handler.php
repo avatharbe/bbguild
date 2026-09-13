@@ -284,12 +284,21 @@ class database_handler
 	public function seed_guild_layout(int $guild_id): void
 	{
 		$source_tab = $this->get_default_tab(0);
+
+		// Always create a default tab for the new guild, even when the
+		// guild_id=0 template has none — otherwise a brand-new guild ends
+		// up with zero tabs and its ACP "Add Module" action silently
+		// no-ops (module_tab stays 0).
+		$tab_name = $source_tab['tab_name'] ?? 'Overview';
+		$tab_slug = $source_tab['tab_slug'] ?? 'welcome';
+		$tab_order = $source_tab !== null ? (int) $source_tab['tab_order'] : 0;
+
+		$new_tab_id = $this->add_tab($guild_id, $tab_name, $tab_slug, $tab_order);
+
 		if ($source_tab === null)
 		{
 			return;
 		}
-
-		$new_tab_id = $this->add_tab($guild_id, $source_tab['tab_name'], $source_tab['tab_slug'], (int) $source_tab['tab_order']);
 
 		$defaults = $this->get_modules(0, (int) $source_tab['tab_id']);
 		foreach ($defaults as $row)
@@ -436,11 +445,37 @@ class database_handler
 
 		if ($fallback_id)
 		{
-			$sql = 'UPDATE ' . $this->modules_table . '
-				SET module_tab = ' . $fallback_id . '
-				WHERE module_tab = ' . (int) $tab_id . '
-					AND guild_id = ' . (int) $guild_id;
-			$this->db->sql_query($sql);
+			// Reassign each module individually, appended at the end of its
+			// column in the fallback tab (mirroring move_module_to_tab()),
+			// instead of a bare bulk UPDATE that would leave modules with
+			// their old module_order and risk colliding with modules
+			// already in the same column of the fallback tab.
+			$modules = $this->get_modules($guild_id, $tab_id);
+			$column_max_order = [];
+
+			foreach ($modules as $module)
+			{
+				$column = (int) $module['module_column'];
+
+				if (!isset($column_max_order[$column]))
+				{
+					$sql = 'SELECT MAX(module_order) as max_order
+						FROM ' . $this->modules_table . '
+						WHERE module_column = ' . $column . '
+							AND module_tab = ' . $fallback_id . '
+							AND guild_id = ' . (int) $guild_id;
+					$this->db->sql_query($sql);
+					$column_max_order[$column] = (int) $this->db->sql_fetchfield('max_order');
+				}
+
+				$column_max_order[$column]++;
+
+				$sql = 'UPDATE ' . $this->modules_table . '
+					SET module_tab = ' . $fallback_id . ',
+						module_order = ' . $column_max_order[$column] . '
+					WHERE module_id = ' . (int) $module['module_id'];
+				$this->db->sql_query($sql);
+			}
 		}
 
 		$sql = 'DELETE FROM ' . $this->tabs_table . '
