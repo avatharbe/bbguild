@@ -33,6 +33,18 @@
         </div>
         {% endif %}
 
+        {% if loops.player_tabs %}
+        <div class="player-detail-tabs">
+            <ul>
+                {% for tab in loops.player_tabs %}
+                <li class="{% if tab.TAB_ACTIVE %}activetab{% endif %}">
+                    <a href="{{ tab.U_TAB }}">{{ tab.TAB_NAME }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
         <!-- Player detail card -->
         <div class="player-detail">
             <div class="player-detail-header">
@@ -45,6 +57,7 @@
                 </div>
                 <div class="player-detail-title-block">
                     <h2 class="player-detail-name" style="color: {{ PLAYER_COLORCODE }}">{{ PLAYER_NAME }}</h2>
+                    {% if PLAYER_GUILD_NAME %}<span class="player-detail-guild-tag">&lt;{{ PLAYER_GUILD_NAME }}&gt;</span>{% endif %}
                     {% if PLAYER_TITLE %}
                     <div class="player-detail-title">&laquo; {{ PLAYER_TITLE }} &raquo;</div>
                     {% endif %}
@@ -55,9 +68,19 @@
                         {% if PLAYER_CLASS_IMAGE %}<img src="{{ PLAYER_CLASS_IMAGE }}" alt="{{ PLAYER_CLASS }}" class="player-detail-icon" />{% endif %}
                         <span style="color: {{ PLAYER_COLORCODE }}">{{ PLAYER_CLASS }}</span>
                     </div>
+                    {% if loops.header_pills %}
+                    <div class="player-detail-pills">
+                        {% for pill in loops.header_pills %}
+                        <span class="player-detail-pill">{{ pill.PILL_LABEL }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
                 </div>
             </div>
 
+            {% if S_PLAYER_TAB_TEMPLATE %}
+            {% include S_PLAYER_TAB_TEMPLATE %}
+            {% else %}
             <div class="player-detail-body">
                 <fieldset>
                     <dl>
@@ -143,6 +166,7 @@
             </div>
 
             {% EVENT bbguild_player_detail_after_content %}
+            {% endif %}
 
         </div>
 
