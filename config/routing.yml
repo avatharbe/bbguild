@@ -1,4 +1,7 @@
 # ext/avathar/bbguild/config/routing.yml
+avathar_bbguild_about:
+    path: /about
+    defaults: { _controller: avathar.bbguild.controller:about }
 avathar_bbguild_player:
     path: /guild/{guild_id}/player/{player_id}
     defaults: { _controller: avathar.bbguild.controller:playerdetail }

@@ -132,6 +132,8 @@ class main_listener implements EventSubscriberInterface
 				'page'     => 'welcome',
 			]),
 			'S_MULTI_GUILD'     => count($guilds) > 1,
+			'U_BBGUILD_ABOUT'   => $this->helper->route('avathar_bbguild_about'),
+			'BBGUILD_VERSION'   => \avathar\bbguild\ext::BBGUILD_VERSION,
 		]);
 
 		foreach ($guilds as $row)

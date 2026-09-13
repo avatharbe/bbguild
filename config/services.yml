@@ -55,6 +55,7 @@ services:
             - '@avathar.bbguild.portal.renderer'
             - '@avathar.bbguild.player_detail'
             - '@dispatcher'
+            - '@language'
     avathar.bbguild.admin.controller:
         class: avathar\bbguild\controller\ajax_controller
         arguments:

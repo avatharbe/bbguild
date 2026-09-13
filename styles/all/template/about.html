@@ -1,0 +1,30 @@
+{% INCLUDE 'overall_header.html' %}
+
+<div class="panel">
+	<div class="inner">
+
+		<h2 class="message-title">{{ lang('BBGUILD_ABOUT') }}</h2>
+
+		<p>{{ lang('BBGUILD_ABOUT_INTRO') }}</p>
+		<p>{{ lang('BBGUILD_ABOUT_ORIGIN') }}</p>
+
+		<dl class="details">
+			<dt>{{ lang('VERSION') }}</dt>
+			<dd>{{ BBGUILD_VERSION }}</dd>
+
+			<dt>{{ lang('DEVELOPEDBY') }}</dt>
+			<dd><a href="https://www.avathar.be" rel="nofollow">Sajaki</a></dd>
+
+			<dt>{{ lang('SVNNAME') }}</dt>
+			<dd><a href="{{ lang('SVNURL') }}" rel="nofollow">{{ lang('SVNURL') }}</a></dd>
+
+			<dt>{{ lang('TCREDITS') }}</dt>
+			<dd><a href="https://github.com/avatharbe/bbguild/graphs/contributors" rel="nofollow">{{ lang('BBGUILD_ABOUT_CONTRIBUTORS') }}</a></dd>
+		</dl>
+
+		<p class="bbguild-about-license">&copy; {{ BBGUILD_YEAR }} avathar.be &mdash; {{ lang('BBGUILD_ABOUT_LICENSE') }}</p>
+
+	</div>
+</div>
+
+{% INCLUDE 'overall_footer.html' %}

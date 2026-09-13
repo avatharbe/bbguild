@@ -9,9 +9,11 @@
 
 namespace avathar\bbguild\controller;
 
+use avathar\bbguild\ext;
 use avathar\bbguild\portal\guild_context;
 use avathar\bbguild\portal\portal_renderer;
 use avathar\bbguild\views\player_detail;
+use phpbb\language\language;
 
 /**
  * Front-end controller for the guild portal and player detail pages.
@@ -39,6 +41,9 @@ class view_controller
 	/** @var \phpbb\event\dispatcher_interface */
 	protected $dispatcher;
 
+	/** @var language */
+	protected $language;
+
 	public function __construct(
 		\phpbb\controller\helper $helper,
 		\phpbb\template\template $template,
@@ -46,7 +51,8 @@ class view_controller
 		guild_context $guild_context,
 		portal_renderer $portal_renderer,
 		player_detail $player_detail,
-		\phpbb\event\dispatcher_interface $dispatcher
+		\phpbb\event\dispatcher_interface $dispatcher,
+		language $language
 	)
 	{
 		$this->helper = $helper;
@@ -56,6 +62,7 @@ class view_controller
 		$this->portal_renderer = $portal_renderer;
 		$this->player_detail = $player_detail;
 		$this->dispatcher = $dispatcher;
+		$this->language = $language;
 	}
 
 	/**
@@ -119,5 +126,21 @@ class view_controller
 		extract($this->dispatcher->trigger_event('avathar.bbguild.player_detail_display', compact($vars)));
 
 		return $this->helper->render('player_detail.html', $this->player_detail->get_player_name());
+	}
+
+	/**
+	 * About page — bbGuild version, license and credits. Opened as a popup
+	 * from the footer copyright line.
+	 *
+	 * @return \Symfony\Component\HttpFoundation\Response
+	 */
+	public function about()
+	{
+		$this->template->assign_vars([
+			'BBGUILD_VERSION' => ext::BBGUILD_VERSION,
+			'BBGUILD_YEAR'    => date('Y'),
+		]);
+
+		return $this->helper->render('about.html', $this->language->lang('BBGUILD_ABOUT'));
 	}
 }

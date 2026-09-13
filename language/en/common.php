@@ -281,6 +281,11 @@ $lang = array_merge(
 
 	// About Page
 	'ABOUT' => 'About',
+	'BBGUILD_ABOUT' => 'About bbGuild',
+	'BBGUILD_ABOUT_INTRO' => 'A Guild Management System for phpBB 3.3. Manage your gaming guild\'s roster, recruitment, and news directly from your forum.',
+	'BBGUILD_ABOUT_ORIGIN' => 'Originally forked as bbDKP from EQDKP to phpBB 3.0 in 2008, rebuilt as bbGuild for phpBB 3.3.',
+	'BBGUILD_ABOUT_LICENSE' => 'Licensed under the GNU General Public License v2.',
+	'BBGUILD_ABOUT_CONTRIBUTORS' => 'View contributors on GitHub',
 	'MAINIMG' => 'bbguild.png',
 	'IMAGE_ALT' => 'Logo',
 	'REPOSITORY_IMAGE' => 'Google.jpg',
