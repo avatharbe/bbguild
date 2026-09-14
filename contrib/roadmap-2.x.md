@@ -1,6 +1,6 @@
 # bbGuild Family Roadmap (2.x)
 
-*Updated 2026-09-13. Working copy: `ext/avathar/bbguild` (+ plugins). Reconciled with GitHub milestones.*
+*Updated 2026-09-14. Working copy: `ext/avathar/bbguild` (+ plugins). Reconciled with GitHub milestones.*
 
 ## North star
 
@@ -11,7 +11,7 @@ Feature parity, measured against four benchmarks at once:
 3. **The extension family** — bbAccounts, bbDKP v2, bbPoints, and planned events/Gameworld/Discord.
 4. **Guild-hosting sites** — guildsofwow.com as the external bar.
 
-Releases are a **coordinated train** across bbGuild core + all 9 game plugins — shipped together and **pairing-locked** (every plugin hard-requires the current core version). **2.0.0 shipped stable 2026-09-12** (core `2.0.0`; bbguildwow's pairing bumped to `>=2.0.0` — its own version stays at `2.1.0-b1`, already mid-feature-work; other plugins' 2.0.0 status not yet re-verified as part of this pass). **New features are at 2.1.0.** Cadence ~6 weeks.
+Releases are a **coordinated train** across bbGuild core + all 9 game plugins — shipped together and **pairing-locked** (every plugin hard-requires the current core version). **2.0.0 tagged stable 2026-09-12** (core `v2.0.0`; bbguildwow's pairing bumped to `>=2.0.0` — its own version stays at `2.1.0-b1`, already mid-feature-work; other plugins' 2.0.0 status not yet re-verified as part of this pass). **"Tagged" ≠ "publicly released" here**: `v2.0.0-rc5` and `v2.0.0` are both pushed tags with no corresponding GitHub Release published (the public Releases page still shows `rc4`, from 2026-07-25, as latest), and no forum announcement was made for either — the last public forum announcement was rc1's (2026-07-24). See Next steps. **New features are at 2.1.0.** Cadence ~6 weeks.
 
 **Scope of this document:** the **bbGuild family** — core, game plugins, and guild-facing extensions (events/RSVP, Discord, Gameworld). The **DKP & accounting family** (bbAccounts, bbDKP, raid logging) is a **separate roadmap/topic** — summarized at the bottom for context only.
 
@@ -23,7 +23,7 @@ Status: ✅ have · ◑ partial · ⬜ gap. "Owner" = which repo delivers it.
 |---|---|---|---|---|---|---|
 | Roster / members | ◑ | ✅ | ✅ | ✅ grid/list, filters | core+wow | shipped |
 | Character page | ⬜ | ◑ | ✅ | ◑ basic, rough | core+wow | 2.1.0 |
-| Character auto-sync (scheduler) | ⬜ | ◑ manual | ✅ | ✅ #360/#361/#362 shipped | core contract + wow | shipped |
+| Character auto-sync (scheduler) | ⬜ | ◑ manual | ✅ | ✅ #361/#362 shipped | core contract + wow | shipped |
 | GW2 roster/character sync (API v2) | — | ⬜ | ✅ v2 | ⬜ | bbguildgw2 | 2.1.0 (gw2#9) |
 | Gear tooltips (bbTips + bonus IDs) | ⬜ | ⬜ | ✅ | ✅ shipped | wow + bbtips | shipped |
 | Per-character achievements | ⬜ | ◑ points | ✅ | ⬜ model exists | wow | 2.1.0 (#365) |
@@ -32,7 +32,7 @@ Status: ✅ have · ◑ partial · ⬜ gap. "Owner" = which repo delivers it.
 | Portal — tabbed pages | ⬜ | ⬜ | ✅ | ✅ shipped | core | shipped |
 | Recruitment | ⬜ | ✅ | ✅ | ✅ | core | shipped |
 | Roster ↔ profile fields | ✅ | — | ✅ | ◑ UCP claim | core | 2.2.0 (#231) |
-| Character-based forum avatars | ✅ | — | ✅ | ⬜ removed from pbwow | wow + core hooks | 2.1.0 (#369) |
+| Character-based forum avatars | ✅ | — | ✅ | ✅ shipped (#369) | wow + core hooks | shipped |
 | Profile-field character info | ✅ | — | ✅ | ⬜ removed from pbwow | wow + core hooks | 2.2.0 (#368) |
 | Professions | ⬜ | ⬜ | ✅ | ⬜ | core+wow | 2.2.0 (#230) |
 | Player statistics | ⬜ | ✅(DKP) | ✅ | ⬜ | core | 2.2.0 (#289) |
@@ -40,18 +40,19 @@ Status: ✅ have · ◑ partial · ⬜ gap. "Owner" = which repo delivers it.
 | Discord integration | ⬜ | ⬜ | ✅ | ⬜ | **new ext** | 2.3.0 — open question, not decided |
 | Boss / raid progress (Gameworld) | ⬜ | ◑(Gameworld MOD) | ✅ | ⬜ old phpBB 3.0 MOD | Gameworld (existing repo) | 2.3.0 (Gameworld#16 — port to 3.3 extension) |
 | Battle.net API modernization | — | ◑ | — | ◑ working | wow | 2.3.0 |
-| bbGuild API surface (events + read API) | — | ◑ bbDKP-api idea | ◑ | ⬜ | core | 2.3.0 (#370) |
+| bbGuild API surface (events + read API) | — | ◑ bbDKP-api idea | ◑ | ◑ events shipped (#370 phase 1) | core | 2.1.0 (#370 phase 1, shipped); 2.3.0 (#370 phase 2 — read API, still open) |
 | Spec build analysis | ⬜ | ⬜ | ◑ | ⬜ | wow | 2.3.0 (#286) |
-| Plugin spec data (8 non-WoW) | — | — | — | ◑ WoW only | plugins | 2.1.0 (#367) |
+| Plugin spec data (8 non-WoW) | — | — | — | ◑ WoW only (rest have researched data already, see #367) | plugins | **parked** (#367, inactive — scope undefined) |
 | DKP / points | ⬜ | ✅ | ✅ | ◑ *separate track* | bbDKP/bbAccounts/bbPoints | see below |
 | Raid logging + importer | ⬜ | ◑(Raidtracker) | ◑ | ⬜ | *DKP track* | see below |
 
 ## Release plan
 
-### 2.0.0 — stable (core + bbguildwow) · due 2026-08-31 · **shipped 2026-09-12**
+### 2.0.0 — stable (core + bbguildwow) · due 2026-08-31 · **tagged 2026-09-12, not yet publicly released**
 **Stabilization only — no new features.**
 - Closed the rc line; bug-bash across roster / UCP / ACP / portal / multi-guild.
 - **#244** unit tests (gated stable) — closed 2026-09-12, scoped to essentials already shipped; remaining migration/CRUD coverage split into #372 (2.1.0).
+- `v2.0.0-rc5` and `v2.0.0` tags are pushed but neither has a GitHub Release published, and there's been no forum announcement since rc1 — see Next steps.
 - Coordinated stable release tagged for core + bbguildwow (`avathar/bbguild >=2.0.0` pairing). Other 8 plugins' 2.0.0 status not re-verified in this pass.
 
 ### 2.1.0 — guild page overhaul · due 2026-10-15 · in progress
@@ -64,8 +65,12 @@ Headline: tabbed portal + character experience + stats.
 - **#365** per-character achievements view — open
 - **#369** character-based forum avatars (restores pbwowext#10, part 1 — rides on the synced renders) — **shipped** (bbguildwow 8124b41, closed)
 - **#366** guild statistics portal module (numbers/percentage lists incl. class distribution) — **shipped** (5b04fe69, closed 2026-09-12)
-- **#279** class distribution — reopened 2026-09-14, narrowed to the chart/graph visualization + optional build-list that #366 didn't cover
-- **#367** complete plugin spec data for the 8 non-WoW games — open
+- **#279** class distribution — reopened 2026-09-14, narrowed to the chart/graph visualization + optional build-list that #366 didn't cover; moved to milestone 2.2.0
+- **#370** bbGuild event catalogue, phase 1 (in-process events only) — **shipped**, merged via PR #378 2026-09-14; `@since 2.1.0` since it ships this train rather than waiting for 2.3.0. Issue itself stays open/milestoned 2.3.0, since it also tracks phase 2 (the out-of-process read API)
+- **#373** about page popup + footer credit — **shipped**, closed 2026-09-13
+- **#375** player-detail sub-tab bar, core half — **shipped**, merged via PR #376 2026-09-13
+- **#377** UCP character-add 503 fix — **shipped**, closed 2026-09-13
+- **#367** complete plugin spec data for the 8 non-WoW games — **parked** 2026-09-13, labeled `inactive` (audited all 8 plugins; found real researched data already exists, remaining gap is thinner translation coverage vs. WoW, scope undefined)
 - **#372** unit test coverage: migrations + remaining guild/player CRUD paths (split from #244) — open
 
 ### 2.2.0 — events + roster depth · due 2026-11-30
@@ -87,7 +92,7 @@ Headline: tabbed portal + character experience + stats.
 All 9 plugins (wow, gw2, lotro, eq, eq2, ffxi, ffxiv, swtor, lineage2) release in lockstep with core and now carry the same milestones (2.0.0–2.3.0, same due dates) — locked to the milestone, not to identical RC numbers (within 2.0.0 stabilisation, core rc5 / WoW rc3 / rest rc2, each plugin hard-requiring core rc5). Per-plugin backlog is allocated as:
 
 - **2.0.0 (stabilization)** — test suites (EPV / unit / functional / smoke / integration) in every plugin, plus roster/class/race **icon fixes** (eq #7, eq2 #7, ffxiv #4, gw2 #7, lineage2 #7/#3, lotro #3, swtor #3, wow #27).
-- **2.1.0 (features/data)** — **seed specializations** for the 8 non-WoW games (eq #6, eq2 #6, ffxi #5, ffxiv #7, gw2 elite-spec icons #8, lineage2 #6, lotro #6, swtor #6); **LOTRO game-data** update (#7); **GW2 API v2** roster/character sync (gw2 #9 — implements the core sync contract for Guild Wars 2); **WoW** character features — scheduled Battle.net sync (#11, implements core #362) — **shipped**, titles collection (#24) — **shipped**, activity feed (#10) — **shipped**.
+- **2.1.0 (features/data)** — **seed specializations** for the 8 non-WoW games (eq #6, eq2 #6, ffxi #5, ffxiv #7, gw2 elite-spec icons #8, lineage2 #6, lotro #6, swtor #6); **LOTRO game-data** update (#7); **GW2 API v2** roster/character sync (gw2 #9 — implements the core sync contract for Guild Wars 2); **WoW** character features — scheduled Battle.net sync (#11, implements core #362) — **shipped**, activity feed (#10) — **shipped**, titles collection (#24) — **closed as won't-do** (compared against real Blizzard armory UI: titles never appear as a collapsible list anywhere, only as a single inline word above the character name — not worth building as originally scoped).
 - **2.2.0** — WoW arena bracket ratings on the player page (#23).
 
 This mirrors core: tests + display bugs stabilize 2.0.0; spec/data + character features land 2.1.0. WoW's scheduled-sync ticket (#11) is the plugin half of the core sync-scheduler contract (#361/#362).
@@ -111,5 +116,6 @@ Gets its own parity matrix + release plan in a separate document.
 
 ## Next steps
 1. Tab foundation (#360) shipped. Remaining character cluster: **#364** (character page polish) and **#365** (achievements view) — own design → plan.
-2. Follow-on spec: guild-statistics module (#366).
-3. Stand up epics/repos for the 2.2.0/2.3.0 new extensions.
+2. **#372** unit test coverage (migrations + remaining guild/player CRUD paths) to close out 2.1.0.
+3. Publish the missing GitHub Releases for `v2.0.0-rc5`/`v2.0.0` (tags exist, pushed 2026-07-26/2026-09-12, but neither has a Release object — the public Releases page still shows rc4 as latest) and consider a forum announcement, matching the rc1 precedent.
+4. Stand up epics/repos for the 2.2.0/2.3.0 new extensions.
