@@ -11,7 +11,7 @@ Feature parity, measured against four benchmarks at once:
 3. **The extension family** — bbAccounts, bbDKP v2, bbPoints, and planned events/Gameworld/Discord.
 4. **Guild-hosting sites** — guildsofwow.com as the external bar.
 
-Releases are a **coordinated train** across bbGuild core + all 9 game plugins — shipped together and **pairing-locked** (every plugin hard-requires the current core version). **2.0.0 tagged stable 2026-09-12** (core `v2.0.0`; bbguildwow's pairing bumped to `>=2.0.0` — its own version stays at `2.1.0-b1`, already mid-feature-work; other plugins' 2.0.0 status not yet re-verified as part of this pass). **"Tagged" ≠ "publicly released" here**: `v2.0.0-rc5` and `v2.0.0` are both pushed tags with no corresponding GitHub Release published (the public Releases page still shows `rc4`, from 2026-07-25, as latest), and no forum announcement was made for either — the last public forum announcement was rc1's (2026-07-24). See Next steps. **New features are at 2.1.0.** Cadence ~6 weeks.
+Releases are a **coordinated train** across bbGuild core + all 9 game plugins — shipped together and **pairing-locked** (every plugin hard-requires the current core version). **2.0.0 shipped stable 2026-09-12, publicly released 2026-09-14** (core `v2.0.0`; bbguildwow's pairing bumped to `>=2.0.0` — its own version stays at `2.1.0-b1`, already mid-feature-work; other plugins' 2.0.0 status not yet re-verified as part of this pass). GitHub Releases for [`v2.0.0-rc5`](https://github.com/avatharbe/bbguild/releases/tag/v2.0.0-rc5) and [`v2.0.0`](https://github.com/avatharbe/bbguild/releases/tag/v2.0.0) were published 2026-09-14 (tagged 2026-07-26/2026-09-12 respectively, but sat without a Release object until then) — a forum announcement is still outstanding, see Next steps. **New features are at 2.1.0.** Cadence ~6 weeks.
 
 **Scope of this document:** the **bbGuild family** — core, game plugins, and guild-facing extensions (events/RSVP, Discord, Gameworld). The **DKP & accounting family** (bbAccounts, bbDKP, raid logging) is a **separate roadmap/topic** — summarized at the bottom for context only.
 
@@ -48,11 +48,11 @@ Status: ✅ have · ◑ partial · ⬜ gap. "Owner" = which repo delivers it.
 
 ## Release plan
 
-### 2.0.0 — stable (core + bbguildwow) · due 2026-08-31 · **tagged 2026-09-12, not yet publicly released**
+### 2.0.0 — stable (core + bbguildwow) · due 2026-08-31 · **shipped 2026-09-12, released 2026-09-14**
 **Stabilization only — no new features.**
 - Closed the rc line; bug-bash across roster / UCP / ACP / portal / multi-guild.
 - **#244** unit tests (gated stable) — closed 2026-09-12, scoped to essentials already shipped; remaining migration/CRUD coverage split into #372 (2.1.0).
-- `v2.0.0-rc5` and `v2.0.0` tags are pushed but neither has a GitHub Release published, and there's been no forum announcement since rc1 — see Next steps.
+- GitHub Releases for `v2.0.0-rc5` and `v2.0.0` published 2026-09-14 (tags existed since 2026-07-26/2026-09-12 but had no Release object until then). Forum announcement still outstanding — see Next steps.
 - Coordinated stable release tagged for core + bbguildwow (`avathar/bbguild >=2.0.0` pairing). Other 8 plugins' 2.0.0 status not re-verified in this pass.
 
 ### 2.1.0 — guild page overhaul · due 2026-10-15 · in progress
@@ -117,5 +117,5 @@ Gets its own parity matrix + release plan in a separate document.
 ## Next steps
 1. Tab foundation (#360) shipped. Remaining character cluster: **#364** (character page polish) and **#365** (achievements view) — own design → plan.
 2. **#372** unit test coverage (migrations + remaining guild/player CRUD paths) to close out 2.1.0.
-3. Publish the missing GitHub Releases for `v2.0.0-rc5`/`v2.0.0` (tags exist, pushed 2026-07-26/2026-09-12, but neither has a Release object — the public Releases page still shows rc4 as latest) and consider a forum announcement, matching the rc1 precedent.
+3. GitHub Releases for `v2.0.0-rc5`/`v2.0.0` published 2026-09-14. Still outstanding: a forum announcement for the 2.0.0 stable line, matching the rc1 precedent (last one was 2026-07-24).
 4. Stand up epics/repos for the 2.2.0/2.3.0 new extensions.
