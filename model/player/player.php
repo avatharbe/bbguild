@@ -1138,10 +1138,10 @@ class player
 						$this->bb_language_table => 'c1') ,
 					'ON' => "c1.attribute_id = c.class_id
 						AND c1.game_id = c.game_id
-						AND c1.language= '" . $this->config['bbguild_lang'] . "'
+						AND c1.language= '" . $this->db->sql_escape($this->config['bbguild_lang']) . "'
 						AND c1.attribute = 'class'")) ,
 			'WHERE' => "
-					l1.attribute_id = r.race_id AND l1.game_id = r.game_id AND l1.language= '" . $this->config['bbguild_lang'] . "' AND l1.attribute = 'race'
+					l1.attribute_id = r.race_id AND l1.game_id = r.game_id AND l1.language= '" . $this->db->sql_escape($this->config['bbguild_lang']) . "' AND l1.attribute = 'race'
 					AND m.game_id = c.game_id
 					AND m.player_class_id = c.class_id
 					AND m.game_id = r.game_id
@@ -1328,7 +1328,7 @@ class player
 		{
 			$sql = 'SELECT count(*) as playerexists
 				FROM ' . $this->bb_players_table . '
-				WHERE player_id <> ' . $this->player_id . "
+				WHERE player_id <> ' . (int) $this->player_id . "
 				AND UPPER(player_name) = UPPER('" . $this->db->sql_escape($this->player_name) . "')";
 			$result = $this->db->sql_query($sql);
 			$countm = $this->db->sql_fetchfield('playerexists');
@@ -1342,7 +1342,7 @@ class player
 		// check if rank exists
 		$sql = 'SELECT count(*) as rankccount
 				FROM ' . $this->bb_ranks_table . '
-				WHERE rank_id=' . (int) $this->player_rank_id . ' and guild_id = ' . $this->player_guild_id;
+				WHERE rank_id=' . (int) $this->player_rank_id . ' and guild_id = ' . (int) $this->player_guild_id;
 		$result = $this->db->sql_query($sql);
 		$countm = $this->db->sql_fetchfield('rankccount');
 		$this->db->sql_freeresult($result);
@@ -1397,7 +1397,7 @@ class player
 		);
 
 		$sql = 'UPDATE ' . $this->bb_players_table . ' SET ' . $query . '
-			WHERE player_id= ' . $this->player_id;
+			WHERE player_id= ' . (int) $this->player_id;
 
 		$this->db->sql_query($sql);
 
@@ -1414,7 +1414,7 @@ class player
 
 			$this->db->sql_query(
 				'UPDATE ' . $this->bb_players_table . ' SET ' . $query . '
-				WHERE player_id= ' . $this->player_id
+				WHERE player_id= ' . (int) $this->player_id
 			);
 
 		}
@@ -1431,7 +1431,7 @@ class player
 			);
 			$this->db->sql_query(
 				'UPDATE ' . $this->bb_players_table . ' SET ' . $query . '
-				WHERE player_id= ' . $this->player_id
+				WHERE player_id= ' . (int) $this->player_id
 			);
 		}
 
@@ -1481,7 +1481,7 @@ class player
 				FROM ' . $this->bb_players_table . "
 				WHERE player_name= '" . $this->db->sql_escape(ucwords($this->player_name)) . "'
 				AND player_realm= '" . $this->db->sql_escape(ucwords($this->player_realm)) . "'
-				AND player_guild_id = " . $this->player_guild_id;
+				AND player_guild_id = " . (int) $this->player_guild_id;
 		$result = $this->db->sql_query($sql);
 		$countm = $this->db->sql_fetchfield('playerexists');
 		$this->db->sql_freeresult($result);
@@ -1699,7 +1699,7 @@ class player
 
 			$this->db->sql_query(
 				'UPDATE ' . $this->bb_players_table . ' SET ' . $query . '
-                WHERE player_id= ' . $this->player_id
+                WHERE player_id= ' . (int) $this->player_id
 			);
 		}
 
@@ -1737,7 +1737,7 @@ class player
 
 			$this->db->sql_query(
 				'UPDATE ' . $this->bb_players_table . ' SET ' . $query . '
-                WHERE player_id= ' . $this->player_id
+                WHERE player_id= ' . (int) $this->player_id
 			);
 		}
 
@@ -1860,7 +1860,7 @@ class player
 	public function get_joindate($player_id)
 	{
 		// get player joindate
-		$sql = 'SELECT player_joindate  FROM ' . $this->bb_players_table . ' WHERE player_id = ' . $player_id;
+		$sql = 'SELECT player_joindate  FROM ' . $this->bb_players_table . ' WHERE player_id = ' . (int) $player_id;
 		$result = $this->db->sql_query($sql, 3600);
 		$joindate = $this->db->sql_fetchfield('player_joindate');
 
@@ -1900,7 +1900,7 @@ class player
 
 		if ($guild_id != 0)
 		{
-			$sql_array['WHERE'] .= ' AND m.player_guild_id = ' . $guild_id;
+			$sql_array['WHERE'] .= ' AND m.player_guild_id = ' . (int) $guild_id;
 		}
 
 		$sql = $this->db->sql_build_query('SELECT', $sql_array);
@@ -1931,7 +1931,7 @@ class player
 
 		$sql = 'UPDATE ' . $this->bb_players_table . '
 						SET ' . $this->db->sql_build_array('UPDATE', $sql_ary) . '
-						WHERE player_id = ' . $this->player_id;
+						WHERE player_id = ' . (int) $this->player_id;
 		$this->db->sql_query($sql);
 	}
 
@@ -2013,7 +2013,7 @@ class player
 				'ON'    => 'u.user_id = m.phpbb_user_id '),
 			array(
 				'FROM'  => array($this->bb_language_table => 'c1'),
-				'ON'    => "c1.attribute_id = c.class_id AND c1.language= '" . $this->config['bbguild_lang'] . "' AND c1.attribute = 'class'  and c1.game_id = c.game_id "
+				'ON'    => "c1.attribute_id = c.class_id AND c1.language= '" . $this->db->sql_escape($this->config['bbguild_lang']) . "' AND c1.attribute = 'class'  and c1.game_id = c.game_id "
 			));
 
 		$sql_array['WHERE'] = ' c.class_id = m.player_class_id
@@ -2042,7 +2042,7 @@ class player
 		}
 
 		$sql_array['WHERE'] .= " AND m.player_rank_id != 99
-			AND e1.attribute_id = e.race_id AND e1.language= '" . $this->config['bbguild_lang'] . "'
+			AND e1.attribute_id = e.race_id AND e1.language= '" . $this->db->sql_escape($this->config['bbguild_lang']) . "'
 			AND e1.attribute = 'race' and e1.game_id = e.game_id";
 
 		if ($game_id != '' )
@@ -2052,32 +2052,32 @@ class player
 
 		if ($mycharsonly == true)
 		{
-			$sql_array['WHERE'] .= ' AND m.phpbb_user_id =  ' . $this->user->data['user_id'];
+			$sql_array['WHERE'] .= ' AND m.phpbb_user_id =  ' . (int) $this->user->data['user_id'];
 		}
 
 		if ($guild_id > 0)
 		{
-			$sql_array['WHERE'] .= ' AND m.player_guild_id =  ' . $guild_id;
+			$sql_array['WHERE'] .= ' AND m.player_guild_id =  ' . (int) $guild_id;
 		}
 
 		if ($class_id > 0 && $query_by_class == true)
 		{
-			$sql_array['WHERE'] .= ' AND m.player_class_id =  ' . $class_id;
+			$sql_array['WHERE'] .= ' AND m.player_class_id =  ' . (int) $class_id;
 		}
 
 		if ($race_id > 0)
 		{
-			$sql_array['WHERE'] .= ' AND m.player_race_id =  ' . $race_id;
+			$sql_array['WHERE'] .= ' AND m.player_race_id =  ' . (int) $race_id;
 		}
 
 		if ($level1 > 0)
 		{
-			$sql_array['WHERE'] .= ' AND m.player_level >=  ' . $level1;
+			$sql_array['WHERE'] .= ' AND m.player_level >=  ' . (int) $level1;
 		}
 
 		if ($level2 != 200)
 		{
-			$sql_array['WHERE'] .= ' AND m.player_level <=  ' . $level2;
+			$sql_array['WHERE'] .= ' AND m.player_level <=  ' . (int) $level2;
 		}
 
 		if ($filter != '' && $query_by_armor == true)
@@ -2196,7 +2196,7 @@ class player
     							AND c.game_id = m.game_id
     							AND r.guild_id = m.player_guild_id
     							AND r.rank_id = m.player_rank_id AND r.rank_hide = 0
-    							AND c1.attribute_id =  c.class_id AND c1.language= '" . $this->config['bbguild_lang'] . "' AND c1.attribute = 'class'
+    							AND c1.attribute_id =  c.class_id AND c1.language= '" . $this->db->sql_escape($this->config['bbguild_lang']) . "' AND c1.attribute = 'class'
     							AND (c.game_id = '" . $this->db->sql_escape($game_id) . "')
     							AND c1.game_id=c.game_id
 
@@ -2213,27 +2213,27 @@ class player
 
 		if ($guild_id > 0)
 		{
-			$sql_array['WHERE'] .= ' AND m.player_guild_id =  ' . $guild_id;
+			$sql_array['WHERE'] .= ' AND m.player_guild_id =  ' . (int) $guild_id;
 		}
 
 		if ($filter != $this->user->lang['ALL']  && $classid > 0)
 		{
-			$sql_array['WHERE'] .= ' AND m.player_class_id =  ' . $classid;
+			$sql_array['WHERE'] .= ' AND m.player_class_id =  ' . (int) $classid;
 		}
 
 		if ($race_id > 0)
 		{
-			$sql_array['WHERE'] .= ' AND m.player_race_id =  ' . $race_id;
+			$sql_array['WHERE'] .= ' AND m.player_race_id =  ' . (int) $race_id;
 		}
 
 		if ($level1 > 0)
 		{
-			$sql_array['WHERE'] .= ' AND m.player_level >=  ' . $level1;
+			$sql_array['WHERE'] .= ' AND m.player_level >=  ' . (int) $level1;
 		}
 
 		if ($level2 != 200)
 		{
-			$sql_array['WHERE'] .= ' AND m.player_level <=  ' . $level2;
+			$sql_array['WHERE'] .= ' AND m.player_level <=  ' . (int) $level2;
 		}
 
 		$sql = $this->db->sql_build_query('SELECT', $sql_array);
@@ -2306,7 +2306,7 @@ class player
 	{
 		$sql = 'UPDATE ' . $this->bb_players_table . '
 			SET player_last_synced = ' . time() . '
-			WHERE player_id = ' . $player_id;
+			WHERE player_id = ' . (int) $player_id;
 		$this->db->sql_query($sql);
 	}
 }

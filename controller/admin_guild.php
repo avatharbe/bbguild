@@ -504,7 +504,7 @@ class admin_guild
 		$guild_id = (int) $updateguild->getGuildid();
 
 		// Check if MOTD row exists for this guild
-		$sql = 'SELECT motd_id FROM ' . $this->bb_motd_table . ' WHERE guild_id = ' . $guild_id;
+		$sql = 'SELECT motd_id FROM ' . $this->bb_motd_table . ' WHERE guild_id = ' . (int) $guild_id;
 		$result = $this->db->sql_query($sql);
 		$motd_row = $this->db->sql_fetchrow($result);
 		$this->db->sql_freeresult($result);
@@ -516,7 +516,7 @@ class admin_guild
 				'motd_timestamp'  => time(),
 				'bbcode_bitfield' => $bitfield,
 				'bbcode_uid'      => $uid,
-			]) . ' WHERE guild_id = ' . $guild_id;
+			]) . ' WHERE guild_id = ' . (int) $guild_id;
 		}
 		else
 		{
@@ -529,6 +529,17 @@ class admin_guild
 			]);
 		}
 		$this->db->sql_query($sql);
+
+		/**
+		 * Fired when a guild's Message of the Day is saved.
+		 *
+		 * @event avathar.bbguild.motd_updated
+		 * @var int guild_id The guild whose MOTD was updated
+		 * @since 2.1.0
+		 */
+		extract($this->dispatcher->trigger_event('avathar.bbguild.motd_updated', [
+			'guild_id' => $guild_id,
+		]));
 
 		if ($updateguild->update_guild($old_guild))
 		{
@@ -985,6 +996,20 @@ class admin_guild
 			{
 				$sql = 'DELETE FROM ' . $this->bb_recruit_table . ' WHERE id = ' . (int) $recruit_id;
 				$this->db->sql_query($sql);
+
+				/**
+				 * Fired when a recruitment posting is deleted.
+				 *
+				 * @event avathar.bbguild.recruitment_deleted
+				 * @var int recruit_id The deleted recruitment posting's id
+				 * @var int guild_id   The guild it belonged to
+				 * @since 2.1.0
+				 */
+				extract($this->dispatcher->trigger_event('avathar.bbguild.recruitment_deleted', [
+					'recruit_id' => (int) $recruit_id,
+					'guild_id'   => $guild_id,
+				]));
+
 				$success_message = sprintf($this->user->lang['ADMIN_DELETE_RECRUITMENT_SUCCESS'], $recruit_id);
 				trigger_error($success_message . $this->link, E_USER_NOTICE);
 			}
@@ -1010,6 +1035,20 @@ class admin_guild
 				$sql = 'INSERT INTO ' . $this->bb_recruit_table . ' ' . $this->db->sql_build_array('INSERT', $recruit_data);
 				$this->db->sql_query($sql);
 				$new_id = $this->db->sql_nextid();
+
+				/**
+				 * Fired when a new recruitment posting is created.
+				 *
+				 * @event avathar.bbguild.recruitment_posted
+				 * @var int recruit_id The newly created recruitment posting's id
+				 * @var int guild_id   The guild it belongs to
+				 * @since 2.1.0
+				 */
+				extract($this->dispatcher->trigger_event('avathar.bbguild.recruitment_posted', [
+					'recruit_id' => (int) $new_id,
+					'guild_id'   => $guild_id,
+				]));
+
 				$success_message = sprintf($this->user->lang['ADMIN_ADD_RECRUITMENT_SUCCESS'], $new_id);
 				trigger_error($success_message . $this->link, E_USER_NOTICE);
 			}
@@ -1019,6 +1058,20 @@ class admin_guild
 				$recruit_data['applicants'] = $this->request->variable('applicants', 0);
 				$sql = 'UPDATE ' . $this->bb_recruit_table . ' SET ' . $this->db->sql_build_array('UPDATE', $recruit_data) . ' WHERE id = ' . (int) $recruit_id;
 				$this->db->sql_query($sql);
+
+				/**
+				 * Fired when an existing recruitment posting is updated.
+				 *
+				 * @event avathar.bbguild.recruitment_updated
+				 * @var int recruit_id The updated recruitment posting's id
+				 * @var int guild_id   The guild it belongs to
+				 * @since 2.1.0
+				 */
+				extract($this->dispatcher->trigger_event('avathar.bbguild.recruitment_updated', [
+					'recruit_id' => (int) $recruit_id,
+					'guild_id'   => $guild_id,
+				]));
+
 				$success_message = sprintf($this->user->lang['ADMIN_UPDATE_RECRUITMENT_SUCCESS'], $recruit_id);
 				trigger_error($success_message . $this->link, E_USER_NOTICE);
 			}
@@ -1051,7 +1104,7 @@ class admin_guild
 			LEFT JOIN " . $this->bb_language_table . " l_r ON r.role_id = l_r.attribute_id
 				AND l_r.attribute = 'role' AND l_r.language = '" . $this->db->sql_escape($lang_code) . "'
 				AND l_r.game_id = '" . $game_id . "'
-			WHERE r.guild_id = " . $guild_id . '
+			WHERE r.guild_id = " . (int) $guild_id . '
 			ORDER BY r.role_id, r.class_id';
 		$result = $this->db->sql_query($sql);
 

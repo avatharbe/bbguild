@@ -21,6 +21,7 @@ use phpbb\cache\driver\driver_interface as cache_interface;
 use phpbb\config\config;
 use phpbb\controller\helper;
 use phpbb\db\driver\driver_interface;
+use phpbb\event\dispatcher_interface;
 use phpbb\extension\manager;
 use phpbb\pagination;
 use phpbb\path_helper;
@@ -48,6 +49,7 @@ class roster extends module_base
 	protected helper $helper;
 	protected game_registry $game_registry;
 	protected asset_url_resolver $asset_resolver;
+	protected dispatcher_interface $dispatcher;
 	protected string $players_table;
 	protected string $ranks_table;
 	protected string $classes_table;
@@ -73,6 +75,7 @@ class roster extends module_base
 		helper $helper,
 		game_registry $game_registry,
 		asset_url_resolver $asset_resolver,
+		dispatcher_interface $dispatcher,
 		string $players_table,
 		string $ranks_table,
 		string $classes_table,
@@ -98,6 +101,7 @@ class roster extends module_base
 		$this->helper = $helper;
 		$this->game_registry = $game_registry;
 		$this->asset_resolver = $asset_resolver;
+		$this->dispatcher = $dispatcher;
 		$this->players_table = $players_table;
 		$this->ranks_table = $ranks_table;
 		$this->classes_table = $classes_table;
@@ -272,6 +276,32 @@ class roster extends module_base
 	}
 
 	/**
+	 * Fires avathar.bbguild.roster_display for one character row.
+	 *
+	 * Shared by display_listing() (list layout) and display_grid() (grid
+	 * layout) so the event is triggered from exactly one call site — EPV
+	 * requires every event name to be documented and fired from a single
+	 * place in the codebase.
+	 *
+	 * @event avathar.bbguild.roster_display
+	 * @var int    player_id The character being displayed
+	 * @var string game_id   The game the character belongs to
+	 * @var int    guild_id  The guild whose roster is rendering
+	 * @var array  tpl_ary   The template block-vars array for this row. Writable — add keys to inject a column.
+	 * @since 2.1.0
+	 */
+	private function fire_roster_display_event(array $char, array $tpl_ary): array
+	{
+		$player_id = (int) $char['player_id'];
+		$game_id = (string) $char['game_id'];
+		$guild_id = (int) $this->guild_id;
+		$vars = ['player_id', 'game_id', 'guild_id', 'tpl_ary'];
+		extract($this->dispatcher->trigger_event('avathar.bbguild.roster_display', compact($vars)));
+
+		return $tpl_ary;
+	}
+
+	/**
 	 * Display the listing (table) view.
 	 */
 	protected function display_listing(array $characters, string $ext_path_images, string $base_url, int $start, array $spec_lookup = [], bool $show_spec = false): void
@@ -279,7 +309,7 @@ class roster extends module_base
 		foreach ($characters[0] as $char)
 		{
 			$spec = $this->resolve_spec($char, $spec_lookup, $ext_path_images);
-			$this->template->assign_block_vars('portal_roster_row', [
+			$tpl_ary = [
 				'PLAYER_ID'   => $char['player_id'],
 				'GAME'        => $char['game_id'],
 				'COLORCODE'   => $char['colorcode'],
@@ -299,7 +329,11 @@ class roster extends module_base
 					'guild_id'  => $this->guild_id,
 					'player_id' => $char['player_id'],
 				]),
-			]);
+			];
+
+			$tpl_ary = $this->fire_roster_display_event($char, $tpl_ary);
+
+			$this->template->assign_block_vars('portal_roster_row', $tpl_ary);
 		}
 
 		// Pagination
@@ -372,7 +406,7 @@ class roster extends module_base
 					if ($char['player_class_id'] == $classid)
 					{
 						$grid_spec = $this->resolve_spec($char, $spec_lookup, $ext_path_images);
-						$this->template->assign_block_vars('class.players_row', [
+						$tpl_ary = [
 							'PLAYER_ID' => $char['player_id'],
 							'GAME'      => $char['game_id'],
 							'COLORCODE' => $char['colorcode'],
@@ -389,11 +423,15 @@ class roster extends module_base
 							'ACHIEVPTS' => $char['player_achiev'],
 							'CLASS_IMAGE' => $ext_path_images . 'class_images/' . basename($char['class_image']),
 							'RACE_IMAGE'  => $ext_path_images . 'race_images/' . basename($char['race_image']),
-						'U_PLAYER_DETAIL' => $this->helper->route('avathar_bbguild_player', [
-							'guild_id'  => $this->guild_id,
-							'player_id' => $char['player_id'],
-						]),
-						]);
+							'U_PLAYER_DETAIL' => $this->helper->route('avathar_bbguild_player', [
+								'guild_id'  => $this->guild_id,
+								'player_id' => $char['player_id'],
+							]),
+						];
+
+						$tpl_ary = $this->fire_roster_display_event($char, $tpl_ary);
+
+						$this->template->assign_block_vars('class.players_row', $tpl_ary);
 					}
 				}
 			}

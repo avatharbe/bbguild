@@ -24,10 +24,21 @@ $lang = array_merge($lang, [
 	'BBGUILD_PORTAL_MOTD'            => 'Messaggio del giorno',
 	'BBGUILD_PORTAL_RECRUITMENT'     => 'Reclutamento',
 	'BBGUILD_PORTAL_ROSTER'          => 'Elenco membri',
+	'BBGUILD_PORTAL_STATISTICS'      => 'Statistiche della gilda',
 
 	// Module content
 	'NO_RECRUITS'                    => 'Nessuna posizione di reclutamento aperta.',
 	'BBGUILD_NO_PORTAL_MODULES'      => 'Nessun modulo portale configurato per questa gilda.',
+
+	// Statistics module
+	'STAT_CLASS_DISTRIBUTION'        => 'Classi',
+	'STAT_RACE_DISTRIBUTION'         => 'Razze',
+	'STAT_LEVEL_DISTRIBUTION'        => 'Livelli',
+	'STAT_RANK_DISTRIBUTION'         => 'Ranghi',
+	'STAT_TOTAL_MEMBERS'             => 'Membri attivi totali: %d',
+	'STAT_RECENT_JOINS'              => 'Iscrizioni recenti',
+	'STAT_RECENT_DEPARTURES'         => 'Uscite recenti',
+	'STAT_NO_DATA'                   => 'Ancora nessun dato.',
 
 	// ACP portal management
 	'ACP_PORTAL_EXPLAIN'             => 'Gestisci i moduli del portale per ogni gilda. Aggiungi, rimuovi, riordina e attiva/disattiva i blocchi.',

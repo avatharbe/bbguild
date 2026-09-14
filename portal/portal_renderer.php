@@ -11,6 +11,7 @@ namespace avathar\bbguild\portal;
 use avathar\bbguild\portal\modules\database_handler;
 use phpbb\config\config;
 use phpbb\controller\helper;
+use phpbb\event\dispatcher_interface;
 use phpbb\template\template;
 use phpbb\user;
 
@@ -27,6 +28,7 @@ class portal_renderer
 	protected template $template;
 	protected user $user;
 	protected helper $helper;
+	protected dispatcher_interface $dispatcher;
 
 	/** @var array Module count per column */
 	protected array $module_count = [];
@@ -38,7 +40,8 @@ class portal_renderer
 		config $config,
 		template $template,
 		user $user,
-		helper $helper
+		helper $helper,
+		dispatcher_interface $dispatcher
 	)
 	{
 		$this->portal_columns = $portal_columns;
@@ -48,6 +51,7 @@ class portal_renderer
 		$this->template = $template;
 		$this->user = $user;
 		$this->helper = $helper;
+		$this->dispatcher = $dispatcher;
 	}
 
 	/**
@@ -96,6 +100,20 @@ class portal_renderer
 			{
 				continue;
 			}
+
+			/**
+			 * Fired for each portal module as it renders. Allows a sibling
+			 * extension to observe or override which template is used for a
+			 * given module row.
+			 *
+			 * @event avathar.bbguild.portal_module_display
+			 * @var int   guild_id       The guild whose portal is rendering
+			 * @var array row            The portal module's database row (module_id, module_type, etc.)
+			 * @var mixed template_module The resolved template file/name for this module — writable
+			 * @since 2.1.0
+			 */
+			$vars = ['guild_id', 'row', 'template_module'];
+			extract($this->dispatcher->trigger_event('avathar.bbguild.portal_module_display', compact($vars)));
 
 			// Assign to template block
 			$this->module_helper->assign_module_vars($row, $template_module);

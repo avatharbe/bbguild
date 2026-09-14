@@ -274,6 +274,7 @@ services:
             - '@ext.manager'
             - '@avathar.bbguild.log'
             - '@avathar.bbguild.util'
+            - '@dispatcher'
             - '%avathar.bbguild.tables.bb_players%'
             - '%avathar.bbguild.tables.bb_ranks%'
             - '%avathar.bbguild.tables.bb_classes%'

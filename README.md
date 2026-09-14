@@ -118,6 +118,8 @@ See the [contributors](https://github.com/avatharbe/bbguild/graphs/contributors)
 
 See `contrib/CHANGELOG.md` for version history.
 
+For extension developers: custom PHP events and integration details are documented in [contrib/Events.md](contrib/Events.md).
+
 ## License
 
 [GNU General Public License v2](http://opensource.org/licenses/gpl-2.0.php)

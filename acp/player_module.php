@@ -1024,7 +1024,7 @@ class player_module
 				$this->bb_races_table  => 'r',
 				$this->bb_language_table => 'l'),
 			'WHERE'    => " r.race_id = l.attribute_id
-								AND r.game_id = '" . $editplayer->game_id . "'
+								AND r.game_id = '" . $this->db->sql_escape($editplayer->game_id) . "'
 								AND l.attribute='race'
 								AND l.game_id = r.game_id
 								AND l.language= '" . $config['bbguild_lang'] . "'",
@@ -1065,7 +1065,7 @@ class player_module
 			'FROM'     => array(
 				$this->bb_classes_table => 'c',
 				$this->bb_language_table => 'l'),
-			'WHERE'    => " l.game_id = c.game_id  AND c.game_id = '" . $editplayer->game_id . "'
+			'WHERE'    => " l.game_id = c.game_id  AND c.game_id = '" . $this->db->sql_escape($editplayer->game_id) . "'
 					AND l.attribute_id = c.class_id  AND l.language= '" . $config['bbguild_lang'] . "' AND l.attribute = 'class' ",
 			'ORDER_BY' => 'l.name asc'
 		);

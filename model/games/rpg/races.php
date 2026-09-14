@@ -127,7 +127,7 @@ class races
 		'WHERE' => "   r.game_id = l.game_id
 						AND r.race_id = l.attribute_id
 						AND l.attribute='race'
-						AND l.language= '" . $this->config['bbguild_lang'] . "'
+						AND l.language= '" . $this->db->sql_escape($this->config['bbguild_lang']) . "'
 						AND l.game_id = '" . $this->db->sql_escape($this->game_id) . "'
 						AND r.race_id = " . ( int ) $this->race_id
 		);
@@ -223,7 +223,7 @@ class races
 			$sql = 'DELETE FROM ' . $this->bb_races_table . ' WHERE race_id =' . ( int ) $this->race_id . " AND game_id = '" . $this->db->sql_escape($this->game_id) . "'";
 			$this->db->sql_query($sql);
 
-			$sql = 'DELETE FROM ' . $this->bb_language_table  . " WHERE language= '" . $this->config['bbguild_lang'] . "'
+			$sql = 'DELETE FROM ' . $this->bb_language_table  . " WHERE language= '" . $this->db->sql_escape($this->config['bbguild_lang']) . "'
 							AND attribute = 'race'
 							AND attribute_id= " . ( int ) $this->race_id . "
 							AND game_id = '" . $this->db->sql_escape($this->game_id) . "'";
@@ -278,7 +278,7 @@ class races
 		'name' => ( string ) $this->race_name, 'name_short' => ( string ) $this->race_name );
 
 		$sql = 'UPDATE ' . $this->bb_language_table  . ' SET ' . $this->db->sql_build_array('UPDATE', $names) . '
-			WHERE attribute_id = ' . ( int ) $this->race_id . " AND attribute='race'  AND language= '" . $this->config['bbguild_lang'] . "' AND game_id =   '" . $this->db->sql_escape($this->game_id) . "'";
+			WHERE attribute_id = ' . ( int ) $this->race_id . " AND attribute='race'  AND language= '" . $this->db->sql_escape($this->config['bbguild_lang']) . "' AND game_id =   '" . $this->db->sql_escape($this->game_id) . "'";
 		$this->db->sql_query($sql);
 
 		$this->db->sql_transaction('commit');
@@ -305,7 +305,7 @@ class races
 		),
 		'WHERE' => " r.race_faction_id = f.faction_id
 					AND f.game_id = r.game_id AND r.game_id = g.game_id AND r.game_id = '" . $this->db->sql_escape($this->game_id) . "'
-		    		AND l.attribute_id = r.race_id AND l.game_id = r.game_id and l.language= '" . $this->config['bbguild_lang'] . "'
+		    		AND l.attribute_id = r.race_id AND l.game_id = r.game_id and l.language= '" . $this->db->sql_escape($this->config['bbguild_lang']) . "'
 		    		AND l.attribute = 'race' ", 'ORDER_BY' => $order );
 
 		$sql = $this->db->sql_build_query('SELECT', $sql_array);

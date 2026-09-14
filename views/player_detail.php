@@ -268,8 +268,8 @@ class player_detail
 	{
 		$sql = 'SELECT rank_name, rank_prefix, rank_suffix
 			FROM ' . $this->bb_ranks_table . '
-			WHERE rank_id = ' . $rank_id . '
-				AND guild_id = ' . $guild_id;
+			WHERE rank_id = ' . (int) $rank_id . '
+				AND guild_id = ' . (int) $guild_id;
 		$result = $this->db->sql_query($sql);
 		$row = $this->db->sql_fetchrow($result);
 		$this->db->sql_freeresult($result);
@@ -289,7 +289,7 @@ class player_detail
 	{
 		$sql = 'SELECT user_id, username, user_colour
 			FROM ' . USERS_TABLE . '
-			WHERE user_id = ' . $user_id;
+			WHERE user_id = ' . (int) $user_id;
 		$result = $this->db->sql_query($sql);
 		$row = $this->db->sql_fetchrow($result);
 		$this->db->sql_freeresult($result);

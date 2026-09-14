@@ -187,6 +187,7 @@ class bbguild_module
 		$this->bbguild_ext_manager = $phpbb_container->get('ext.manager');
 		$this->bbguild_game_registry = $phpbb_container->get('avathar.bbguild.game_registry');
 		$this->asset_resolver = $phpbb_container->get('avathar.bbguild.asset_url_resolver');
+		$dispatcher = $phpbb_container->get('dispatcher');
 
 		// Resolve table names from container parameters
 		$this->bb_players_table = $phpbb_container->getParameter('avathar.bbguild.tables.bb_players');
@@ -258,6 +259,21 @@ class bbguild_module
 					{
 						if ($player->Unclaim_Player())
 						{
+							/**
+							 * Fired when a user unclaims a character from their forum account.
+							 *
+							 * @event avathar.bbguild.character_unclaim
+							 * @var int player_id The character that was unclaimed
+							 * @var int guild_id  The guild the character belongs to
+							 * @var int user_id   The forum user who performed the unclaim
+							 * @since 2.1.0
+							 */
+							extract($dispatcher->trigger_event('avathar.bbguild.character_unclaim', [
+								'player_id' => $player_id,
+								'guild_id'  => (int) $player->getPlayerGuildId(),
+								'user_id'   => (int) $this->user->data['user_id'],
+							]));
+
 							meta_refresh(2, $this->u_action);
 							$message = sprintf($this->user->lang['CHARACTER_UNCLAIMED'], $player_name) . '<br /><br />' . sprintf($this->user->lang['RETURN_UCP'], '<a href="' . $this->u_action . '">', '</a>');
 							trigger_error($message);
@@ -287,6 +303,22 @@ class bbguild_module
 					$player->player_id = $player_id;
 					$player->Getplayer();
 					$player->Claim_Player();
+
+					/**
+					 * Fired when a user claims an existing (unclaimed) character.
+					 *
+					 * @event avathar.bbguild.character_claim
+					 * @var int player_id The character that was claimed
+					 * @var int guild_id  The guild the character belongs to
+					 * @var int user_id   The forum user who claimed it
+					 * @since 2.1.0
+					 */
+					extract($dispatcher->trigger_event('avathar.bbguild.character_claim', [
+						'player_id' => $player_id,
+						'guild_id'  => (int) $player->getPlayerGuildId(),
+						'user_id'   => (int) $this->user->data['user_id'],
+					]));
+
 					meta_refresh(2, $this->u_action);
 					$message = sprintf($this->user->lang['CHARACTERS_UPDATED'], $player->getPlayerName()) . '<br /><br />' . sprintf($this->user->lang['RETURN_UCP'], '<a href="' . $this->u_action . '">', '</a>');
 					unset($player);
@@ -386,7 +418,25 @@ class bbguild_module
 							$deleteplayer = new player($this->db, $this->config, $this->bbguild_cache, $this->user, $this->bbguild_ext_manager, $this->bbguild_log, $this->bbguild_util, $this->bb_players_table, $this->bb_ranks_table, $this->bb_classes_table, $this->bb_races_table, $this->bb_language_table, $this->bb_guild_table, $this->bb_factions_table, $this->bb_games_table, $this->bbguild_game_registry);
 							$deleteplayer->player_id = $this->request->variable('del_player_id', 0);
 							$deleteplayer->Getplayer();
+							$deleted_player_id = $deleteplayer->player_id;
+							$deleted_guild_id = (int) $deleteplayer->getPlayerGuildId();
+							$deleted_user_id = (int) $deleteplayer->getPhpbbUserId();
 							$deleteplayer->Deleteplayer();
+
+							/**
+							 * Fired when a character is deleted from the UCP.
+							 *
+							 * @event avathar.bbguild.character_delete
+							 * @var int player_id The character that was deleted
+							 * @var int guild_id  The guild the character belonged to
+							 * @var int user_id   The forum user account it was linked to (0 if unclaimed)
+							 * @since 2.1.0
+							 */
+							extract($dispatcher->trigger_event('avathar.bbguild.character_delete', [
+								'player_id' => $deleted_player_id,
+								'guild_id'  => $deleted_guild_id,
+								'user_id'   => $deleted_user_id,
+							]));
 
 							$success_message = sprintf($this->user->lang['ADMIN_DELETE_PLAYERS_SUCCESS'], $deleteplayer->getPlayerName());
 							trigger_error($success_message);
@@ -457,6 +507,22 @@ class bbguild_module
 							$newplayer->setPlayerComment(sprintf($this->user->lang['ADMIN_ADD_PLAYER_SUCCESS'], ucwords($newplayer->getPlayerName()), date('F j, Y, g:i a')));
 							$newplayer->Armory_getplayer($this->get_game_provider($newplayer->game_id));
 							$newplayer->Updateplayer($newplayer);
+
+							/**
+							 * Fired when a character is successfully added via the UCP.
+							 *
+							 * @event avathar.bbguild.character_add
+							 * @var int player_id The newly created character's id
+							 * @var int guild_id  The guild the character belongs to
+							 * @var int user_id   The forum user who added it
+							 * @since 2.1.0
+							 */
+							extract($dispatcher->trigger_event('avathar.bbguild.character_add', [
+								'player_id' => $newplayer->player_id,
+								'guild_id'  => (int) $newplayer->getPlayerGuildId(),
+								'user_id'   => (int) $newplayer->getPhpbbUserId(),
+							]));
+
 							meta_refresh(1, $this->u_action . '&amp;player_id=' . $newplayer->player_id);
 							$success_message = sprintf($this->user->lang['ADMIN_ADD_PLAYER_SUCCESS'], ucwords($newplayer->getPlayerName()), date('F j, Y, g:i a'));
 							trigger_error($success_message, E_USER_NOTICE);
@@ -483,6 +549,21 @@ class bbguild_module
 							trigger_error($this->user->lang['NOUCPUPDCHARS']);
 						}
 						$updateplayer = $this->UpdateMyCharacter($player_id);
+
+						/**
+						 * Fired when a character's details are updated via the UCP.
+						 *
+						 * @event avathar.bbguild.character_edit
+						 * @var int player_id The character that was updated
+						 * @var int guild_id  The guild the character belongs to
+						 * @var int user_id   The forum user who owns it
+						 * @since 2.1.0
+						 */
+						extract($dispatcher->trigger_event('avathar.bbguild.character_edit', [
+							'player_id' => $updateplayer->player_id,
+							'guild_id'  => (int) $updateplayer->getPlayerGuildId(),
+							'user_id'   => (int) $updateplayer->getPhpbbUserId(),
+						]));
 
 						meta_refresh(1, $this->u_action . '&amp;player_id=' . $updateplayer->player_id);
 						//$success_message = sprintf($this->user->lang['ADMIN_UPDATE_PLAYER_SUCCESS'], ucwords($updateplayer->player_name))  . '<br /><br />' . sprintf($this->user->lang['RETURN_UCP'], '<a href="' . $this->u_action . '">', '</a>');
@@ -669,7 +750,7 @@ class bbguild_module
 				$this->bb_language_table        => 'l',
 			),
 			'WHERE'        => " r.race_id = l.attribute_id
-						AND r.game_id = '" . $guilds->game_id . "'
+						AND r.game_id = '" . $this->db->sql_escape($guilds->game_id) . "'
 						AND l.attribute='race'
 						AND l.game_id = r.game_id
 						AND l.language= '" . $this->config['bbguild_lang'] ."'",
@@ -715,7 +796,7 @@ class bbguild_module
 				$this->bb_classes_table        => 'c',
 				$this->bb_language_table        => 'l',
 			),
-			'WHERE'        => " l.game_id = c.game_id  AND c.game_id = '" . $guilds->game_id . "'
+			'WHERE'        => " l.game_id = c.game_id  AND c.game_id = '" . $this->db->sql_escape($guilds->game_id) . "'
 			AND l.attribute_id = c.class_id  AND l.language= '" . $this->config['bbguild_lang'] . "' AND l.attribute = 'class' ",
 			'ORDER_BY'    => 'l.name asc'
 		);
@@ -983,7 +1064,7 @@ class bbguild_module
 						DKPSYS_TABLE         => 'd',
 						$this->bb_players_table     => 'l',
 					),
-					'WHERE'     => "l.player_id = m.player_id and l.player_status = 1 and m.player_dkpid = d.dkpsys_id and d.dkpsys_status='Y' and m.player_id = " . $char['player_id'],
+					'WHERE'     => "l.player_id = m.player_id and l.player_status = 1 and m.player_dkpid = d.dkpsys_id and d.dkpsys_status='Y' and m.player_id = " . (int) $char['player_id'],
 					'GROUP_BY'  => ' d.dkpsys_id, d.dkpsys_name ',
 					'ORDER_BY'    => ' d.dkpsys_name ',
 				);

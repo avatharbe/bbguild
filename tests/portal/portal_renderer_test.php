@@ -20,6 +20,9 @@ class portal_renderer_test extends TestCase
 	/** @var \PHPUnit\Framework\MockObject\MockObject */
 	protected $helper;
 
+	/** @var \PHPUnit\Framework\MockObject\MockObject */
+	protected $dispatcher;
+
 	/** @var array Captured assign_block_vars() calls: [blockname, vars][] */
 	protected $block_calls;
 
@@ -32,6 +35,8 @@ class portal_renderer_test extends TestCase
 		$this->template = $this->createMock(\phpbb\template\template::class);
 		$user = $this->createMock(\phpbb\user::class);
 		$this->helper = $this->createMock(\phpbb\controller\helper::class);
+		$this->dispatcher = $this->createMock(\phpbb\event\dispatcher_interface::class);
+		$this->dispatcher->method('trigger_event')->willReturnArgument(1);
 
 		$this->block_calls = [];
 		$this->template->method('assign_block_vars')
@@ -41,10 +46,17 @@ class portal_renderer_test extends TestCase
 		$this->template->method('assign_vars')->willReturn(null);
 
 		$this->helper->method('route')->willReturn('/guild/welcome/5');
-		$this->database_handler->method('get_modules')->willReturn([]);
+		// Deliberately no default stub for get_modules(): PHPUnit 9.6 uses
+		// first-registered-wins for multiple any-args stubs on the same
+		// method, so a default configured here would silently shadow a
+		// test's own ->willReturn() override (see
+		// test_render_fires_portal_module_display_per_module). Leaving it
+		// unconfigured falls back to PHPUnit's auto-generated `[]` default
+		// for the `array` return type, which every existing test already
+		// relies on.
 
 		return new \avathar\bbguild\portal\portal_renderer(
-			$portal_columns, $module_helper, $this->database_handler, $config, $this->template, $user, $this->helper
+			$portal_columns, $module_helper, $this->database_handler, $config, $this->template, $user, $this->helper, $this->dispatcher
 		);
 	}
 
@@ -153,5 +165,60 @@ class portal_renderer_test extends TestCase
 		$this->assertCount(2, $tabs);
 		$this->assertSame('welcome', $tabs[0]['TAB_SLUG']);
 		$this->assertSame('raids', $tabs[1]['TAB_SLUG']);
+	}
+
+	public function test_render_fires_portal_module_display_per_module()
+	{
+		$renderer = $this->get_renderer();
+		$this->database_handler->method('get_tabs')->willReturn([
+			['tab_id' => 1, 'tab_name' => 'Overview', 'tab_slug' => 'welcome'],
+		]);
+		$this->database_handler->method('get_modules')->willReturn([
+			// module_column is required by get_module_template(); the value
+			// itself is irrelevant here since number_to_string() below is
+			// stubbed to ignore its argument.
+			['module_id' => 7, 'module_type' => 'roster', 'module_column' => 1],
+		]);
+
+		$module = $this->createMock(\avathar\bbguild\portal\modules\module_interface::class);
+		$module_helper = $this->getMockBuilder(\avathar\bbguild\portal\module_helper::class)
+			->disableOriginalConstructor()
+			->getMock();
+
+		// Rebuild the renderer with a real module_helper mock wired to return
+		// our $module, since get_renderer() uses a bare createMock() whose
+		// get_portal_module() returns null by default (making the loop skip
+		// via the `if (!$module) { continue; }` guard).
+		$portal_columns = $this->createMock(\avathar\bbguild\portal\columns::class);
+		// number_to_string() has a `string` return type, so an unstubbed
+		// mock call defaults to '' — which get_module_template() treats as
+		// "no column" and skips the row before the event ever fires. Stub a
+		// non-empty column name so the row reaches the event-fire code.
+		$portal_columns->method('number_to_string')->willReturn('center');
+		$config = new \phpbb\config\config([]);
+		$module_helper->method('get_portal_module')->willReturn($module);
+		// load_module_language()/assign_module_vars() are declared `: void`;
+		// PHPUnit 9.6 throws IncompatibleReturnValueException if a stub for a
+		// void method is explicitly given `willReturn(null)`, so these are
+		// left unstubbed (the default void-returning stub is sufficient).
+		$module_helper->method('load_module_language');
+		$module_helper->method('assign_module_vars');
+		$module->method('get_template_center')->willReturn('some_template.html');
+
+		$this->dispatcher->expects($this->once())
+			->method('trigger_event')
+			->with(
+				'avathar.bbguild.portal_module_display',
+				$this->callback(function ($vars) {
+					return $vars['guild_id'] === 5 && $vars['row']['module_id'] === 7;
+				})
+			)
+			->willReturnArgument(1);
+
+		$renderer = new \avathar\bbguild\portal\portal_renderer(
+			$portal_columns, $module_helper, $this->database_handler, $config, $this->template, $this->createMock(\phpbb\user::class), $this->helper, $this->dispatcher
+		);
+
+		$renderer->render(5, '');
 	}
 }

@@ -776,6 +776,7 @@ $lang = array_merge(
 	'LISTATTENDEES_FOOTCOUNT' => '... trovati %d partecipante(i)',
 	'MANAGE_PLAYERS_FOOTCOUNT' => '... trovati %d giocatore(i)',
 	'VIEWLOGS_FOOTCOUNT' => '... trovati %d log(s) / %d per pagina',
+	'LOGS_PER_PAGE' => 'Mostra per pagina:',
 	'GUILD_FOOTCOUNT' => '... trovati %d gilde',
 	'NEWS_FOOTCOUNT' => '... trovati %d news',
 	'LISTADJ_FOOTCOUNT' => '... trovati %d modifiche / %d per pagina',

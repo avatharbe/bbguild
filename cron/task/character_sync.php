@@ -19,6 +19,7 @@ use avathar\bbguild\model\admin\log;
 use avathar\bbguild\model\admin\util;
 use avathar\bbguild\model\games\character_sync_registry;
 use avathar\bbguild\model\player\player;
+use phpbb\event\dispatcher_interface;
 
 class character_sync extends \phpbb\cron\task\base
 {
@@ -56,6 +57,9 @@ class character_sync extends \phpbb\cron\task\base
 
 	/** @var util */
 	protected $util;
+
+	/** @var dispatcher_interface */
+	protected $dispatcher;
 
 	/** @var string */
 	protected $bb_players_table;
@@ -106,6 +110,7 @@ class character_sync extends \phpbb\cron\task\base
 		\phpbb\extension\manager $ext_manager,
 		log $bbguild_log,
 		util $util,
+		dispatcher_interface $dispatcher,
 		string $bb_players_table,
 		string $bb_ranks_table,
 		string $bb_classes_table,
@@ -124,6 +129,7 @@ class character_sync extends \phpbb\cron\task\base
 		$this->user = $user;
 		$this->ext_manager = $ext_manager;
 		$this->util = $util;
+		$this->dispatcher = $dispatcher;
 		$this->bb_players_table = $bb_players_table;
 		$this->bb_ranks_table = $bb_ranks_table;
 		$this->bb_classes_table = $bb_classes_table;
@@ -213,6 +219,22 @@ class character_sync extends \phpbb\cron\task\base
 					'log_action' => [$player_row['player_name'], $player_row['game_id']],
 				]);
 			}
+
+			/**
+			 * Fired after a game-API sync attempt finishes for one character,
+			 * whether it succeeded or failed.
+			 *
+			 * @event avathar.bbguild.character_sync_completed
+			 * @var int    player_id The character that was synced
+			 * @var string game_id   The game the character belongs to
+			 * @var bool   success   Whether the sync succeeded
+			 * @since 2.1.0
+			 */
+			extract($this->dispatcher->trigger_event('avathar.bbguild.character_sync_completed', [
+				'player_id' => (int) $player_row['player_id'],
+				'game_id'   => (string) $player_row['game_id'],
+				'success'   => $success,
+			]));
 
 			$player->update_last_synced((int) $player_row['player_id']);
 		}

@@ -93,10 +93,10 @@ class ajax_controller
 	 */
 	public function getfaction()
 	{
-		$game_id = $this->db->sql_escape($this->request->variable('game_id', '', true));
+		$game_id = $this->request->variable('game_id', '', true);
 		$sql = 'SELECT faction_id, faction_name
 			FROM ' . $this->bb_factions_table . "
-			WHERE game_id = '" . $game_id . "'
+			WHERE game_id = '" . $this->db->sql_escape($game_id) . "'
 			ORDER BY faction_id";
 		$result = $this->db->sql_query($sql);
 
@@ -127,7 +127,7 @@ class ajax_controller
 		$sql = 'SELECT a.rank_id, a.rank_name, b.game_id
 			FROM ' . $this->bb_ranks_table . ' a, ' . $this->bb_guild_table . ' b
 			WHERE a.rank_hide = 0
-				AND a.guild_id = ' . $guild_id . '
+				AND a.guild_id = ' . (int) $guild_id . '
 				AND a.guild_id = b.id
 			ORDER BY rank_id DESC';
 
@@ -162,7 +162,7 @@ class ajax_controller
 			FROM ' . $this->bb_players_table . ' p
 			LEFT JOIN ' . $this->bb_ranks_table . ' r
 				ON p.player_rank_id = r.rank_id AND p.player_guild_id = r.guild_id
-			WHERE p.player_guild_id = ' . $guild_id . '
+			WHERE p.player_guild_id = ' . (int) $guild_id . '
 			ORDER BY p.player_name ASC';
 
 		$result = $this->db->sql_query($sql);
@@ -187,8 +187,8 @@ class ajax_controller
 	*/
 	public function getclassrace()
 	{
-		$game_id = $this->db->sql_escape($this->request->variable('game_id', '', true));
-		$lang = $this->db->sql_escape($this->config['bbguild_lang']);
+		$game_id = $this->request->variable('game_id', '', true);
+		$lang = $this->config['bbguild_lang'];
 
 		// Races
 		$sql_array = [
@@ -198,10 +198,10 @@ class ajax_controller
 				$this->bb_language_table => 'l',
 			],
 			'WHERE'    => "r.race_id = l.attribute_id
-				AND r.game_id = '" . $game_id . "'
+				AND r.game_id = '" . $this->db->sql_escape($game_id) . "'
 				AND l.attribute = 'race'
 				AND l.game_id = r.game_id
-				AND l.language = '" . $lang . "'",
+				AND l.language = '" . $this->db->sql_escape($lang) . "'",
 			'ORDER_BY' => 'l.name',
 		];
 		$sql = $this->db->sql_build_query('SELECT', $sql_array);
@@ -225,9 +225,9 @@ class ajax_controller
 				$this->bb_language_table  => 'l',
 			],
 			'WHERE'    => "l.game_id = c.game_id
-				AND c.game_id = '" . $game_id . "'
+				AND c.game_id = '" . $this->db->sql_escape($game_id) . "'
 				AND l.attribute_id = c.class_id
-				AND l.language = '" . $lang . "'
+				AND l.language = '" . $this->db->sql_escape($lang) . "'
 				AND l.attribute = 'class'",
 		];
 		$sql = $this->db->sql_build_query('SELECT', $sql_array);

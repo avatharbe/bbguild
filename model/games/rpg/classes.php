@@ -194,7 +194,7 @@ class classes
 							AND l.attribute='class'
 							AND l.game_id = '" . $this->db->sql_escape($this->game_id) . "'
 							AND c.game_id = l.game_id
-							AND l.language= '" . $this->config['bbguild_lang'] . "'
+							AND l.language= '" . $this->db->sql_escape($this->config['bbguild_lang']) . "'
 							AND c.class_id = " . ( int ) $this->class_id);
 
 		$sql = $this->db->sql_build_query('SELECT', $sql_array);
@@ -290,7 +290,7 @@ class classes
 			$sql = 'DELETE FROM ' . $this->bb_classes_table . ' WHERE class_id  = ' . ( int ) $this->class_id . " and game_id = '" . $this->db->sql_escape($this->game_id) . "'";
 			$this->db->sql_query($sql);
 
-			$sql = 'DELETE FROM ' . $this->bb_language_table . " WHERE language= '" . $this->config['bbguild_lang'] . "' AND attribute = 'class'
+			$sql = 'DELETE FROM ' . $this->bb_language_table . " WHERE language= '" . $this->db->sql_escape($this->config['bbguild_lang']) . "' AND attribute = 'class'
 					and attribute_id= " . ( int ) $this->class_id . " and game_id = '" . $this->db->sql_escape($this->game_id) . "'";
 			$this->db->sql_query($sql);
 
@@ -364,7 +364,7 @@ class classes
 
 		$sql = 'UPDATE ' . $this->bb_language_table . ' SET ' . $this->db->sql_build_array('UPDATE', $names) . '
 		 WHERE attribute_id = ' . ( int ) $oldclass->class_id . " AND attribute='class'
-		 AND language= '" . $this->config['bbguild_lang'] . "' AND game_id = '" . $this->db->sql_escape($this->game_id) . "'";
+		 AND language= '" . $this->db->sql_escape($this->config['bbguild_lang']) . "' AND game_id = '" . $this->db->sql_escape($this->game_id) . "'";
 		$this->db->sql_query($sql);
 
 		$this->db->sql_transaction('commit');
@@ -392,7 +392,7 @@ class classes
 			$this->bb_games_table => 'g'  ),
 		'WHERE' => " c.class_id = l.attribute_id
 							AND c.game_id = g.game_id AND c.game_id = l.game_id AND l.game_id = '" . $this->db->sql_escape($this->game_id) . "'
-							AND l.attribute='class' AND l.language= '" . $this->config['bbguild_lang'] . "'",
+							AND l.attribute='class' AND l.language= '" . $this->db->sql_escape($this->config['bbguild_lang']) . "'",
 		'ORDER_BY' => $order );
 
 		if ($mode == 0)
