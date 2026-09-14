@@ -30,7 +30,8 @@ its schema as a chain of `phpbb\db\migration` classes. `ext.php` extends
 `gd`/`curl` extensions (`is_enableable()`); it also auto-disables known
 child extensions before core disables (`disable_step()`), since a child's
 `services.yml` references core-defined DI parameters that stop existing
-once core is gone.
+once core is gone — though its hardcoded child list is currently stale
+(see [Known Gaps](#known-gaps--deliberately-out-of-scope)).
 
 **Game plugins** — `bbguildwow`, `bbguildgw2`, `bbguildlotro`, `bbguildeq`,
 `bbguildeq2`, `bbguildffxi`, `bbguildffxiv`, `bbguildswtor`,
@@ -238,6 +239,19 @@ A built-in "Custom" game ships in core itself
 (`model/games/library/install_custom.php`) for boards not tied to a
 specific supported title.
 
+In practice, **8 of the 9 game plugins are pure data-seeding plugins**:
+just a `game/<game>_provider.php` + `game/<game>_installer.php` pair (no
+`src/`, controllers, entities, or new DB tables), seeding rows into core's
+shared `bb_classes`/`bb_races`/`bb_factions`/`bb_language`/
+`bb_specializations` tables. `bbguildwow` is the sole exception and is
+treated as the reference implementation for what a full-featured plugin
+looks like — it alone has its own API client, cron sync, ACP modules,
+achievements, and an avatar driver (see `bbguildwow/docs/ARCHITECTURE.md`).
+Plugins whose game has no named "build/spec" layer above their class list
+(eq, eq2, ffxi, ffxiv, lineage2) ship an intentionally empty
+`spec_catalog()` with a documented rationale rather than fabricated data —
+this is a deliberate modeling decision per plugin, not missing work.
+
 ### Log system
 
 `model/admin/log.php` follows phpBB core's own log design: each entry
@@ -440,3 +454,20 @@ predecessor.
 - **Game-plugin API coverage is uneven**: only WoW (Battle.net) and GW2
   have first-class APIs; FFXIV relies on fragile third-party parsers; the
   remaining games have no API path and are roster-managed manually.
+- **`ext.php::disable_step()`'s child-extension list is stale**: it only
+  auto-disables `bbguildwow` and `bbguildeq2`, not all 9 plugins — the
+  other 7 would be left enabled (and erroring) if core were disabled first.
+- **Spec-icon assets are incomplete across several plugins** that do have a
+  real specialization catalog: `bbguildgw2` (27 elite specs),
+  `bbguildswtor` (48 disciplines), and `bbguildlotro`'s newly-added
+  Brawler/Mariner classes (0 specs assigned yet) all ship with no icon
+  art — each is self-documented as a follow-up in its own provider/install
+  code, not a silent gap.
+- **A few per-plugin docs/tooling have drifted from the code** and haven't
+  been caught by CI: `bbguildeq`'s README class table doesn't match its
+  installer's actual class_id/armor-type mapping (bbguildeq2's equivalent
+  table is correct); `contrib/cleanup.sql` in `bbguildeq`, `bbguildeq2`,
+  and `bbguildlineage2` still references the pre-2.0.0-b4 underscored
+  package names (`avathar/bbguild_eq` etc.) and would silently no-op.
+  Worth a documentation/tooling audit pass across the family rather than
+  fixing these one at a time as they're noticed.
