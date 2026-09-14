@@ -28,7 +28,7 @@ Status: ✅ have · ◑ partial · ⬜ gap. "Owner" = which repo delivers it.
 | Gear tooltips (bbTips + bonus IDs) | ⬜ | ⬜ | ✅ | ✅ shipped | wow + bbtips | shipped |
 | Per-character achievements | ⬜ | ◑ points | ✅ | ⬜ model exists | wow | 2.1.0 (#365) |
 | Guild achievement browser | ⬜ | ⬜ | ✅ | ✅ 3-level | wow | shipped |
-| Guild statistics | ⬜ | ◑ class dist | ✅ | ⬜ | core module | 2.1.0 (#366, #279) |
+| Guild statistics | ⬜ | ◑ class dist | ✅ | ✅ lists (#366 shipped) | core module | 2.1.0 (#366 shipped); 2.2.0 (#279 reopened — chart/build-list gap) |
 | Portal — tabbed pages | ⬜ | ⬜ | ✅ | ✅ shipped | core | shipped |
 | Recruitment | ⬜ | ✅ | ✅ | ✅ | core | shipped |
 | Roster ↔ profile fields | ✅ | — | ✅ | ◑ UCP claim | core | 2.2.0 (#231) |
@@ -63,7 +63,8 @@ Headline: tabbed portal + character experience + stats.
 - **#364** character page polish (layout + async stats) — open
 - **#365** per-character achievements view — open
 - **#369** character-based forum avatars (restores pbwowext#10, part 1 — rides on the synced renders) — **shipped** (bbguildwow 8124b41, closed)
-- **#366** guild statistics portal module (+ **#279** class distribution) — open
+- **#366** guild statistics portal module (numbers/percentage lists incl. class distribution) — **shipped** (5b04fe69, closed 2026-09-12)
+- **#279** class distribution — reopened 2026-09-14, narrowed to the chart/graph visualization + optional build-list that #366 didn't cover
 - **#367** complete plugin spec data for the 8 non-WoW games — open
 - **#372** unit test coverage: migrations + remaining guild/player CRUD paths (split from #244) — open
 
