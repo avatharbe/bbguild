@@ -457,6 +457,15 @@ predecessor.
 - **`ext.php::disable_step()`'s child-extension list is stale**: it only
   auto-disables `bbguildwow` and `bbguildeq2`, not all 9 plugins — the
   other 7 would be left enabled (and erroring) if core were disabled first.
+- **Two plugin-facing interfaces rely on weak typing where a shared DTO
+  would be safer**: `game_install_interface::install()` takes 6 positional
+  params, five same-typed strings (`$game_id, $game_name, $boss_base_url,
+  $zone_base_url, $region`), so nothing catches a plugin passing two of
+  them swapped; `character_sync_interface::sync_character(array
+  $player_row)` hands plugins the raw `bb_players` row, so every plugin's
+  sync handler independently depends on core's exact column names with no
+  shared source of truth. Neither has caused a bug yet, but both would fail
+  silently rather than loudly.
 - **Spec-icon assets are incomplete across several plugins** that do have a
   real specialization catalog: `bbguildgw2` (27 elite specs),
   `bbguildswtor` (48 disciplines), and `bbguildlotro`'s newly-added
