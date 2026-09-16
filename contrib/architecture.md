@@ -439,6 +439,27 @@ own logic depends on that config value existing. `depends_on()` forms a
 strict linear chain; each migration only ever depends on its immediate
 predecessor.
 
+## Code Complexity
+
+A cyclomatic-complexity pass (McCabe, per-function decision-point count)
+confirms the architecture on paper: complexity is concentrated almost
+entirely in core and `bbguildwow`, while the other 8 plugins are genuinely
+trivial data-seeders (max complexity 7). Core averages 2.85/function
+(628 functions, 9 above 20) and `bbguildwow` averages 3.84 (297 functions,
+7 above 20) — healthy overall, with a long tail worth knowing about:
+
+| CC | Location |
+|---|---|
+| 73 | `ucp/bbguild_module.php::fill_addplayer()` |
+| 60 | `acp/player_module.php::BuildTemplateAddEditplayers()` |
+| 52 | `bbguildwow/model/achievement.php::syncCategories()` |
+| 45 | `bbguildwow/model/achievement.php::setAchievements()` |
+| 33 | `ucp/bbguild_module.php::main()` |
+
+The top two are both form-building/dispatch methods with many field/mode
+branches inline — reasonable extraction candidates if ever revisited, and
+the same pair `CLAUDE.md`'s #354/#377 bugs already came from.
+
 ## Known Gaps / Deliberately Out of Scope
 
 - **DKP & accounting** is a separate extension family (bbAccounts/bbDKP/
