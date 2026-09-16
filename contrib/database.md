@@ -38,16 +38,6 @@ no schema change.)
   `bb_bosstable` and `bb_zonetable` — are **not created by any migration
   yet**. Schema is still TBD, so they're omitted from the diagrams below.
 
-## Table-count discrepancy (resolved)
-
-`CLAUDE.md` currently says "16 tables in core" and lists 9 Core + 2 Portal +
-5 Game Content = 16. That count is stale by one table: migration `v210b2`
-(`add_portal_tabs.php`, shipping #360 on 2026-09-13) added `bb_portal_tabs`,
-which brings Portal to 3 tables and the true current total to **17**. The
-16-table figure was accurate before `v210b2` merged; `CLAUDE.md`'s Database
-Tables section just hasn't been updated since. This document reflects the
-current, correct count of 17.
-
 ---
 
 ## Diagram 1 — Core guild & player
@@ -259,10 +249,9 @@ erDiagram
 Per-game lookup tables (classes, races, factions, roles) plus the
 localisation table (`bb_language`) that supplies display names for all of
 them. `bb_specializations` bridges this diagram and Diagram 1 — it's
-counted under "Core" in `CLAUDE.md`'s bucketing (it's player-facing state,
-not static reference data) but its `class_id`/`role_id` columns tie it
-directly into this subsystem, so it's shown here too. `bb_games` is
-repeated (PK + game_id only) to anchor the relationship lines.
+player-facing state, not static reference data, but its `class_id`/`role_id`
+columns tie it directly into this subsystem, so it's shown here too.
+`bb_games` is repeated (PK + game_id only) to anchor the relationship lines.
 
 ```mermaid
 erDiagram
