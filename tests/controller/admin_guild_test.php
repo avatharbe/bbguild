@@ -25,6 +25,11 @@ use avathar\bbguild\controller\admin_guild;
 use avathar\bbguild\model\player\guilds;
 use PHPUnit\Framework\TestCase;
 
+// What: a minimal stand-in for phpBB's real template service.
+// Why: admin_guild's $template property is untyped, so a plain object
+// that just records what it's given (instead of a PHPUnit mock) lets the
+// test assert on the exact vars/blocks the method assigned, in plain
+// arrays, without having to configure return-value expectations per call.
 class fake_admin_guild_template
 {
 	public $vars = [];
@@ -33,6 +38,13 @@ class fake_admin_guild_template
 	public function assign_block_vars($block, $a) { $this->blocks[$block][] = $a; }
 }
 
+// What: a no-listener stand-in for phpBB's event dispatcher.
+// Why: show_editguildrecruitment() calls $this->dispatcher->trigger_event()
+// inside the add/update/delete branches (skipped by this test, but the
+// property still needs a real-enough object in case that ever changes)
+// and phpBB's own trigger_event() just returns its input array back when
+// nothing is subscribed — this mirrors that instead of pulling in the
+// real event-dispatcher service and its own dependency chain.
 class fake_admin_guild_dispatcher
 {
 	public function trigger_event($name, $vars) { return $vars; }
@@ -40,18 +52,38 @@ class fake_admin_guild_dispatcher
 
 class admin_guild_test extends TestCase
 {
+	// What: builds an admin_guild instance without running its real
+	// constructor.
+	// Why: the real constructor takes ~25 typed phpBB/bbguild service
+	// arguments and does actual DI-driven setup (builds a `game` object,
+	// queries the installed-games list, resolves a controller route) —
+	// none of which show_editguildrecruitment() itself needs. Bypassing it
+	// and injecting only the handful of properties this method actually
+	// touches keeps the test focused on that method's own behavior.
 	private function make_controller(): admin_guild
 	{
 		$reflection = new \ReflectionClass(admin_guild::class);
 		return $reflection->newInstanceWithoutConstructor();
 	}
 
+	// What: builds a `guilds` model instance without its real constructor.
+	// Why: show_editguildrecruitment() takes `guilds $updateguild` as a
+	// plain typed parameter — it doesn't need a DB-backed guild, just one
+	// whose getters return known values, so reflection + setters (same
+	// pattern as tests/player/guilds_crud_test.php) is simpler than
+	// satisfying the constructor's own DB/cache/log dependencies.
 	private function make_guild(): guilds
 	{
 		$reflection = new \ReflectionClass(guilds::class);
 		return $reflection->newInstanceWithoutConstructor();
 	}
 
+	// What: sets a declared (possibly protected) property via reflection.
+	// Why: admin_guild's dependencies are properly declared class
+	// properties (unlike ucp\bbguild_module's, which are only ever
+	// dynamically created — see tests/ucp/bbguild_module_test.php's own
+	// comment on that), so reflection-based injection works uniformly
+	// here without needing a separate "dynamic property" code path.
 	private function set_prop($obj, string $name, $value): void
 	{
 		$reflection = new \ReflectionObject($obj);
@@ -62,6 +94,13 @@ class admin_guild_test extends TestCase
 
 	public function test_show_editguildrecruitment_view_only_assigns_template_vars(): void
 	{
+		// What: a DB double where every query "succeeds" but returns no
+		// rows.
+		// Why: this collapses the recruit-list loop and both the class and
+		// role dropdown loops to zero iterations, so the test only has to
+		// assert on the always-executed setup/assign_vars code — the loop
+		// bodies themselves are a documented, separate follow-up (see the
+		// file docblock).
 		$db = $this->createMock(\phpbb\db\driver\driver_interface::class);
 		$db->method('sql_query')->willReturn('RESULT');
 		$db->method('sql_fetchrow')->willReturn(false); // no recruits, empty class/role dropdowns
@@ -70,6 +109,12 @@ class admin_guild_test extends TestCase
 			fn($op, $data) => '(' . implode(', ', array_keys($data)) . ')'
 		);
 
+		// What: only the language keys this specific code path actually
+		// reads.
+		// Why: RECRUIT_FOOTCOUNT is a sprintf format string ("%d ..."),
+		// not a literal — exercising the real sprintf() call is how the
+		// "0 recruitment postings" assertion below is meaningful, rather
+		// than just echoing back a hardcoded string.
 		$user = $this->createMock(\phpbb\user::class);
 		$user->lang = [
 			'RETURN_GUILDLIST' => 'Return to guild list',
@@ -78,13 +123,30 @@ class admin_guild_test extends TestCase
 			'RECRUIT_FOOTCOUNT' => '%d recruitment postings',
 		];
 
+		// What: request stub that always returns whatever default the
+		// production code asked for.
+		// Why: that default is '' for recruit_action and 0 for the
+		// id/role/class_id/etc. request vars the add/update/edit branches
+		// would otherwise read — i.e. this is what drives the method down
+		// the plain "view page" path this test targets. is_set_post()
+		// returning false for both add_recruit/update_recruit is what
+		// skips the add/update block (and, with it, the need to mock
+		// phpBB's global check_form_key()).
 		$request = $this->createMock(\phpbb\request\request::class);
 		$request->method('variable')->willReturnCallback(fn($name, $default) => $default);
 		$request->method('is_set_post')->willReturn(false); // no add_recruit / update_recruit POST
 
 		$template = new fake_admin_guild_template();
 
-		$GLOBALS['phpbb_dispatcher'] = new fake_admin_guild_dispatcher(); // append_sid() via acp_url()
+		// What: phpBB's append_sid() (called internally by acp_url(), used
+		// to build $this->link and every U_EDIT_*/U_DELETE template var)
+		// reads `global $phpbb_dispatcher` directly, not through the
+		// controller's own $this->dispatcher property.
+		// Why: without this global set, append_sid() fatals on a null
+		// method call — same root cause as the add_form_key()/
+		// $phpbb_dispatcher dependency documented in
+		// tests/ucp/bbguild_module_test.php and tests/acp/player_module_test.php.
+		$GLOBALS['phpbb_dispatcher'] = new fake_admin_guild_dispatcher();
 
 		$c = $this->make_controller();
 		$this->set_prop($c, 'db', $db);
@@ -102,6 +164,12 @@ class admin_guild_test extends TestCase
 		$c->bb_language_table = 'bb_language';
 		$c->bb_gameroles_table = 'bb_gameroles';
 
+		// What: a guild with a known id/name/game/min-armory-level.
+		// Why: these four values are what the method echoes back into
+		// GUILDID/GUILD_NAME/RECRUIT_LEVEL (min armory is the fallback
+		// recruit level when there's no in-progress edit) — asserting on
+		// them below confirms the method actually reads from the guild
+		// object passed in, not just from its own state.
 		$guild = $this->make_guild();
 		$guild->setGuildid(5);
 		$guild->setName('Test Guild');

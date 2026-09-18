@@ -31,6 +31,10 @@ namespace avathar\bbguild\tests\acp;
 use avathar\bbguild\acp\player_module;
 use PHPUnit\Framework\TestCase;
 
+// What/why: same recording-template pattern as
+// tests/ucp/bbguild_module_test.php's fake_module_template — a plain
+// object beats a mock here since it lets assertions read back the exact
+// vars/blocks assigned, in plain arrays.
 class fake_player_module_template
 {
 	public $vars = [];
@@ -40,6 +44,9 @@ class fake_player_module_template
 	public function assign_block_vars($block, $a) { $this->blocks[$block][] = $a; }
 }
 
+// What/why: same as fake_module_container in the UCP test — get()
+// throwing forces game_has_api() down its DB-fallback branch instead of
+// needing a real game_registry service double.
 class fake_player_module_container
 {
 	private $params;
@@ -48,6 +55,10 @@ class fake_player_module_container
 	public function getParameter($id) { return $this->params[$id] ?? ('bb_' . substr($id, strrpos($id, '.') + 1)); }
 }
 
+// What/why: same as fake_module_dispatcher in the UCP test — phpBB's
+// append_sid() (called for UA_FINDRANK/UA_FINDCLASSRACE and elsewhere)
+// unconditionally calls $phpbb_dispatcher->trigger_event(); without this
+// stand-in that fatals on a null method call.
 class fake_player_module_dispatcher
 {
 	public function trigger_event($name, $vars) { return $vars; } // no listeners registered
@@ -55,12 +66,22 @@ class fake_player_module_dispatcher
 
 class player_module_test extends TestCase
 {
+	// What: builds a player_module instance without its real constructor.
+	// Why: the real constructor (main()) pulls its dependencies from
+	// globals and does real DI-container lookups (game/list_games(),
+	// several `getParameter()` table-name resolutions) that
+	// BuildTemplateAddEditplayers() itself doesn't need — bypassing it
+	// keeps the test scoped to that one method.
 	private function make_module(): player_module
 	{
 		$reflection = new \ReflectionClass(player_module::class);
 		return $reflection->newInstanceWithoutConstructor();
 	}
 
+	// What: sets a declared property via reflection, bypassing visibility.
+	// Why: unlike ucp\bbguild_module, every property this test needs on
+	// player_module IS a declared class property, so reflection-based
+	// injection works uniformly here (no dynamic-property special case).
 	private function set_prop($obj, string $name, $value): void
 	{
 		$reflection = new \ReflectionObject($obj);
@@ -114,9 +135,19 @@ class player_module_test extends TestCase
 			fn($op, $data) => '(' . implode(', ', array_keys($data)) . ')'
 		);
 
+		// A real (interface) mock, not a plain duck-typed fake — required
+		// because BuildTemplateAddEditplayers() passes $this->bbguild_cache
+		// into `new player(...)`/`new guilds(...)`/etc., whose constructors
+		// type-hint \phpbb\cache\driver\driver_interface.
 		$cache = $this->createMock(\phpbb\cache\driver\driver_interface::class);
+		// A real (not mocked) config — cheap to construct, and several
+		// constructed objects below type-hint the concrete class.
 		$config = new \phpbb\config\config(['bbguild_lang' => 'en']);
 
+		// Only the language keys this method's happy path actually reads:
+		// region names (via player::getRegionlist()), the page title/
+		// explain text, and three JS-facing alert strings assigned near
+		// the end of the method.
 		$user = $this->createMock(\phpbb\user::class);
 		$user->lang = [
 			'CLOSED' => 'Closed', 'OPEN' => 'Open',
@@ -129,10 +160,16 @@ class player_module_test extends TestCase
 		$user->data = ['user_id' => 2, 'username' => 'tester', 'user_form_salt' => 'salt'];
 		$user->session_id = 'sess123';
 
+		// Every domain object this method constructs (player/game/...)
+		// calls get_extension_path() unconditionally in its own
+		// constructor — only needs to return a string, the value itself
+		// is unused by anything this test asserts on.
 		$ext_manager = $this->getMockBuilder(\phpbb\extension\manager::class)
 			->disableOriginalConstructor()->getMock();
 		$ext_manager->method('get_extension_path')->willReturn('ext/avathar/bbguild/');
 
+		// No-op mocks for bbguild's own log/util/asset-resolver services —
+		// constructor-required, but their real behavior isn't under test.
 		$log = $this->getMockBuilder(\avathar\bbguild\model\admin\log::class)
 			->disableOriginalConstructor()->getMock();
 		$util = $this->getMockBuilder(\avathar\bbguild\model\admin\util::class)
@@ -141,6 +178,10 @@ class player_module_test extends TestCase
 			->disableOriginalConstructor()->getMock();
 		$asset_resolver->method('resolve_portrait_url')->willReturn('');
 
+		// player_id always resolves to 0 (add mode, via
+		// hidden_player_id/URI_NAMEID) regardless of $default; only the
+		// guild_id request var is driven by this test's own parameter, so
+		// each test case can choose whether the target guild resolves.
 		$request = $this->createMock(\phpbb\request\request::class);
 		$request->method('variable')->willReturnCallback(
 			fn($name, $default) => $name === \avathar\bbguild\model\admin\constants::URI_GUILD ? $target_guild_id : 0
@@ -185,6 +226,11 @@ class player_module_test extends TestCase
 		return [$m, $template];
 	}
 
+	// What: the base "add a new character" happy path, target guild
+	// resolves with a real region ('eu').
+	// Why: the resolvable guild is what exercises the normal
+	// region-inheritance path (guild -> new player) cleanly, without
+	// tripping the undefined-array-key edge case the second test targets.
 	public function test_build_template_addeditplayers_add_mode_assigns_template_vars(): void
 	{
 		[$m, $template] = $this->build_configured_module(5, [
@@ -194,6 +240,8 @@ class player_module_test extends TestCase
 			'guilddefault' => 0, 'recruitforum' => 0, 'faction' => 0, 'faction_name' => 'Alliance',
 		]);
 
+		// Private + template-side-effect-only, same as fill_addplayer() —
+		// reflection is the only way to invoke it directly.
 		$reflection = new \ReflectionObject($m);
 		$method = $reflection->getMethod('BuildTemplateAddEditplayers');
 		$method->setAccessible(true);

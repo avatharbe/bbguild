@@ -31,6 +31,13 @@ namespace avathar\bbguild\tests\player;
 use avathar\bbguild\model\player\player;
 use PHPUnit\Framework\TestCase;
 
+// What: a duck-typed DB double with a FIFO queue for sql_fetchfield()
+// results.
+// Why: `player`'s $db/$user/$log properties are untyped, so a plain fake
+// (not a PHPUnit mock of the real interface) works — see the file
+// docblock. queue_fetchfield() lets each test script exactly what each
+// sequential COUNT(*)-style query should answer, in call order, mirroring
+// the pattern already established in guilds_crud_test.php.
 class fake_player_db_driver
 {
 	public $queries = [];
@@ -47,6 +54,12 @@ class fake_player_db_driver
 	public function sql_nextid() { return 501; }
 }
 
+// What: records every log_insert() call instead of doing anything with
+// it.
+// Why: lets tests assert on the exact log_type/log_action a
+// Makeplayer()/Updateplayer()/Deleteplayer() call produced, without
+// needing bbguild's real `log` class (and its own DB-write behavior)
+// loadable.
 class fake_player_log
 {
 	public $inserted = [];
@@ -74,6 +87,12 @@ class player_crud_test extends TestCase
 		return (object) ['data' => ['user_id' => 7, 'username' => 'tester'], 'lang' => $lang];
 	}
 
+	// What: the character-add success path — no duplicate name, a valid
+	// rank, level within the class's max.
+	// Why: Makeplayer() runs three sequential validation SELECTs before
+	// the actual INSERT (duplicate-name check, rank-exists check,
+	// max-level check) — queue_fetchfield() answers them in that exact
+	// order to keep the method on its happy path and reach the INSERT.
 	public function test_makeplayer_success_inserts_and_returns_new_player_id(): void
 	{
 		$p = $this->make_player();
@@ -114,6 +133,10 @@ class player_crud_test extends TestCase
 		$this->assertSame('L_ACTION_PLAYER_ADDED', $log->inserted[0]['log_type']);
 	}
 
+	// What: a requested level (999) above the class's actual max (60).
+	// Why: confirms Makeplayer() clamps down to the class max rather than
+	// storing an out-of-range level verbatim — a real validation rule,
+	// not just an incidental side effect.
 	public function test_makeplayer_clamps_level_to_class_max_level(): void
 	{
 		$p = $this->make_player();
@@ -143,6 +166,14 @@ class player_crud_test extends TestCase
 		$this->assertSame(60, $p->getPlayerLevel());
 	}
 
+	// What: an in-place edit where neither the name nor the status
+	// changes.
+	// Why: keeping $p/$old's name and status identical skips
+	// Updateplayer()'s rename-collision check and both
+	// status-transition branches (deactivated/reactivated commentary),
+	// isolating just the base UPDATE-and-log behavior. A non-empty
+	// portrait URL also skips the portrait-regeneration call, which isn't
+	// under test here.
 	public function test_updateplayer_success_updates_row_and_logs(): void
 	{
 		$p = $this->make_player();
@@ -181,6 +212,12 @@ class player_crud_test extends TestCase
 		$this->assertSame('L_ACTION_PLAYER_UPDATED', $log->inserted[0]['log_type']);
 	}
 
+	// What: an Updateplayer() call on a player with no id.
+	// Why: this is Updateplayer()'s own explicit guard clause (`if
+	// ($this->player_id == 0) return false;`) — worth its own test since
+	// it's a real early-return branch, not just a side note on the
+	// success-path test above. No DB/log doubles needed since the guard
+	// fires before either is touched.
 	public function test_updateplayer_returns_false_when_player_id_zero(): void
 	{
 		$p = $this->make_player();
@@ -190,6 +227,10 @@ class player_crud_test extends TestCase
 		$this->assertFalse($p->Updateplayer($old));
 	}
 
+	// What: the character-delete success path.
+	// Why: Deleteplayer() is the simplest of the three CRUD methods here
+	// — a single DELETE plus a log entry, no validation queries — so this
+	// test just confirms both happen with the right ids/values.
 	public function test_deleteplayer_success_removes_row_and_logs(): void
 	{
 		$p = $this->make_player();

@@ -217,16 +217,33 @@ class guilds_crud_test extends TestCase
 		$this->assertStringContainsString('WHERE id= 5', $db->queries[2]);
 	}
 
+	// What: the guild-creation success path, including the implicit
+	// "Guild Leader" rank it creates via a real `ranks` object.
+	// Why: this is the case the file's own docblock used to document as
+	// unsatisfiable with the plain fakes below — db/cache/user/log all
+	// need to be real interface/class mocks here (not the duck-typed
+	// fake_guilds_db_driver/fake_guilds_cache_driver used elsewhere in
+	// this file) because make_guild() passes them straight into
+	// `new ranks(...)`, whose constructor type-hints the real phpBB
+	// types. createMock()/getMockBuilder() against those real types is
+	// what makes this solvable (same trick as roster_test.php).
 	public function test_make_guild_success_inserts_guild_and_guildleader_rank(): void
 	{
 		$g = $this->make_guild();
 
+		// Captures every sql_query() call's SQL text in order, so the
+		// assertions below can check the exact sequence of queries this
+		// one make_guild() call produces (across both `guilds` and the
+		// `ranks` object it constructs internally).
 		$captured = [];
 		$db = $this->createMock(\phpbb\db\driver\driver_interface::class);
 		$db->method('sql_query')->willReturnCallback(function ($sql) use (&$captured) {
 			$captured[] = $sql;
 			return true;
 		});
+		// Exactly two sql_fetchrow() calls happen on this path: the
+		// duplicate-guild-name check (0 = no clash) and the MAX(id)
+		// lookup used to compute the new guild's id (4 -> new id 5).
 		$db->method('sql_fetchrow')->willReturnOnConsecutiveCalls(['evcount' => 0], ['id' => 4]);
 		$db->method('sql_build_array')->willReturnCallback(
 			fn($op, $data) => ' (' . implode(', ', array_keys($data)) . ')'
@@ -235,9 +252,14 @@ class guilds_crud_test extends TestCase
 
 		$cache = $this->createMock(\phpbb\cache\driver\driver_interface::class);
 
+		// GUILDLEADER is read when the internally-constructed `ranks`
+		// object's RankName gets set to it, just before Makerank() runs.
 		$user = $this->createMock(\phpbb\user::class);
 		$user->lang = ['GUILDLEADER' => 'Guild Leader'];
 
+		// Two log_insert() calls: make_guild()'s own L_ACTION_GUILD_ADDED,
+		// plus Makerank()'s L_ACTION_RANK_ADDED for the guild-leader rank
+		// it creates as a side effect.
 		$log = $this->getMockBuilder(\avathar\bbguild\model\admin\log::class)
 			->disableOriginalConstructor()
 			->getMock();
