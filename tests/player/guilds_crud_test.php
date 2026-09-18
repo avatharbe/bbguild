@@ -11,6 +11,21 @@
  * the renamed-but-not-a-duplicate branch (including the recompute-
  * playercount side effect via count_players() in both cases).
  *
+ * make_guild()/delete_guild() success paths (#372): make_guild() internally
+ * constructs a real `ranks` object via `new ranks(...)`, whose constructor
+ * type-hints `\phpbb\db\driver\driver_interface`/
+ * `\phpbb\cache\driver\driver_interface`/`\phpbb\user`/
+ * `\avathar\bbguild\model\admin\log` — the plain duck-typed
+ * fake_guilds_db_driver/fake_guilds_cache_driver classes below satisfy
+ * guilds' own untyped properties fine, but fail that type check. Their
+ * test uses PHPUnit's createMock()/getMockBuilder() against the real
+ * interfaces/classes instead (same pattern already proven in
+ * roster_test.php), which satisfies both the type hints and the untyped
+ * property-injection this file otherwise uses. delete_guild() doesn't
+ * construct anything with typed constructor args, so it keeps using the
+ * plain fakes; its filesystem emblem-cleanup touches a real path that
+ * doesn't exist for the test fixture, so no filesystem double is needed.
+ *
  * NOT covered (documented gap, not silently dropped):
  *   - The trigger_error(E_USER_WARNING) guard clauses in make_guild(),
  *     update_guild(), and delete_guild() (empty name/realm, duplicate
@@ -18,15 +33,6 @@
  *     phpBB's human-facing UI error path — msg_handler() catches
  *     E_USER_WARNING and renders a message to the browser user — not a
  *     programmatic control-flow signal, so they're not a unit-test target.
- *   - make_guild()'s and delete_guild()'s full success paths. make_guild()
- *     success instantiates a real `ranks` object via `new ranks(...)`,
- *     whose constructor requires real `\phpbb\user`/
- *     `\phpbb\cache\driver\driver_interface`/`\avathar\bbguild\model\admin\log`
- *     typed arguments — those can't be satisfied with the untyped-property
- *     injection trick this file otherwise uses. delete_guild()'s success
- *     path touches the real filesystem (emblem cleanup) and
- *     `log->log_insert()`. Both left for a follow-up once a fuller phpBB
- *     test double library exists.
  */
 
 namespace avathar\bbguild\tests\player;
@@ -209,5 +215,89 @@ class guilds_crud_test extends TestCase
 		$this->assertCount(3, $db->queries);
 		$this->assertStringContainsString('UPDATE bb_guild SET', $db->queries[2]);
 		$this->assertStringContainsString('WHERE id= 5', $db->queries[2]);
+	}
+
+	public function test_make_guild_success_inserts_guild_and_guildleader_rank(): void
+	{
+		$g = $this->make_guild();
+
+		$captured = [];
+		$db = $this->createMock(\phpbb\db\driver\driver_interface::class);
+		$db->method('sql_query')->willReturnCallback(function ($sql) use (&$captured) {
+			$captured[] = $sql;
+			return true;
+		});
+		$db->method('sql_fetchrow')->willReturnOnConsecutiveCalls(['evcount' => 0], ['id' => 4]);
+		$db->method('sql_build_array')->willReturnCallback(
+			fn($op, $data) => ' (' . implode(', ', array_keys($data)) . ')'
+		);
+		$db->method('sql_escape')->willReturnArgument(0);
+
+		$cache = $this->createMock(\phpbb\cache\driver\driver_interface::class);
+
+		$user = $this->createMock(\phpbb\user::class);
+		$user->lang = ['GUILDLEADER' => 'Guild Leader'];
+
+		$log = $this->getMockBuilder(\avathar\bbguild\model\admin\log::class)
+			->disableOriginalConstructor()
+			->getMock();
+		$log->expects($this->exactly(2))->method('log_insert');
+
+		$this->set_prop($g, 'db', $db);
+		$this->set_prop($g, 'cache', $cache);
+		$this->set_prop($g, 'user', $user);
+		$this->set_prop($g, 'log', $log);
+		$g->setName('Test Guild');
+		$g->setRealm('TestRealm');
+		$g->bb_guild_table = 'bb_guild';
+		$g->bb_players_table = 'bb_players';
+		$g->bb_ranks_table = 'bb_ranks';
+
+		$g->make_guild();
+
+		// 6 queries: evcount check, MAX(id) check, INSERT guild, then the
+		// new `ranks` object's constructor runs Getrank() (RankGuild>=0 &&
+		// RankId==0 triggers it before Makerank() overwrites RankName etc.),
+		// then Makerank()'s own DELETE + INSERT.
+		$this->assertSame(5, $g->getGuildid());
+		$this->assertCount(6, $captured);
+		$this->assertStringContainsString('INSERT INTO bb_guild', $captured[2]);
+		$this->assertStringContainsString('SELECT rank_name', $captured[3]);
+		$this->assertStringContainsString('DELETE FROM bb_ranks', $captured[4]);
+		$this->assertStringContainsString('rank_id = 0', $captured[4]);
+		$this->assertStringContainsString('guild_id = 5', $captured[4]);
+		$this->assertStringContainsString('INSERT INTO bb_ranks', $captured[5]);
+	}
+
+	public function test_delete_guild_success_removes_ranks_and_guild_row(): void
+	{
+		$GLOBALS['phpbb_root_path'] = '/tmp/bbguild-test-nonexistent-root/';
+
+		$g = $this->make_guild();
+		$db = new fake_guilds_db_driver();
+		$cache = new fake_guilds_cache_driver();
+		$log = $this->getMockBuilder(\avathar\bbguild\model\admin\log::class)
+			->disableOriginalConstructor()
+			->getMock();
+		$log->expects($this->once())->method('log_insert');
+
+		$this->set_prop($g, 'db', $db);
+		$this->set_prop($g, 'cache', $cache);
+		$this->set_prop($g, 'log', $log);
+		$g->guildid = 5;
+		$g->bb_guild_table = 'bb_guild';
+		$g->bb_players_table = 'bb_players';
+		$g->bb_ranks_table = 'bb_ranks';
+		$db->queue_fetchfield(0); // no players in guild
+
+		$g->delete_guild();
+
+		$this->assertCount(3, $db->queries);
+		$this->assertStringContainsString('SELECT COUNT(*) as mcount', $db->queries[0]);
+		$this->assertStringContainsString('DELETE FROM bb_ranks', $db->queries[1]);
+		$this->assertStringContainsString('guild_id = 5', $db->queries[1]);
+		$this->assertStringContainsString('DELETE FROM bb_guild', $db->queries[2]);
+		$this->assertStringContainsString('WHERE id = 5', $db->queries[2]);
+		$this->assertSame([['sql', 'bb_guild']], $cache->destroyed);
 	}
 }
