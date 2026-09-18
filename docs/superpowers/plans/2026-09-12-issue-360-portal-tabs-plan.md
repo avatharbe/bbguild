@@ -1,6 +1,6 @@
 # Issue #360 Implementation Plan: Portal page-level guild tabs
 
-**Design doc:** `2026-09-12-issue-360-portal-tabs-design.md` (approved). This plan implements that design in 5 tasks.
+**Design doc:** `../specs/2026-09-12-issue-360-portal-tabs-design.md` (approved). This plan implements that design in 5 tasks.
 
 **Branch:** `issue-360-portal-tabs` (worktree already created).
 

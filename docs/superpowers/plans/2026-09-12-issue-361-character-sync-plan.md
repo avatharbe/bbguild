@@ -8,7 +8,7 @@
 
 **Tech Stack:** phpBB 3.3 extension (PHP 8.1+), PHPUnit 9.5 (mock-based; DB-backed tests defer to CI — see Global Constraints).
 
-**Spec:** [`2026-09-12-issue-361-character-sync-design.md`](2026-09-12-issue-361-character-sync-design.md)
+**Spec:** [`2026-09-12-issue-361-character-sync-design.md`](../specs/2026-09-12-issue-361-character-sync-design.md)
 
 ## Global Constraints
 

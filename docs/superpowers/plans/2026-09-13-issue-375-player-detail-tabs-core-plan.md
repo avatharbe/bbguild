@@ -8,7 +8,7 @@
 
 **Tech Stack:** PHP 8.1+, phpBB 3.3 extension framework (Symfony DI `phpbb\di\service_collection`, Symfony routing), Twig.
 
-**Spec:** `contrib/superpowers/plans/2026-09-13-issue-375-player-detail-tabs-design.md`
+**Spec:** `docs/superpowers/specs/2026-09-13-issue-375-player-detail-tabs-design.md`
 
 ## Global Constraints
 
