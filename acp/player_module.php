@@ -1229,7 +1229,7 @@ class player_module
 				'PLAYER_LEVEL'             => $editplayer->getPlayerLevel(),
 				'REALM'                    => $editplayer->getPlayerRealm(),
 				'REGION'                   => $editplayer->getPlayerRegion(),
-				'REGIONNAME'               => $editplayer->getRegionlist()[$editplayer->getPlayerRegion()],
+				'REGIONNAME'               => $editplayer->getRegionlist()[$editplayer->getPlayerRegion()] ?? '',
 				'DEACTIVATE_REASON'        => $editplayer->getDeactivateReason() == '' ? '' : $this->user->lang[$editplayer->getDeactivateReason()],
 				'STATUS_LOCK'              => $editplayer->getDeactivateReason() == '' ? false : true,
 				'PLAYER_ACHIEV'            => $editplayer->getPlayerAchiev(),

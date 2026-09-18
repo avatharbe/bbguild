@@ -18,6 +18,12 @@
  * collapsing every dropdown-population loop to zero iterations. Not
  * covered: the edit-mode (player_id > 0) branch and every dropdown loop
  * body — same documented follow-up scope as the UCP module test.
+ *
+ * Also covers a regression: writing the happy-path test surfaced a real
+ * undefined-array-key bug on REGIONNAME when a player's region can't be
+ * resolved to one of getRegionlist()'s eu/kr/sea/tw/us keys (e.g. a guild
+ * whose own region was never configured). Fixed in the same change with
+ * a `?? ''` fallback; see test_build_template_addeditplayers_falls_back_when_region_unresolved().
  */
 
 namespace avathar\bbguild\tests\acp;
@@ -63,17 +69,26 @@ class player_module_test extends TestCase
 		$prop->setValue($obj, $value);
 	}
 
-	public function test_build_template_addeditplayers_add_mode_assigns_template_vars(): void
+	/**
+	 * Builds a fully-wired player_module ready to invoke
+	 * BuildTemplateAddEditplayers() on, add-mode (player_id == 0).
+	 *
+	 * @param int $target_guild_id Guild id the request's guild_id param
+	 *     should resolve to. 0 means "no guild" (guilds::get_guild() is
+	 *     never even called, so the guild's region stays the DB default
+	 *     '' — this is the unresolved-region edge case).
+	 * @param array|null $guild_row Row get_guild()'s "WHERE id = $target_guild_id"
+	 *     query should return, when $target_guild_id > 0. Ignored otherwise.
+	 * @return array{0: player_module, 1: fake_player_module_template}
+	 */
+	private function build_configured_module(int $target_guild_id, ?array $guild_row = null): array
 	{
 		if (!defined('USERS_TABLE')) { define('USERS_TABLE', 'phpbb_users'); }
 
-		// $editplayer's guild (id 5) needs a resolvable region — otherwise
-		// getRegionlist()['' /* unresolved region */] is a genuine undefined-
-		// array-key hit in production code (getRegionlist() only has
-		// eu/kr/sea/tw/us keys). Track the last query's SQL text so
-		// sql_fetchrow can return a real row only for get_guild()'s specific
-		// "WHERE id = 5" lookup and zero rows for every other query (every
-		// dropdown-population loop).
+		// Track the last query's SQL text so sql_fetchrow can return a real
+		// row only for get_guild()'s specific "WHERE id = $target_guild_id"
+		// lookup and zero rows for every other query (every dropdown-
+		// population loop).
 		$last_sql = '';
 		$guild_row_returned = false;
 		$db = $this->createMock(\phpbb\db\driver\driver_interface::class);
@@ -81,19 +96,17 @@ class player_module_test extends TestCase
 			$last_sql = $sql;
 			return 'RESULT';
 		});
-		$db->method('sql_fetchrow')->willReturnCallback(function ($result) use (&$last_sql, &$guild_row_returned) {
-			if (!$guild_row_returned && str_contains($last_sql, 'WHERE id = 5'))
-			{
-				$guild_row_returned = true;
-				return [
-					'game_id' => 'wow', 'game_edition' => 'retail', 'id' => 5, 'name' => 'Test Guild',
-					'realm' => 'Realm', 'region' => 'eu', 'roster' => 1, 'emblemurl' => 'x.png',
-					'min_armory' => 0, 'rec_status' => 1, 'armory_enabled' => 0, 'armoryresult' => '',
-					'guilddefault' => 0, 'recruitforum' => 0, 'faction' => 0, 'faction_name' => 'Alliance',
-				];
+		$db->method('sql_fetchrow')->willReturnCallback(
+			function ($result) use (&$last_sql, &$guild_row_returned, $target_guild_id, $guild_row) {
+				if (!$guild_row_returned && $guild_row !== null
+					&& str_contains($last_sql, 'WHERE id = ' . $target_guild_id))
+				{
+					$guild_row_returned = true;
+					return $guild_row;
+				}
+				return false; // every dropdown loop sees zero rows
 			}
-			return false; // every dropdown loop sees zero rows
-		});
+		);
 		$db->method('sql_fetchfield')->willReturn(0);
 		$db->method('sql_escape')->willReturnArgument(0);
 		$db->method('sql_build_query')->willReturn('BUILT_QUERY');
@@ -130,8 +143,8 @@ class player_module_test extends TestCase
 
 		$request = $this->createMock(\phpbb\request\request::class);
 		$request->method('variable')->willReturnCallback(
-			fn($name, $default) => $name === \avathar\bbguild\model\admin\constants::URI_GUILD ? 5 : 0
-		); // player_id == 0 (add mode) with a resolvable target guild (id 5)
+			fn($name, $default) => $name === \avathar\bbguild\model\admin\constants::URI_GUILD ? $target_guild_id : 0
+		); // player_id == 0 (add mode)
 
 		$template = new fake_player_module_template();
 
@@ -169,6 +182,18 @@ class player_module_test extends TestCase
 		$this->set_prop($m, 'bb_games_table', 'bb_games');
 		$this->set_prop($m, 'bb_gameroles_table', 'bb_gameroles');
 
+		return [$m, $template];
+	}
+
+	public function test_build_template_addeditplayers_add_mode_assigns_template_vars(): void
+	{
+		[$m, $template] = $this->build_configured_module(5, [
+			'game_id' => 'wow', 'game_edition' => 'retail', 'id' => 5, 'name' => 'Test Guild',
+			'realm' => 'Realm', 'region' => 'eu', 'roster' => 1, 'emblemurl' => 'x.png',
+			'min_armory' => 0, 'rec_status' => 1, 'armory_enabled' => 0, 'armoryresult' => '',
+			'guilddefault' => 0, 'recruitforum' => 0, 'faction' => 0, 'faction_name' => 'Alliance',
+		]);
+
 		$reflection = new \ReflectionObject($m);
 		$method = $reflection->getMethod('BuildTemplateAddEditplayers');
 		$method->setAccessible(true);
@@ -180,5 +205,26 @@ class player_module_test extends TestCase
 		$this->assertArrayHasKey('S_JOINDATE_DAY_OPTIONS', $template->vars);
 		$this->assertStringContainsString('<option value="1"', $template->vars['S_JOINDATE_DAY_OPTIONS']);
 		$this->assertArrayHasKey('UA_FINDRANK', $template->vars);
+		$this->assertSame('eu', $template->vars['REGION']);
+		$this->assertSame('Europe', $template->vars['REGIONNAME']);
+	}
+
+	/**
+	 * Regression test: a guild whose region was never configured (still the
+	 * DB default '') used to make BuildTemplateAddEditplayers() fatal with
+	 * an undefined-array-key access, since getRegionlist() only has
+	 * eu/kr/sea/tw/us keys. Fixed with a `?? ''` fallback.
+	 */
+	public function test_build_template_addeditplayers_falls_back_when_region_unresolved(): void
+	{
+		[$m, $template] = $this->build_configured_module(0, null); // no guild -> region stays ''
+
+		$reflection = new \ReflectionObject($m);
+		$method = $reflection->getMethod('BuildTemplateAddEditplayers');
+		$method->setAccessible(true);
+		$method->invoke($m, 'addplayer');
+
+		$this->assertSame('', $template->vars['REGION']);
+		$this->assertSame('', $template->vars['REGIONNAME']);
 	}
 }
