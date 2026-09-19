@@ -120,24 +120,6 @@
                             {% endif %}
                         </dd>
                     </dl>
-                    {% if PLAYER_JOINDATE %}
-                    <dl>
-                        <dt>{{ lang('JOINDATE') }}:</dt>
-                        <dd>{{ PLAYER_JOINDATE }}</dd>
-                    </dl>
-                    {% endif %}
-                    {% if PLAYER_OUTDATE and not S_PLAYER_ACTIVE %}
-                    <dl>
-                        <dt>{{ lang('OUTDATE') }}:</dt>
-                        <dd>{{ PLAYER_OUTDATE }}</dd>
-                    </dl>
-                    {% endif %}
-                    {% if PLAYER_LAST_UPDATE %}
-                    <dl>
-                        <dt>{{ lang('LAST_UPDATE') }}:</dt>
-                        <dd>{{ PLAYER_LAST_UPDATE }}</dd>
-                    </dl>
-                    {% endif %}
                     {% if S_HAS_PHPBB_USER %}
                     <dl>
                         <dt>{{ lang('LINKED_USER') }}:</dt>
@@ -156,6 +138,37 @@
                         <dt>{{ lang('COMMENT') }}:</dt>
                         <dd>{{ PLAYER_COMMENT }}</dd>
                     </dl>
+                </fieldset>
+            </div>
+            {% endif %}
+
+            {# Lower-priority metadata (bbguildwow#51) -- kept at the very
+               bottom of the page, below whatever a game plugin injects via
+               bbguild_player_detail_after_content (e.g. bbguildwow's
+               Specialization/Average Item Level/equipment), not interleaved
+               with the character's own Rank/Role/Gender/Realm/Status fields
+               above. #}
+            {% if PLAYER_JOINDATE or (PLAYER_OUTDATE and not S_PLAYER_ACTIVE) or PLAYER_LAST_UPDATE %}
+            <div class="player-detail-body">
+                <fieldset>
+                    {% if PLAYER_JOINDATE %}
+                    <dl>
+                        <dt>{{ lang('JOINDATE') }}:</dt>
+                        <dd>{{ PLAYER_JOINDATE }}</dd>
+                    </dl>
+                    {% endif %}
+                    {% if PLAYER_OUTDATE and not S_PLAYER_ACTIVE %}
+                    <dl>
+                        <dt>{{ lang('OUTDATE') }}:</dt>
+                        <dd>{{ PLAYER_OUTDATE }}</dd>
+                    </dl>
+                    {% endif %}
+                    {% if PLAYER_LAST_UPDATE %}
+                    <dl>
+                        <dt>{{ lang('LAST_UPDATE') }}:</dt>
+                        <dd>{{ PLAYER_LAST_UPDATE }}</dd>
+                    </dl>
+                    {% endif %}
                 </fieldset>
             </div>
             {% endif %}
