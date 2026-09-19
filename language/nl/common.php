@@ -169,6 +169,7 @@ $lang = array_merge(
 	'STATUS' => 'Status J/N',
 	'CHARACTER' => 'Hier is een lijst van al uw personages. ',
 	'PLAYER_TAB_CHARACTER' => 'Personage',
+	'PLAYER_TAB_GUILD' => 'Guild',
 	'CHARACTER_EXPLAIN' => 'Kies een niet-geclaimd personage om het te claimen en druk op verzenden.',
 	'CHARACTERS_UPDATED' => 'De personagenaam %s is toegewezen aan uw account. ',
 	'CLAIM_PLAYER' => 'Karakter claimen',

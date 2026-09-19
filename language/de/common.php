@@ -166,6 +166,7 @@ $lang = array_merge(
 	'STATUS' => 'Status Y/N',
 	'CHARACTER' => 'Charaktername',
 	'PLAYER_TAB_CHARACTER' => 'Charakter',
+	'PLAYER_TAB_GUILD' => 'Gilde',
 	'CHARACTER_EXPLAIN' => 'Wähle dein Charakternamen and bestätige.',
 	'CHARACTERS_UPDATED' => 'Der Charaktername %s wurde an dein Forumkonto gekoppelt. ',
 	'CLAIM_PLAYER' => 'Charakter beanspruchen',

@@ -169,6 +169,7 @@ $lang = array_merge(
 	'STATUS' => 'Status T/N',
 	'CHARACTER' => 'Oto lista wszystkich Twoich postaci. ',
 	'PLAYER_TAB_CHARACTER' => 'Postać',
+	'PLAYER_TAB_GUILD' => 'Gildia',
 	'CHARACTER_EXPLAIN' => 'Wybierz nieprzypisaną postać, aby ją przypisać, i naciśnij Zatwierdź.',
 	'CHARACTERS_UPDATED' => 'Postać %s została przypisana do Twojego konta. ',
 	'CLAIM_PLAYER' => 'Przypisz postać',

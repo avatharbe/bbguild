@@ -127,6 +127,21 @@ class view_controller
 		$available_tabs = $this->player_detail_tab_registry->get_available_tabs($player_id, $game_id);
 		$active_tab = $tab_slug !== '' ? $this->player_detail_tab_registry->find($tab_slug, $player_id, $game_id) : null;
 
+		// Not a player-detail sub-tab like the ones below -- a plain nav
+		// link back to the guild's own portal page (bbguild#379), so it's
+		// hardcoded here rather than going through player_detail_tab_interface
+		// (that system is for game-plugin content rendered inline via
+		// render()/S_PLAYER_TAB_TEMPLATE, not external navigation) and is
+		// never itself the "active" tab on this page.
+		$this->template->assign_block_vars('player_tabs', [
+			'TAB_NAME'   => $this->language->lang('PLAYER_TAB_GUILD'),
+			'TAB_SLUG'   => '',
+			'TAB_ACTIVE' => false,
+			'U_TAB'      => $this->helper->route('avathar_bbguild_guild', [
+				'guild_id' => $guild_id,
+			]),
+		]);
+
 		$this->template->assign_block_vars('player_tabs', [
 			'TAB_NAME'   => $this->language->lang('PLAYER_TAB_CHARACTER'),
 			'TAB_SLUG'   => '',
