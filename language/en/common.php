@@ -170,6 +170,7 @@ $lang = array_merge(
 	'CHARACTER' => 'Here is a list of all your Characters. ',
 	'PLAYER_TAB_CHARACTER' => 'Character',
 	'PLAYER_TAB_GUILD' => 'Guild',
+	'PLAYER_ACTIVITY' => 'Activity',
 	'CHARACTER_EXPLAIN' => 'Choose an unclaimed Character to claim it and press submit.',
 	'CHARACTERS_UPDATED' => 'The Charactername %s was assigned to your account. ',
 	'CLAIM_PLAYER' => 'Claim Character',

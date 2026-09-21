@@ -95,10 +95,6 @@
                         <dd>{{ PLAYER_ROLE }}</dd>
                     </dl>
                     {% endif %}
-                    <dl>
-                        <dt>{{ lang('REALM') }}:</dt>
-                        <dd>{% if PLAYER_REGION %}{{ PLAYER_REGION }}-{% endif %}{{ PLAYER_REALM }}</dd>
-                    </dl>
                     {% if S_SHOWACH %}
                     <dl>
                         <dt>{{ lang('ACHIEV') }}:</dt>
@@ -128,13 +124,11 @@
             {% EVENT bbguild_player_detail_after_content %}
 
             {% if PLAYER_COMMENT %}
-            <div class="player-detail-body">
-                <fieldset>
-                    <dl>
-                        <dt>{{ lang('COMMENT') }}:</dt>
-                        <dd>{{ PLAYER_COMMENT }}</dd>
-                    </dl>
-                </fieldset>
+            <div class="player-detail-pane">
+                <dl>
+                    <dt>{{ lang('COMMENT') }}:</dt>
+                    <dd>{{ PLAYER_COMMENT }}</dd>
+                </dl>
             </div>
             {% endif %}
 
@@ -142,30 +136,28 @@
                bottom of the page, below whatever a game plugin injects via
                bbguild_player_detail_after_content (e.g. bbguildwow's
                Specialization/Average Item Level/equipment), not interleaved
-               with the character's own Rank/Role/Gender/Realm/Status fields
-               above. #}
+               with the character's own Rank/Role/Status fields above. #}
             {% if PLAYER_JOINDATE or (PLAYER_OUTDATE and not S_PLAYER_ACTIVE) or PLAYER_LAST_UPDATE %}
-            <div class="player-detail-body">
-                <fieldset>
-                    {% if PLAYER_JOINDATE %}
-                    <dl>
-                        <dt>{{ lang('JOINDATE') }}:</dt>
-                        <dd>{{ PLAYER_JOINDATE }}</dd>
-                    </dl>
-                    {% endif %}
-                    {% if PLAYER_OUTDATE and not S_PLAYER_ACTIVE %}
-                    <dl>
-                        <dt>{{ lang('OUTDATE') }}:</dt>
-                        <dd>{{ PLAYER_OUTDATE }}</dd>
-                    </dl>
-                    {% endif %}
-                    {% if PLAYER_LAST_UPDATE %}
-                    <dl>
-                        <dt>{{ lang('LAST_UPDATE') }}:</dt>
-                        <dd>{{ PLAYER_LAST_UPDATE }}</dd>
-                    </dl>
-                    {% endif %}
-                </fieldset>
+            <div class="player-detail-pane">
+                <h4 class="player-detail-pane-title">{{ lang('PLAYER_ACTIVITY') }}</h4>
+                {% if PLAYER_JOINDATE %}
+                <dl>
+                    <dt>{{ lang('JOINDATE') }}:</dt>
+                    <dd>{{ PLAYER_JOINDATE }}</dd>
+                </dl>
+                {% endif %}
+                {% if PLAYER_OUTDATE and not S_PLAYER_ACTIVE %}
+                <dl>
+                    <dt>{{ lang('OUTDATE') }}:</dt>
+                    <dd>{{ PLAYER_OUTDATE }}</dd>
+                </dl>
+                {% endif %}
+                {% if PLAYER_LAST_UPDATE %}
+                <dl>
+                    <dt>{{ lang('LAST_UPDATE') }}:</dt>
+                    <dd>{{ PLAYER_LAST_UPDATE }}</dd>
+                </dl>
+                {% endif %}
             </div>
             {% endif %}
             {% endif %}

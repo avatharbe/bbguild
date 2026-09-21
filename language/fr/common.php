@@ -167,6 +167,7 @@ $lang = array_merge(
 	'CHARACTER' => 'Nom de Caractère',
 	'PLAYER_TAB_CHARACTER' => 'Personnage',
 	'PLAYER_TAB_GUILD' => 'Guilde',
+	'PLAYER_ACTIVITY' => 'Activité',
 	'CHARACTER_EXPLAIN' => 'Choisis ton nom de Caractere et confirme.',
 	'CHARACTERS_UPDATED' => 'Le nom de Caractère %s est assigné à votre compte.',
 	'CLAIM_PLAYER' => 'Revendiquer un personnage',

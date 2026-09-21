@@ -170,6 +170,7 @@ $lang = array_merge(
 	'CHARACTER' => 'Aquí tienes una lista de todos tus personajes. ',
 	'PLAYER_TAB_CHARACTER' => 'Personaje',
 	'PLAYER_TAB_GUILD' => 'Hermandad',
+	'PLAYER_ACTIVITY' => 'Actividad',
 	'CHARACTER_EXPLAIN' => 'Elige un personaje no reclamado para reclamarlo y pulsa enviar.',
 	'CHARACTERS_UPDATED' => 'El personaje %s fue asignado a tu cuenta. ',
 	'CLAIM_PLAYER' => 'Reclamar personaje',

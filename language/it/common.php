@@ -167,6 +167,7 @@ $lang = array_merge(
 	'CHARACTER' => 'Questa è la lista di tutti i tuoi Personaggi. ',
 	'PLAYER_TAB_CHARACTER' => 'Personaggio',
 	'PLAYER_TAB_GUILD' => 'Gilda',
+	'PLAYER_ACTIVITY' => 'Attività',
 	'CHARACTER_EXPLAIN' => 'Scegli un Personaggio che non è ancora stato associato.',
 	'CHARACTERS_UPDATED' => 'Il Personaggio %s è stato assegnato al tuo account. ',
 	'CLAIM_PLAYER' => 'Rivendica personaggio',

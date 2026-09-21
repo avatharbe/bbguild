@@ -473,6 +473,54 @@ ul#bbguild-achievement-feed {
     vertical-align: middle;
 }
 
+/* Boxed "pane" per info category (Comment, Guild Join date/Last Update
+   below, and any game plugin's own sections via
+   bbguild_player_detail_after_content e.g. bbguildwow's Character
+   Info/Professions/Mythic+) -- a generic, reusable class rather than
+   each consumer styling its own box, so every category reads as the
+   same kind of panel regardless of which extension rendered it.
+   dl/dt/dd repeat .player-detail-body's own rules so a pane doesn't
+   need that class too just to get them. */
+.player-detail-pane {
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 12px;
+}
+
+.player-detail-pane-title {
+    font-size: 0.85em;
+    text-transform: uppercase;
+    opacity: 0.6;
+    margin: 0 0 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.player-detail-pane dl {
+    display: flex;
+    margin: 0;
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(128, 128, 128, 0.1);
+}
+
+.player-detail-pane dl:last-child {
+    border-bottom: none;
+}
+
+.player-detail-pane dt {
+    width: 160px;
+    min-width: 160px;
+    font-weight: bold;
+    padding: 2px 0;
+}
+
+.player-detail-pane dd {
+    margin: 0;
+    padding: 2px 0;
+    flex: 1;
+}
+
 .player-status-active {
     color: #00cc00;
     font-weight: bold;
@@ -490,11 +538,13 @@ ul#bbguild-achievement-feed {
         text-align: center;
     }
 
-    .player-detail-body dl {
+    .player-detail-body dl,
+    .player-detail-pane dl {
         flex-direction: column;
     }
 
-    .player-detail-body dt {
+    .player-detail-body dt,
+    .player-detail-pane dt {
         width: auto;
         min-width: auto;
     }
