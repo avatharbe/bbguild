@@ -1237,13 +1237,29 @@ class player_module
 		}
 
 		// phpbb User dropdown
+		// NEWLY_REGISTERED and banned aren't fixed-id constants across
+		// installs (unlike GUESTS/BOTS, which phpBB seeds first and this
+		// install still has at 1/6) -- resolved by name instead of
+		// hardcoding ids. 'banned' is a site-specific group (not a stock
+		// phpBB group like NEWLY_REGISTERED), so this silently no-ops on
+		// installs that don't have one, same as any other unmatched name.
+		$excluded_group_ids = [];
+		$group_result = $this->db->sql_query("SELECT group_id FROM " . GROUPS_TABLE . " WHERE group_name IN ('NEWLY_REGISTERED', 'banned')");
+		while ($group_row = $this->db->sql_fetchrow($group_result))
+		{
+			$excluded_group_ids[] = (int) $group_row['group_id'];
+		}
+		$this->db->sql_freeresult($group_result);
+
 		$phpbb_user_id = $editplayer->player_id > 0 ? $editplayer->getPhpbbUserId() : 0;
 		$sql_array     = array(
 			'SELECT'   => ' u.user_id, u.username ',
 			'FROM'     => array(
 				USERS_TABLE => 'u'),
 			// exclude bots and guests, order by name -- ticket  129
-			'WHERE'    => ' u.group_id != 6 and u.group_id != 1 ',
+			// exclude not-yet-approved / banned accounts -- bbguild#382
+			'WHERE'    => ' u.group_id != 6 and u.group_id != 1'
+				. (!empty($excluded_group_ids) ? ' and u.group_id NOT IN (' . implode(', ', $excluded_group_ids) . ')' : '') . ' ',
 			'ORDER_BY' => ' u.username ASC');
 		$sql           = $this->db->sql_build_query('SELECT', $sql_array);
 		$result        = $this->db->sql_query($sql);
