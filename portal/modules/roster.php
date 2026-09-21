@@ -227,32 +227,9 @@ class roster extends module_base
 		}
 
 		$spec = new \avathar\bbguild\model\games\rpg\specialization($this->db, $this->cache, $this->specializations_table, $this->language_table);
-		$lookup = [];
-		foreach ($spec->get_for_class($game_id) as $row)
-		{
-			$lookup[$row['spec_id']] = [
-				'name'     => $row['spec_name'],
-				'icon'     => $row['spec_icon'],
-				'class_id' => $row['class_id'],
-			];
-		}
-
-		// Overlay locale-specific names from bb_language. Specs without a
-		// translation for the user's language keep their canonical English
-		// spec_name as the fallback (issue #331 / bbguildwow#26).
 		$user_lang = isset($this->user->lang_name) ? (string) $this->user->lang_name : '';
-		if ($user_lang !== '' && $user_lang !== 'en')
-		{
-			foreach ($spec->get_translations($game_id, $user_lang) as $spec_id => $translated)
-			{
-				if (isset($lookup[$spec_id]))
-				{
-					$lookup[$spec_id]['name'] = $translated;
-				}
-			}
-		}
 
-		return $lookup;
+		return $spec->build_lookup($game_id, $user_lang);
 	}
 
 	/**
@@ -265,14 +242,18 @@ class roster extends module_base
 	 */
 	protected function resolve_spec(array $char, array $spec_lookup, string $ext_path_images): array
 	{
-		$spec_id = (int) ($char['player_spec_id'] ?? 0);
-		if ($spec_id > 0 && isset($spec_lookup[$spec_id]))
+		$spec = \avathar\bbguild\model\games\rpg\specialization::resolve_name_and_icon(
+			(int) ($char['player_spec_id'] ?? 0),
+			(string) ($char['player_spec'] ?? ''),
+			$spec_lookup
+		);
+
+		if ($spec['icon'] !== '')
 		{
-			$row = $spec_lookup[$spec_id];
-			$icon = $row['icon'] !== '' ? $ext_path_images . 'spec_icons/' . basename($row['icon']) . '.png' : '';
-			return ['name' => $row['name'], 'icon' => $icon];
+			$spec['icon'] = $ext_path_images . 'spec_icons/' . basename($spec['icon']) . '.png';
 		}
-		return ['name' => (string) ($char['player_spec'] ?? ''), 'icon' => ''];
+
+		return $spec;
 	}
 
 	/**

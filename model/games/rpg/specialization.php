@@ -193,4 +193,66 @@ class specialization
 		$this->db->sql_freeresult($result);
 		return $translations;
 	}
+
+	/**
+	 * Build a spec_id => {name, icon, class_id} lookup for a game, with
+	 * locale-specific names overlaid from bb_language when available
+	 * (falls back to the canonical spec_name when untranslated).
+	 *
+	 * Shared by the front-end roster module and the ACP roster listing
+	 * so there's one canonical "which spec wins" implementation instead
+	 * of two independently-drifting copies.
+	 *
+	 * @return array<int, array{name:string,icon:string,class_id:int}>
+	 */
+	public function build_lookup(string $game_id, string $lang = ''): array
+	{
+		$lookup = [];
+		foreach ($this->get_for_class($game_id) as $row)
+		{
+			$lookup[$row['spec_id']] = [
+				'name'     => $row['spec_name'],
+				'icon'     => $row['spec_icon'],
+				'class_id' => $row['class_id'],
+			];
+		}
+
+		if ($lang !== '' && $lang !== 'en')
+		{
+			foreach ($this->get_translations($game_id, $lang) as $spec_id => $translated)
+			{
+				if (isset($lookup[$spec_id]))
+				{
+					$lookup[$spec_id]['name'] = $translated;
+				}
+			}
+		}
+
+		return $lookup;
+	}
+
+	/**
+	 * Resolve a character's display-ready spec name + icon filename from
+	 * a build_lookup() lookup. Falls back to the legacy free-text
+	 * player_spec column (no icon) when player_spec_id is unset or
+	 * doesn't match a known spec -- true for every character until
+	 * bbguild#331 Phase 5 migrates (closed without a migration, so this
+	 * fallback is effectively permanent rather than a transitional path).
+	 *
+	 * Returns the bare icon filename, not a resolved URL/path -- callers
+	 * build that themselves the same way they already do for class/race
+	 * images, since the web root and image subdirectory are caller
+	 * concerns, not this model's.
+	 *
+	 * @param array<int, array{name:string,icon:string,class_id:int}> $lookup
+	 * @return array{name:string,icon:string}
+	 */
+	public static function resolve_name_and_icon(int $spec_id, string $legacy_spec_text, array $lookup): array
+	{
+		if ($spec_id > 0 && isset($lookup[$spec_id]))
+		{
+			return ['name' => $lookup[$spec_id]['name'], 'icon' => $lookup[$spec_id]['icon']];
+		}
+		return ['name' => $legacy_spec_text, 'icon' => ''];
+	}
 }

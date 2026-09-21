@@ -699,6 +699,28 @@ class player_module
 	}
 
 	/**
+	 * Resolve a game-plugin image (class/race/spec icon) to a web URL,
+	 * only if the file actually exists on disk. Shared by the roster
+	 * listing's class/race/spec columns instead of three near-identical
+	 * inline file_exists()/URL-build blocks.
+	 */
+	private function resolve_game_icon(string $img_path, string $img_web, string $subdir, string $filename): string
+	{
+		if ($img_path === '' || $filename === '')
+		{
+			return '';
+		}
+
+		$filename = basename($filename) . '.png';
+		if (!file_exists($img_path . $subdir . '/' . $filename))
+		{
+			return '';
+		}
+
+		return $img_web . $subdir . '/' . $filename;
+	}
+
+	/**
 	 * List Players
 	 *
 	 * @param $mode
@@ -796,56 +818,29 @@ class player_module
 			$img_path = $image_cache[$game_id]['path'];
 			$img_web  = $image_cache[$game_id]['web'];
 
-			if ($img_path && file_exists($img_path . 'class_images/' . $row['imagename'] . '.png'))
-			{
-				$class_img = $img_web . 'class_images/' . $row['imagename'] . '.png';
-			}
-			else
-			{
-				$class_img = '';
-			}
-
-			if ($img_path && file_exists($img_path . 'race_images/' . $race_image . '.png'))
-			{
-				$race_img = $img_web . 'race_images/' . $race_image . '.png';
-			}
-			else
-			{
-				$race_img = '';
-			}
+			$class_img = $this->resolve_game_icon($img_path, $img_web, 'class_images', $row['imagename']);
+			$race_img  = $this->resolve_game_icon($img_path, $img_web, 'race_images', $race_image);
 
 			// Specialization — issue #331. Falls back to the legacy free-text
 			// player_spec column (no icon) when player_spec_id is unset/0,
-			// since existing characters haven't been migrated yet (#331 Phase 5).
+			// since existing characters haven't been migrated yet (#331 Phase 5,
+			// closed without a migration -- this fallback is effectively
+			// permanent rather than transitional). Shared with the front-end
+			// roster's identical fallback via specialization::build_lookup()/
+			// resolve_name_and_icon() rather than a second, drifting copy.
 			if (!isset($spec_cache[$game_id]))
 			{
-				$spec_lookup = [];
 				$spec_model = new \avathar\bbguild\model\games\rpg\specialization($this->db, $this->bbguild_cache, $bb_specializations_table, $this->bb_language_table);
-				$translations = $spec_model->get_translations($game_id, (string) $this->config['bbguild_lang']);
-				foreach ($spec_model->get_for_class($game_id) as $sp)
-				{
-					$spec_lookup[$sp['spec_id']] = [
-						'name' => $translations[$sp['spec_id']] ?? $sp['spec_name'],
-						'icon' => $sp['spec_icon'],
-					];
-				}
-				$spec_cache[$game_id] = $spec_lookup;
+				$spec_cache[$game_id] = $spec_model->build_lookup($game_id, (string) $this->config['bbguild_lang']);
 			}
 
-			$player_spec_id = (int) ($row['player_spec_id'] ?? 0);
-			if ($player_spec_id > 0 && isset($spec_cache[$game_id][$player_spec_id]))
-			{
-				$spec_name = $spec_cache[$game_id][$player_spec_id]['name'];
-				$spec_icon_file = $spec_cache[$game_id][$player_spec_id]['icon'];
-				$spec_img = ($img_path && $spec_icon_file && file_exists($img_path . 'spec_icons/' . basename($spec_icon_file) . '.png'))
-					? $img_web . 'spec_icons/' . basename($spec_icon_file) . '.png'
-					: '';
-			}
-			else
-			{
-				$spec_name = (string) ($row['player_spec'] ?? '');
-				$spec_img = '';
-			}
+			$spec = \avathar\bbguild\model\games\rpg\specialization::resolve_name_and_icon(
+				(int) ($row['player_spec_id'] ?? 0),
+				(string) ($row['player_spec'] ?? ''),
+				$spec_cache[$game_id]
+			);
+			$spec_name = $spec['name'];
+			$spec_img  = $spec['icon'] !== '' ? $this->resolve_game_icon($img_path, $img_web, 'spec_icons', $spec['icon']) : '';
 
 			$this->template->assign_block_vars(
 				'players_row', array(
@@ -1236,30 +1231,20 @@ class player_module
 			$s_playerout_year_options .= "<option value=\"$i\"$selected>$i</option>";
 		}
 
-		// phpbb User dropdown
-		// NEWLY_REGISTERED and banned aren't fixed-id constants across
-		// installs (unlike GUESTS/BOTS, which phpBB seeds first and this
-		// install still has at 1/6) -- resolved by name instead of
-		// hardcoding ids. 'banned' is a site-specific group (not a stock
-		// phpBB group like NEWLY_REGISTERED), so this silently no-ops on
-		// installs that don't have one, same as any other unmatched name.
-		$excluded_group_ids = [];
-		$group_result = $this->db->sql_query("SELECT group_id FROM " . GROUPS_TABLE . " WHERE group_name IN ('NEWLY_REGISTERED', 'banned')");
-		while ($group_row = $this->db->sql_fetchrow($group_result))
-		{
-			$excluded_group_ids[] = (int) $group_row['group_id'];
-		}
-		$this->db->sql_freeresult($group_result);
-
+		// phpbb User dropdown -- excludes bots, guests, not-yet-approved
+		// newly-registered, and banned accounts (ticket 129, bbguild#382).
+		// GUESTS/BOTS ids (1/6) are fixed phpBB constants, seeded first on
+		// every install; NEWLY_REGISTERED/banned aren't, so those are
+		// resolved by group_name in the same subquery rather than
+		// hardcoded ids or a separate round-trip. 'banned' isn't a stock
+		// phpBB group -- it's this install's own convention -- so it
+		// silently excludes nothing extra on installs that don't have one.
 		$phpbb_user_id = $editplayer->player_id > 0 ? $editplayer->getPhpbbUserId() : 0;
 		$sql_array     = array(
 			'SELECT'   => ' u.user_id, u.username ',
 			'FROM'     => array(
 				USERS_TABLE => 'u'),
-			// exclude bots and guests, order by name -- ticket  129
-			// exclude not-yet-approved / banned accounts -- bbguild#382
-			'WHERE'    => ' u.group_id != 6 and u.group_id != 1'
-				. (!empty($excluded_group_ids) ? ' and u.group_id NOT IN (' . implode(', ', $excluded_group_ids) . ')' : '') . ' ',
+			'WHERE'    => ' u.group_id NOT IN (SELECT group_id FROM ' . GROUPS_TABLE . " WHERE group_id IN (1, 6) OR group_name IN ('NEWLY_REGISTERED', 'banned'))",
 			'ORDER_BY' => ' u.username ASC');
 		$sql           = $this->db->sql_build_query('SELECT', $sql_array);
 		$result        = $this->db->sql_query($sql);
