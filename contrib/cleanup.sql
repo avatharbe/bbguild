@@ -27,6 +27,7 @@ DROP TABLE IF EXISTS phpbb_bb_achievement_criteria;
 DROP TABLE IF EXISTS phpbb_bb_achievement_category;
 DROP TABLE IF EXISTS phpbb_bb_achievement;
 DROP TABLE IF EXISTS phpbb_bb_player_equipment;
+DROP TABLE IF EXISTS phpbb_bb_player_item_stat;
 DROP TABLE IF EXISTS phpbb_bb_guild_wow;
 
 -- ----------------------------------------------------------------------------
