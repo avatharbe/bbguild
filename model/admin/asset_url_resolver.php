@@ -109,4 +109,44 @@ class asset_url_resolver
 		// Legacy or other game path — use direct web path
 		return $this->path_helper->get_web_root_path() . $url;
 	}
+
+	/**
+	 * Resolve a full-body character render URL for template use. Same
+	 * shape as resolve_portrait_url() -- files/bbguildwow/ isn't
+	 * web-accessible directly (deny-all .htaccess), so a local path is
+	 * served via a dedicated route instead of exposed as a raw path.
+	 *
+	 * @param string $url       Stored render URL/path (from DB)
+	 * @param int    $player_id Player ID (for route generation)
+	 * @return string Web-accessible URL, or empty string
+	 */
+	public function resolve_render_url(string $url, int $player_id): string
+	{
+		if (empty($url) || $url === 'N/A')
+		{
+			return '';
+		}
+
+		// External URL — pass through
+		if (strpos($url, 'http://') === 0 || strpos($url, 'https://') === 0)
+		{
+			return $url;
+		}
+
+		// Local file in files/bbguildwow/ — serve via controller
+		if (strpos($url, 'bbguildwow/') !== false)
+		{
+			try
+			{
+				return $this->helper->route('avathar_bbguildwow_render', array('player_id' => $player_id));
+			}
+			catch (\Symfony\Component\Routing\Exception\RouteNotFoundException $e)
+			{
+				return '';
+			}
+		}
+
+		// Legacy or other game path — use direct web path
+		return $this->path_helper->get_web_root_path() . $url;
+	}
 }
