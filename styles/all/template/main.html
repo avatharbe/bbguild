@@ -27,26 +27,44 @@
             </div>
         </div>
 
-        {% if loops.tabs|length > 1 %}
-        <div class="guild-portal-tabs">
+        {# Same top-of-page nav bar as the player-detail page (bbguild#379),
+           with "Guild" as the only, always-active entry here -- Character/
+           Talents/etc. are resolved per-player and have no single character
+           to point to from this page. #}
+        {% if loops.nav_tabs|length > 0 %}
+        <div class="guild-nav-tabs">
             <ul>
-                {% for tabs in loops.tabs %}
-                <li class="{% if tabs.TAB_ACTIVE %}activetab{% endif %}">
-                    <a href="{{ tabs.U_TAB }}">{{ tabs.TAB_NAME }}</a>
+                {% for tab in loops.nav_tabs %}
+                <li class="{% if tab.TAB_ACTIVE %}activetab{% endif %}">
+                    <a href="{{ tab.U_TAB }}">{{ tab.TAB_NAME }}</a>
                 </li>
                 {% endfor %}
             </ul>
         </div>
         {% endif %}
 
-        {% if S_ERROR %}
-        <h2>{{ ERROR_MESSAGE }}</h2>
-        {% endif %}
+        <div class="guild-nav-content">
+            {% if loops.tabs|length > 1 %}
+            <div class="guild-portal-tabs">
+                <ul>
+                    {% for tabs in loops.tabs %}
+                    <li class="{% if tabs.TAB_ACTIVE %}activetab{% endif %}">
+                        <a href="{{ tabs.U_TAB }}">{{ tabs.TAB_NAME }}</a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
 
-        <!-- Portal renders all content (MOTD, Roster, Recruitment, etc.) -->
-        {% INCLUDE 'view/welcome.html' %}
+            {% if S_ERROR %}
+            <h2>{{ ERROR_MESSAGE }}</h2>
+            {% endif %}
 
-        {% EVENT bbguild_main_after_content %}
+            <!-- Portal renders all content (MOTD, Roster, Recruitment, etc.) -->
+            {% INCLUDE 'view/welcome.html' %}
+
+            {% EVENT bbguild_main_after_content %}
+        </div>
 
     </div>
 </div>

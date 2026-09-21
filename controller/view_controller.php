@@ -89,6 +89,19 @@ class view_controller
 		$this->portal_renderer->render($this->guild_context->guild_id, (string) $page);
 		$this->template->assign_vars(['S_DISPLAY_WELCOME' => true]);
 
+		// Same top-of-page nav bar as the player detail page (bbguild#379),
+		// with "Guild" as the (only, always active) entry here -- the
+		// Character/Talents/etc. entries are resolved per-player and have
+		// no single character to point to from this page.
+		$this->template->assign_block_vars('nav_tabs', [
+			'TAB_NAME'   => $this->language->lang('PLAYER_TAB_GUILD'),
+			'TAB_SLUG'   => '',
+			'TAB_ACTIVE' => true,
+			'U_TAB'      => $this->helper->route('avathar_bbguild_guild', [
+				'guild_id' => $this->guild_context->guild_id,
+			]),
+		]);
+
 		return $this->helper->render('main.html', $this->guild_context->guild->getName());
 	}
 
@@ -133,7 +146,7 @@ class view_controller
 		// (that system is for game-plugin content rendered inline via
 		// render()/S_PLAYER_TAB_TEMPLATE, not external navigation) and is
 		// never itself the "active" tab on this page.
-		$this->template->assign_block_vars('player_tabs', [
+		$this->template->assign_block_vars('nav_tabs', [
 			'TAB_NAME'   => $this->language->lang('PLAYER_TAB_GUILD'),
 			'TAB_SLUG'   => '',
 			'TAB_ACTIVE' => false,
@@ -142,7 +155,7 @@ class view_controller
 			]),
 		]);
 
-		$this->template->assign_block_vars('player_tabs', [
+		$this->template->assign_block_vars('nav_tabs', [
 			'TAB_NAME'   => $this->language->lang('PLAYER_TAB_CHARACTER'),
 			'TAB_SLUG'   => '',
 			'TAB_ACTIVE' => $active_tab === null,
@@ -154,7 +167,7 @@ class view_controller
 
 		foreach ($available_tabs as $tab)
 		{
-			$this->template->assign_block_vars('player_tabs', [
+			$this->template->assign_block_vars('nav_tabs', [
 				'TAB_NAME'   => $this->language->lang($tab->get_tab_name()),
 				'TAB_SLUG'   => $tab->get_tab_slug(),
 				'TAB_ACTIVE' => $tab->get_tab_slug() === $tab_slug,

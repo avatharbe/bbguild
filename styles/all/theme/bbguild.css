@@ -143,15 +143,19 @@ table.table1.bbguild th {
     padding-left: 11px;
 }
 
-/* Guild portal tab bar — sits directly below the guild header */
+/* Guild nav tab bar (Guild/Character/Talents/etc., bbguild#375/#379) and
+   guild portal sub-page tab bar — both sit directly below the guild
+   header, and share the same look. .guild-nav-tabs appears on both the
+   guild front page and the player-detail page; .guild-portal-tabs is
+   the front page's own secondary tab bar for multiple portal pages. */
 .guild-portal-tabs,
-.player-detail-tabs {
+.guild-nav-tabs {
     margin-bottom: 10px;
     border-bottom: 1px solid rgba(128, 128, 128, 0.3);
 }
 
 .guild-portal-tabs ul,
-.player-detail-tabs ul {
+.guild-nav-tabs ul {
     display: flex;
     flex-wrap: wrap;
     list-style: none;
@@ -160,12 +164,12 @@ table.table1.bbguild th {
 }
 
 .guild-portal-tabs li,
-.player-detail-tabs li {
+.guild-nav-tabs li {
     margin: 0 4px -1px 0;
 }
 
 .guild-portal-tabs li a,
-.player-detail-tabs li a {
+.guild-nav-tabs li a {
     display: block;
     padding: 8px 14px;
     font-size: 1.1em;
@@ -176,7 +180,7 @@ table.table1.bbguild th {
 }
 
 .guild-portal-tabs li.activetab a,
-.player-detail-tabs li.activetab a {
+.guild-nav-tabs li.activetab a {
     font-weight: bold;
     background: rgba(0, 0, 0, 0.08);
     border-color: rgba(128, 128, 128, 0.3);

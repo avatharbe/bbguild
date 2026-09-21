@@ -33,10 +33,10 @@
         </div>
         {% endif %}
 
-        {% if loops.player_tabs|length > 1 %}
-        <div class="player-detail-tabs">
+        {% if loops.nav_tabs|length > 1 %}
+        <div class="guild-nav-tabs">
             <ul>
-                {% for tab in loops.player_tabs %}
+                {% for tab in loops.nav_tabs %}
                 <li class="{% if tab.TAB_ACTIVE %}activetab{% endif %}">
                     <a href="{{ tab.U_TAB }}">{{ tab.TAB_NAME }}</a>
                 </li>
