@@ -477,16 +477,23 @@ ul#bbguild-achievement-feed {
     vertical-align: middle;
 }
 
-/* Boxed "pane" per info category (Comment, Guild Join date/Last Update
+/* Boxed "pane" per info category (Comment/Guild Join date/Last Update
    below, and any game plugin's own sections via
    bbguild_player_detail_after_content e.g. bbguildwow's Character
    Info/Professions/Mythic+) -- a generic, reusable class rather than
    each consumer styling its own box, so every category reads as the
    same kind of panel regardless of which extension rendered it.
    dl/dt/dd repeat .player-detail-body's own rules so a pane doesn't
-   need that class too just to get them. */
+   need that class too just to get them.
+
+   Deliberately does NOT set background/color/border/box-shadow here --
+   markup pairs this with phpBB's own stock ".panel" class (present in
+   prosilver and every style built on it, incl. pbwow3), so the pane's
+   actual look comes from whichever style is active instead of a
+   hardcoded color that'd clash with it. Extension CSS loads after the
+   style's own stylesheet, so leaving those properties unset here is
+   what lets .panel's declarations win. */
 .player-detail-pane {
-    background: rgba(255, 255, 255, 0.04);
     border-radius: 8px;
     padding: 12px 14px;
     margin-bottom: 12px;
@@ -498,7 +505,7 @@ ul#bbguild-achievement-feed {
     opacity: 0.6;
     margin: 0 0 8px;
     padding-bottom: 6px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(128, 128, 128, 0.3);
 }
 
 .player-detail-pane dl {
