@@ -93,7 +93,7 @@ $lang = array_merge(
 
 	// Roster
 	'GUILDROSTER' => 'Armurerie',
-	'RANK'   => 'Grade',
+	'RANK'   => 'Grade de guilde',
 	'CLASS'   => 'Classe',
 	'SPEC'    => 'Spécialisation',
 	'PLAYER_SPEC_EXPLAIN' => 'Optionnel. Choisis une spécialisation au sein de la classe sélectionnée.',

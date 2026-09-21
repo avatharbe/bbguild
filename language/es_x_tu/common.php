@@ -94,7 +94,7 @@ $lang = array_merge(
 
 	// Roster
 	'GUILDROSTER' => 'Plantilla de la hermandad',
-	'RANK'   => 'Rango',
+	'RANK'   => 'Rango de hermandad',
 	'CLASS'   => 'Clase',
 	'SPEC'    => 'Especialización',
 	'PLAYER_SPEC_EXPLAIN' => 'Opcional. Elige una especialización dentro de la clase seleccionada.',

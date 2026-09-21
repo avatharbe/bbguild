@@ -94,7 +94,7 @@ $lang = array_merge(
 
 	// Roster
 	'GUILDROSTER' => 'Guild Roster',
-	'RANK'   => 'Rank',
+	'RANK'   => 'Guild Rank',
 	'CLASS'   => 'Class',
 	'SPEC'    => 'Specialization',
 	'PLAYER_SPEC_EXPLAIN' => 'Optional. Pick a specialization within the selected class.',

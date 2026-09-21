@@ -83,35 +83,15 @@
             {% if S_PLAYER_TAB_TEMPLATE %}
             {% include S_PLAYER_TAB_TEMPLATE ignore missing %}
             {% else %}
+            {% if S_SHOWACH or S_HAS_PHPBB_USER %}
             <div class="player-detail-body">
                 <fieldset>
-                    <dl>
-                        <dt>{{ lang('RANK') }}:</dt>
-                        <dd>{{ PLAYER_RANK }}</dd>
-                    </dl>
-                    {% if PLAYER_ROLE %}
-                    <dl>
-                        <dt>{{ lang('ROLE') }}:</dt>
-                        <dd>{{ PLAYER_ROLE }}</dd>
-                    </dl>
-                    {% endif %}
                     {% if S_SHOWACH %}
                     <dl>
                         <dt>{{ lang('ACHIEV') }}:</dt>
                         <dd>{{ PLAYER_ACHIEV }}</dd>
                     </dl>
                     {% endif %}
-                    <dl>
-                        <dt>{{ lang('STATUS') }}:</dt>
-                        <dd>
-                            {% if S_PLAYER_ACTIVE %}
-                            <span class="player-status-active">{{ lang('ACTIVE') }}</span>
-                            {% else %}
-                            <span class="player-status-inactive">{{ lang('INACTIVE') }}</span>
-                            {% if PLAYER_DEACTIVATE_REASON %}<br /><em>{{ PLAYER_DEACTIVATE_REASON }}</em>{% endif %}
-                            {% endif %}
-                        </dd>
-                    </dl>
                     {% if S_HAS_PHPBB_USER %}
                     <dl>
                         <dt>{{ lang('LINKED_USER') }}:</dt>
@@ -120,6 +100,7 @@
                     {% endif %}
                 </fieldset>
             </div>
+            {% endif %}
 
             {% EVENT bbguild_player_detail_after_content %}
 

@@ -93,7 +93,7 @@ $lang = array_merge(
 
 	// Roster
 	'GUILDROSTER' => 'Elenco personaggi',
-	'RANK'   => 'Grado',
+	'RANK'   => 'Grado di gilda',
 	'CLASS'   => 'Classe',
 	'SPEC'    => 'Specializzazione',
 	'PLAYER_SPEC_EXPLAIN' => 'Facoltativo. Scegli una specializzazione all\'interno della classe selezionata.',
