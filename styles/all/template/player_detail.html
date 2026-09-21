@@ -1,6 +1,6 @@
 {% INCLUDE 'overall_header.html' %}
 <div class="bbguildouter">
-    <div id="bbguildwelcome">
+    <div id="bbguildwelcome" class="faction-bg-{{ FACTION_CSS }}">
 
         <!-- Guild header -->
         <div class="guild-header">
@@ -15,7 +15,7 @@
                 </div>
                 <div class="guild-header-details">
                     <span class="faction">{{ FACTION_NAME }}</span> {{ lang('GUILD') }}<span class="comma">,</span>
-                    <span class="realm">{{ REGION }}-{{ REALM }}</span><span class="comma">.</span>
+                    <span class="realm">{{ REALM|capitalize }} ({{ REGION|upper }})</span><span class="comma">.</span>
                     <span class="members">{{ PLAYERCOUNT }} {{ lang('MEMBERS') }}</span>
                 </div>
             </div>
@@ -59,7 +59,6 @@
                 </div>
                 <div class="player-detail-title-block">
                     <h2 class="player-detail-name" style="color: {{ PLAYER_COLORCODE }}">{{ PLAYER_NAME }}</h2>
-                    {% if PLAYER_GUILD_NAME %}<span class="player-detail-guild-tag">&lt;{{ PLAYER_GUILD_NAME }}&gt;</span>{% endif %}
                     {% if PLAYER_TITLE %}
                     <div class="player-detail-title">&laquo; {{ PLAYER_TITLE }} &raquo;</div>
                     {% endif %}
@@ -69,15 +68,20 @@
                         {{ PLAYER_RACE }}
                         {% if PLAYER_CLASS_IMAGE %}<img src="{{ PLAYER_CLASS_IMAGE }}" alt="{{ PLAYER_CLASS }}" class="player-detail-icon" />{% endif %}
                         <span style="color: {{ PLAYER_COLORCODE }}">{{ PLAYER_CLASS }}</span>
+                        {% if PLAYER_REALM %}<span class="player-detail-dot">&middot;</span>{{ PLAYER_REALM|capitalize }}{% if PLAYER_REGION %} ({{ PLAYER_REGION|upper }}){% endif %}{% endif %}
+                        {% if PLAYER_GUILD_NAME %}<span class="player-detail-dot">&middot;</span><span class="player-detail-guild-tag">&lt;{{ PLAYER_GUILD_NAME }}&gt;</span>{% endif %}
                     </div>
-                    {% if loops.header_pills %}
-                    <div class="player-detail-pills">
-                        {% for pill in loops.header_pills %}
-                        <span class="player-detail-pill">{{ pill.PILL_LABEL }}</span>
-                        {% endfor %}
-                    </div>
+                    {% if PLAYER_LAST_UPDATE %}
+                    <div class="player-detail-last-seen">{{ lang('LAST_UPDATE') }}: {{ PLAYER_LAST_UPDATE }}</div>
                     {% endif %}
                 </div>
+                {% if loops.header_pills %}
+                <div class="player-detail-pills">
+                    {% for pill in loops.header_pills %}
+                    <span class="player-detail-pill">{{ pill.PILL_LABEL }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
             </div>
 
             {% if S_PLAYER_TAB_TEMPLATE %}

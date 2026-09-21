@@ -1,6 +1,6 @@
 {% INCLUDE 'overall_header.html' %}
 <div class="bbguildouter">
-    <div id="bbguildwelcome">
+    <div id="bbguildwelcome" class="faction-bg-{{ FACTION_CSS }}">
 
         <!-- Guild header -->
         <div class="guild-header">
@@ -15,7 +15,7 @@
                 </div>
                 <div class="guild-header-details">
                     <span class="faction">{{ FACTION_NAME }}</span> {{ lang('GUILD') }}<span class="comma">,</span>
-                    <span class="realm">{{ REGION }}-{{ REALM }}</span><span class="comma">.</span>
+                    <span class="realm">{{ REALM|capitalize }} ({{ REGION|upper }})</span><span class="comma">.</span>
                     <span class="members">{{ PLAYERCOUNT }} {{ lang('MEMBERS') }}</span>
                     <!-- EVENT bbguild_guild_header_details_after -->
                 </div>
