@@ -31,36 +31,8 @@
 
 /* Module blocks
 --------------------------------------------- */
-.portal-center-block,
-.portal-side {
-	margin-bottom: 10px;
-	border: 1px solid rgba(128, 128, 128, 0.3);
-	border-radius: 4px;
-}
-
-.portal-no-margin {
-	margin: 0;
-}
-
-.portal-module-postbody {
-	padding: 0;
-}
-
-.portal-module-postbody {
-	width: 100%;
-	max-width: 100%;
-}
-
-.portal-module-content {
-	padding: 10px;
-}
-
-.portal-module-content p:last-child {
+.player-detail-pane p:last-child {
 	margin-bottom: 0;
-}
-
-.portal-module-list {
-	list-style: none;
 }
 
 /* Icon alignment */
@@ -68,8 +40,7 @@
 	vertical-align: middle;
 }
 
-.portal-center-block .header dt i.fa,
-.portal-side .header dt i.fa {
+.player-detail-pane-title i.fa {
 	vertical-align: middle;
 	margin-right: 3px;
 }

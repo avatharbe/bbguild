@@ -1,6 +1,7 @@
 {#
  # Block wrapper definitions for portal modules.
- # Matches the Board3 _block_config.html pattern.
+ # Uses the same player-detail-pane box style as the character page
+ # (bbguild#380), not the original Board3 forabg/topiclist wrapper.
  #
  # Side blocks (right column): LR_BLOCK_H_L/H_R/F_L/F_R
  # Center blocks (top/center/bottom): C_BLOCK_H_L/H_R/F_L/F_R
@@ -9,66 +10,36 @@
 {# --- Side block wrappers (right column) --- #}
 
 {% DEFINE LR_BLOCK_H_L %}
-<div class="forabg portal-side" id="portal-module-{{ definition.MODULE_ID }}">
-	<div class="inner">
-		<ul class="topiclist">
-			<li class="header">
-				<dl class="row-item">
-					<dt>
+<div class="player-detail-pane panel" id="portal-module-{{ definition.MODULE_ID }}">
+	<h4 class="player-detail-pane-title">
 {% ENDDEFINE %}
 
 {% DEFINE LR_BLOCK_H_R %}
-					</dt>
-				</dl>
-			</li>
-		</ul>
-		<ul class="topiclist portal-module-list">
-			<li class="row">
-				<div class="list-inner portal-module-content">
+	</h4>
 {% ENDDEFINE %}
 
 {% DEFINE LR_BLOCK_F_L %}
-				</div>
-			</li>
-		</ul>
 {% ENDDEFINE %}
 
 {% DEFINE LR_BLOCK_F_R %}
-	</div>
 </div>
 {% ENDDEFINE %}
 
 {# --- Center block wrappers (top, center, bottom columns) --- #}
 
 {% DEFINE C_BLOCK_H_L %}
-<div class="forabg portal-center-block" id="portal-module-{{ definition.MODULE_ID }}">
-	<div class="inner">
-		<ul class="topiclist">
-			<li class="header">
-				<dl class="row-item">
-					<dt>
+<div class="player-detail-pane panel" id="portal-module-{{ definition.MODULE_ID }}">
+	<h4 class="player-detail-pane-title">
 {% ENDDEFINE %}
 
 {% DEFINE C_BLOCK_H_R %}
-					</dt>
-				</dl>
-			</li>
-		</ul>
-		<div class="panel bg1 portal-no-margin">
-			<div class="inner">
-				<div class="postbody portal-module-postbody">
-					<div class="content portal-module-content">
+	</h4>
 {% ENDDEFINE %}
 
 {% DEFINE C_BLOCK_F_L %}
-					</div>
-				</div>
-			</div>
-		</div>
 {% ENDDEFINE %}
 
 {% DEFINE C_BLOCK_F_R %}
-	</div>
 </div>
 {% ENDDEFINE %}
 
