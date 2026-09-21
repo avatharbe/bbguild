@@ -768,6 +768,8 @@ class player_module
 		$players_result = $this->guild->list_players($current_order['sql'], $start, 1, $minlevel, $maxlevel, $selectactive, $selectnonactive, $player_filter);
 		$lines          = 0;
 		$image_cache = [];
+		$spec_cache = [];
+		$bb_specializations_table = $this->phpbb_container->getParameter('avathar.bbguild.tables.bb_specializations');
 		while ($row = $this->db->sql_fetchrow($players_result))
 		{
 			$phpbb_user_id = (int) $row['phpbb_user_id'];
@@ -812,6 +814,39 @@ class player_module
 				$race_img = '';
 			}
 
+			// Specialization — issue #331. Falls back to the legacy free-text
+			// player_spec column (no icon) when player_spec_id is unset/0,
+			// since existing characters haven't been migrated yet (#331 Phase 5).
+			if (!isset($spec_cache[$game_id]))
+			{
+				$spec_lookup = [];
+				$spec_model = new \avathar\bbguild\model\games\rpg\specialization($this->db, $this->bbguild_cache, $bb_specializations_table, $this->bb_language_table);
+				$translations = $spec_model->get_translations($game_id, (string) $this->config['bbguild_lang']);
+				foreach ($spec_model->get_for_class($game_id) as $sp)
+				{
+					$spec_lookup[$sp['spec_id']] = [
+						'name' => $translations[$sp['spec_id']] ?? $sp['spec_name'],
+						'icon' => $sp['spec_icon'],
+					];
+				}
+				$spec_cache[$game_id] = $spec_lookup;
+			}
+
+			$player_spec_id = (int) ($row['player_spec_id'] ?? 0);
+			if ($player_spec_id > 0 && isset($spec_cache[$game_id][$player_spec_id]))
+			{
+				$spec_name = $spec_cache[$game_id][$player_spec_id]['name'];
+				$spec_icon_file = $spec_cache[$game_id][$player_spec_id]['icon'];
+				$spec_img = ($img_path && $spec_icon_file && file_exists($img_path . 'spec_icons/' . basename($spec_icon_file) . '.png'))
+					? $img_web . 'spec_icons/' . basename($spec_icon_file) . '.png'
+					: '';
+			}
+			else
+			{
+				$spec_name = (string) ($row['player_spec'] ?? '');
+				$spec_img = '';
+			}
+
 			$this->template->assign_block_vars(
 				'players_row', array(
 					'S_READONLY'           => ($row['rank_id'] == 90 || $row['rank_id'] == 99) ? true : false,
@@ -828,7 +863,11 @@ class player_module
 					'S_CLASS_IMAGE_EXISTS' => !empty($class_img),
 					'RACE_IMAGE'           => $race_img,
 					'S_RACE_IMAGE_EXISTS'  => !empty($race_img),
+					'RACE'                 => (!empty($row['race_name'])) ? $row['race_name'] : '&nbsp;',
 					'CLASS'                => ($row['player_class'] != 'NULL') ? $row['player_class'] : '&nbsp;',
+					'SPEC'                 => ($spec_name !== '') ? $spec_name : '&nbsp;',
+					'SPEC_ICON'            => $spec_img,
+					'S_SPEC_ICON_EXISTS'   => !empty($spec_img),
 					'LAST_UPDATE'          => ($row['last_update'] == 0) ? '' : $this->user->format_date($row['last_update']),
 					'U_VIEW_USER'          => append_sid("{$phpbb_admin_path}index.$phpEx", "i=users&amp;icat=13&amp;mode=overview&amp;u=$phpbb_user_id"),
 					'U_VIEW_PLAYER'        => append_sid("{$phpbb_admin_path}index.$phpEx", 'i=-avathar-bbguild-acp-player_module&amp;mode=addplayer&amp;' . constants::URI_NAMEID . '=' . $row['player_id']),

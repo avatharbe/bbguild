@@ -1030,7 +1030,7 @@ class guilds
 	public function list_players($order = 'm.player_name', $start = 0, $mode = 0, $minlevel = 1, $maxlevel = 200, $selectactive = 1, $selectnonactive = 1, $player_filter = '', $last_update = false)
 	{
 		$sql_array = array(
-			'SELECT' => 'm.* , u.username, u.user_id, u.user_colour, g.name, l.name as player_class, r.rank_id,
+			'SELECT' => 'm.* , u.username, u.user_id, u.user_colour, g.name, l.name as player_class, rl.name as race_name, r.rank_id,
 			    				r.rank_name, r.rank_prefix, r.rank_suffix,
 								 c.colorcode , c.imagename, a.image_female, a.image_male' ,
 			'FROM' => array(
@@ -1044,7 +1044,11 @@ class guilds
 				array(
 					'FROM' => array(
 						USERS_TABLE => 'u') ,
-					'ON' => 'u.user_id = m.phpbb_user_id ')) ,
+					'ON' => 'u.user_id = m.phpbb_user_id ') ,
+				array(
+					'FROM' => array(
+						$this->bb_language_table => 'rl') ,
+					'ON' => "rl.attribute_id = a.race_id AND rl.game_id = a.game_id AND rl.language = '" . $this->db->sql_escape($this->config['bbguild_lang']) . "' AND rl.attribute = 'race'")) ,
 			'WHERE' => " (m.player_rank_id = r.rank_id)
 			    				and m.game_id = l.game_id
 			    				AND l.attribute_id = c.class_id and l.game_id = c.game_id AND l.language= '" . $this->db->sql_escape($this->config['bbguild_lang']) . "' AND l.attribute = 'class'

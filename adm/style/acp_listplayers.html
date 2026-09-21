@@ -87,8 +87,10 @@
                 </th>
 
                 <th style="text-align:left; width:3%"><a href="{{ O_ID }}">{{ lang('ID') }}</a></th>
-                <th style="text-align:left; width:12%"><a href="{{ O_NAME }}">{{ lang('NAME') }}</a></th>
-                <th style="text-align:left; width:15%; white-space: nowrap;"><a href="{{ O_CLASS }}">{{ lang('RACE') }}/{{ lang('CLASS') }}</a></th>
+                <th style="text-align:left; width:10%"><a href="{{ O_NAME }}">{{ lang('NAME') }}</a></th>
+                <th style="text-align:left; width:10%; white-space: nowrap;">{{ lang('RACE') }}</th>
+                <th style="text-align:left; width:10%; white-space: nowrap;"><a href="{{ O_CLASS }}">{{ lang('CLASS') }}</a></th>
+                <th style="text-align:left; width:10%; white-space: nowrap;">{{ lang('SPEC') }}</th>
                 <th style="text-align:left; width:5%; white-space: nowrap;"><a href="{{ O_LEVEL }}">{{ lang('LEVEL') }}</a></th>
                 <th style="text-align:left; width:10%"><a href="{{ O_USERNAME }}">{{ lang('USERNAME') }}</a></th>
                 <th style="text-align:left; width:10%"><a href="{{ O_RANK }}">{{ lang('RANK') }}</a></th>
@@ -102,7 +104,7 @@
             </thead>
             <tfoot>
             <tr>
-                <th colspan="10" class="footer">{{ LISTPLAYERS_FOOTCOUNT }}</th>
+                <th colspan="12" class="footer">{{ LISTPLAYERS_FOOTCOUNT }}</th>
             </tr>
             </tfoot>
             <tbody>
@@ -121,7 +123,9 @@
                 <td style="text-align:center;">{{ players_row.ID }}</td>
                 <td class="row2" style="text-align:left;" >
                     <a href="{{ players_row.U_VIEW_PLAYER }}" style="color: {{ players_row.COLORCODE }}"><strong>{{ players_row.NAME }}</strong></a></td>
-                <td style="text-align:left;" >{% if players_row.S_RACE_IMAGE_EXISTS %}<img src="{{ players_row.RACE_IMAGE }}" alt="" />&nbsp;{% else %}&nbsp;{% endif %}{% if players_row.S_CLASS_IMAGE_EXISTS %}<img src="{{ players_row.CLASS_IMAGE }}" alt="" />{% else %}&nbsp;{% endif %}&nbsp;<span style="color:{{ players_row.COLORCODE }}" >{{ players_row.CLASS }}</span></td>
+                <td style="text-align:left;" >{% if players_row.S_RACE_IMAGE_EXISTS %}<img src="{{ players_row.RACE_IMAGE }}" alt="" />&nbsp;{% endif %}{{ players_row.RACE }}</td>
+                <td style="text-align:left;" >{% if players_row.S_CLASS_IMAGE_EXISTS %}<img src="{{ players_row.CLASS_IMAGE }}" alt="" />&nbsp;{% endif %}<span style="color:{{ players_row.COLORCODE }}" >{{ players_row.CLASS }}</span></td>
+                <td style="text-align:left;" >{% if players_row.S_SPEC_ICON_EXISTS %}<img src="{{ players_row.SPEC_ICON }}" alt="" />&nbsp;{% endif %}{{ players_row.SPEC }}</td>
                 <td style="text-align:center;" >{{ players_row.LEVEL }}</td>
                 <td style="text-align:left;" ><a href="{{ players_row.U_VIEW_USER }}">{{ players_row.USERNAME }}</a></td>
                 <td style="text-align:left;" >{{ players_row.RANK }}</td>
