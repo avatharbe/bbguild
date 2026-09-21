@@ -123,23 +123,22 @@
 
             {% EVENT bbguild_player_detail_after_content %}
 
-            {% if PLAYER_COMMENT %}
-            <div class="player-detail-pane">
-                <dl>
-                    <dt>{{ lang('COMMENT') }}:</dt>
-                    <dd>{{ PLAYER_COMMENT }}</dd>
-                </dl>
-            </div>
-            {% endif %}
-
             {# Lower-priority metadata (bbguildwow#51) -- kept at the very
                bottom of the page, below whatever a game plugin injects via
                bbguild_player_detail_after_content (e.g. bbguildwow's
                Specialization/Average Item Level/equipment), not interleaved
-               with the character's own Rank/Role/Status fields above. #}
-            {% if PLAYER_JOINDATE or (PLAYER_OUTDATE and not S_PLAYER_ACTIVE) or PLAYER_LAST_UPDATE %}
+               with the character's own Rank/Role/Status fields above.
+               Comment lives in this same pane rather than its own, since
+               it's activity-adjacent metadata too. #}
+            {% if PLAYER_COMMENT or PLAYER_JOINDATE or (PLAYER_OUTDATE and not S_PLAYER_ACTIVE) or PLAYER_LAST_UPDATE %}
             <div class="player-detail-pane">
                 <h4 class="player-detail-pane-title">{{ lang('PLAYER_ACTIVITY') }}</h4>
+                {% if PLAYER_COMMENT %}
+                <dl>
+                    <dt>{{ lang('COMMENT') }}:</dt>
+                    <dd>{{ PLAYER_COMMENT }}</dd>
+                </dl>
+                {% endif %}
                 {% if PLAYER_JOINDATE %}
                 <dl>
                     <dt>{{ lang('JOINDATE') }}:</dt>
