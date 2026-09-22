@@ -24,18 +24,16 @@ class release_2_1_0 extends \phpbb\db\migration\container_aware_migration
 	}
 
 	/**
-	 * The guild_id=0 template tab is the last artifact seeded by this
-	 * chain (former v210b3) — checking for it is equivalent to checking
-	 * the whole chain ran.
+	 * Table-existence check only (not a data query): this migration's own
+	 * update_schema() is what creates bb_portal_tabs, so on a genuinely
+	 * fresh install effectively_installed() runs before that table exists
+	 * at all -- querying it here would hard-error instead of returning
+	 * false. (The original chain queried a row in it safely only because
+	 * that check lived in a *separate*, later migration by then.)
 	 */
 	public function effectively_installed()
 	{
-		$sql = 'SELECT tab_id FROM ' . $this->table_prefix . 'bb_portal_tabs WHERE guild_id = 0';
-		$result = $this->db->sql_query_limit($sql, 1);
-		$row = $this->db->sql_fetchrow($result);
-		$this->db->sql_freeresult($result);
-
-		return (bool) $row;
+		return $this->db_tools->sql_table_exists($this->table_prefix . 'bb_portal_tabs');
 	}
 
 	public function update_schema()
