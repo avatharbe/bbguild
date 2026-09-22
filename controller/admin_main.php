@@ -277,8 +277,9 @@ class admin_main
 		// active player kpi
 		$total_players = $total_players_active . ' / ' . $total_players_inactive;
 
-		//number of guilds
-		$sql = 'SELECT count(*) as guild_count FROM ' . $this->bb_guild_table;
+		//number of guilds (excludes the reserved guild_id=0 "Guildless" placeholder)
+		$sql = 'SELECT count(*) as guild_count FROM ' . $this->bb_guild_table . '
+			WHERE id > 0';
 		$result = $this->db->sql_query($sql);
 		$total_guildcount = (int) $this->db->sql_fetchfield('guild_count');
 
