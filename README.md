@@ -15,11 +15,12 @@ Originally forked as bbDKP from EQDKP to phpBB 3.0 in 2008, the 2.0 version has 
 ## Features
 
 ### Guild Portal
-- **Block-based welcome page** — configurable portal with 3-column layout (top, center, right)
-- **Built-in modules** — Message of the Day, Roster, Recruitment
+- **Tabbed portal pages** — a guild's portal can have multiple pages (e.g. "Overview", "Roster", "Rules"), each with its own independently organized layout
+- **Block-based layout** — configurable per tab, with a 4-column layout (top, center, right, bottom)
+- **Built-in modules** — Message of the Day, Roster, Recruitment, Guild Statistics
 - **Guild-scoped** — each guild gets its own portal layout, independently configured
 - **Module plugin system** — extensible via tagged services; add custom portal modules from other extensions
-- **ACP management** — add, remove, reorder, move between columns, and enable/disable modules per guild
+- **ACP management** — add, remove, reorder tabs and modules, move between columns, and enable/disable modules per guild
 - **Default layout template** — new guilds inherit a default module configuration
 
 ### Guild Management
@@ -28,8 +29,8 @@ Originally forked as bbDKP from EQDKP to phpBB 3.0 in 2008, the 2.0 version has 
 - **Guild news** — message of the day and news feed
 
 ### Roster
-- **Full guild roster** — sortable player list with class, race, rank, and level
-- **Player profiles** — detailed character view with gear, stats, and guild history
+- **Full guild roster** — sortable player list with class, race, rank, spec, and level
+- **Player profiles** — detailed character view with gear, stats, and guild history, organized into a tab bar (Character plus any tabs game plugins register, e.g. Talents/Achievements) with a Guild tab linking back to the guild's own portal page
 - **Character management** — add, edit, delete, and claim characters via ACP and UCP
 - **Rank management** — define custom guild ranks with display preferences
 
@@ -52,7 +53,7 @@ Originally forked as bbDKP from EQDKP to phpBB 3.0 in 2008, the 2.0 version has 
 - **Per-game data** — classes, races, factions, and roles are fully configurable per game
 
 ### Administration (ACP)
-- **Portal management** — configure portal modules per guild (add, remove, reorder, toggle)
+- **Portal management** — configure portal tabs and modules per guild (add, remove, reorder, toggle)
 - **Game management** — install, configure, and remove game definitions
 - **Guild management** — create and edit guilds, assign games and realms
 - **Player management** — full CRUD for characters, batch operations, rank sorting
@@ -81,6 +82,8 @@ Originally forked as bbDKP from EQDKP to phpBB 3.0 in 2008, the 2.0 version has 
 3. Extract `bbguild` into `ext/avathar/bbguild/`.
 4. In the ACP, go to **Customise > Manage extensions**.
 5. Find **bbGuild** under Disabled Extensions and click **Enable**.
+
+For permission setup, creating your first guild, portal/tab configuration, and troubleshooting, see the full [Installation Guide](contrib/INSTALL.md).
 
 ### Game Plugins
 

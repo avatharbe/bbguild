@@ -198,11 +198,10 @@ Defined in `config/routing.yml`:
 
 ### ACP modules
 
-The bbGuild ACP category (`ACP_CAT_BBGUILD`) has three sub-categories. The
-base tree is registered in `migrations/v200b3/release_2_0_0_b3.php`; the
-**Game settings** category was added in
-`migrations/v200rc4/release_2_0_0_rc4.php`, which also moved the Game List
-module into it and positions the category right after General Settings.
+The bbGuild ACP category (`ACP_CAT_BBGUILD`) has three sub-categories,
+registered directly in their final position — including **Game
+settings**, positioned right after General Settings — by
+`migrations/v200/release_2_0_0.php`.
 
 | Sub-category (langname → title) | Module (`acp/*_module.php`) | Controller | Modes |
 |---|---|---|---|
@@ -271,7 +270,7 @@ format strings whose first `%s` is always the username resolved from
 | `model/` | Business logic and data access: `player/` (player, guild, rank, recruitment queries), `games/` (provider/installer/registry interfaces and the game_registry/character_sync_registry DI wiring), `games/rpg/` (classes/races/roles/factions/specialization CRUD), `admin/` (curl client, activity log, request-parsing `util`, asset URL resolver), `api/` (Battle.net-style API client abstraction) | phpBB `dbal`, `config`, `cache` services |
 | `portal/` | The portal rendering engine: `guild_context` (resolves the active guild + header vars), `portal_renderer` (resolves the active tab, assembles enabled modules per column), `columns`/`module_helper`/`module_registry`, and `modules/` (module CRUD `manager`, `database_handler` for layout/config persistence, `module_interface`/`module_base`, and the built-in modules themselves: MOTD, Roster, Recruitment, Statistics) | `model/` for data, phpBB `template` |
 | `event/` | `main_listener`, the single `EventSubscriberInterface` implementation: assigns a global template flag on every page (`core.common`), registers bbGuild's language sets (`core.user_setup`), adds the guild-picker link to the page header (`core.page_header`), and registers the `bbguild` permission category (`core.permissions`) | phpBB core events only |
-| `migrations/` | Schema, seed data, config keys, permissions, and ACP/UCP module registration, as a chain of milestone-named migration classes (`v200b3` → `v210b2`, see `contrib/database.md`) | phpBB migrator; each migration `depends_on()` the previous |
+| `migrations/` | Schema, seed data, config keys, permissions, and ACP/UCP module registration, as two release-named migration classes — `v200/release_2_0_0.php` and `v210/release_2_1_0.php`, each writing its milestone's full end state directly (see `contrib/database.md`) | phpBB migrator; `v210` `depends_on()` `v200` |
 | `acp/` | ACP module glue: an `*_info.php` (menu registration) + `*_module.php` (mode dispatch) pair per category, delegating the actual work to the matching `controller/admin_*.php` | `controller/`, phpBB `module.manager` |
 | `ucp/` | The single UCP module (`bbguild_module`): character claim/add/update/delete for the logged-in user | `model/player/` |
 | `cron/` | `task/character_sync.php` — the scheduled task described under [character-sync](#character-sync-scheduler-361) below | `model/games/character_sync_registry`, `model/player/player` |
@@ -374,10 +373,14 @@ character builds — role alone ("DPS") is too coarse and class alone
 dimension; role and class stay first-class, independent lookup tables
 (`bb_gameroles`, `bb_classes`), and specialization is purely a join between
 them plus a display name/icon/order. `bb_players.player_spec_id` is
-additive: the legacy free-text `player_spec` column stays in place
-(migrating existing values is tracked separately as #331 Phase 5, not yet
-done), so upgrading doesn't require a data migration to keep existing
-character pages working.
+additive: the legacy free-text `player_spec` column stays in place.
+Migrating existing values to `player_spec_id` was tracked separately as
+#331 Phase 5 (later split into its own issue, #381), and was ultimately
+**closed without a migration** — existing installs aren't a support
+concern (clean install is the supported upgrade path), so there's no real
+backlog to backfill in practice. Both columns coexist indefinitely; the
+front-end and ACP roster resolve spec display by preferring
+`player_spec_id` and falling back to the legacy text when it's unset.
 
 **`ext::BBGUILD_VERSION` moved out of `phpbb_config` (#353).** The version
 used to live as a `bbguild_version` row in `phpbb_config`, updated by each
@@ -427,17 +430,31 @@ full grant matrix; it's also summarized in the README.
 
 ### Migration and versioning convention
 
-Migrations live in milestone-named directories (`v200b3`, `v200b4`,
-`v200rc1`, `v200rc2`, `v200rc4`, `v210b1`, `v210b2`, `v210b3` — there is no
-`v200rc3`, a code-only bug-fix release with no schema/data change) rather
-than being numbered sequentially or dated. Each migration's
+Migrations live in release-named directories, one per shipped minor
+version — `migrations/v200/release_2_0_0.php` and
+`migrations/v210/release_2_1_0.php` — rather than being numbered
+sequentially, dated, or split into the many beta/rc-named files each
+release-line actually developed through. Each of those two migrations
+was **squashed** (#383, matching the 2.0.0 line's earlier squash of its
+own beta chain into `v200b3`) from what had been a longer chain of
+incremental beta/rc migrations, once the release shipped: since existing
+installs are expected to clean-install rather than upgrade through old
+beta history, the squashed migration writes its milestone's full final
+schema/data/permissions/module state directly — e.g. `v200/release_2_0_0.php`
+declares `bb_language.language` as `VCHAR:10` from the start rather than
+`CHAR:2` then widened, and creates the **Game settings** ACP category in
+its final position rather than under General Settings and moved
+afterward. `v210/release_2_1_0.php` depends on `v200/release_2_0_0.php`
+and is the only other migration in the chain. Each migration's
 `effectively_installed()` checks a concrete artifact it itself creates — a
 table, a column, a specific permission grant row — rather than comparing
 against a version string, which is what makes moving the canonical version
 out of `phpbb_config` (#353, above) safe: nothing in the migration chain's
 own logic depends on that config value existing. `depends_on()` forms a
 strict linear chain; each migration only ever depends on its immediate
-predecessor.
+predecessor. Downstream game plugins pin their own `depends_on()` to
+these same two class names (a correctness dependency on the schema they
+actually need), not to a version number.
 
 ## Code Complexity
 
@@ -470,8 +487,10 @@ the same pair `CLAUDE.md`'s #354/#377 bugs already came from.
 - **`bb_bosstable`/`bb_zonetable`** have DI table-name parameters wired in
   `config/tables.yml` and are referenced by ACP controller constructors,
   but no migration creates them yet — schema is still TBD.
-- **Legacy `player_spec` → `player_spec_id` migration** (#331 Phase 5) is
-  not started; both columns currently coexist on `bb_players`.
+- **Legacy `player_spec` → `player_spec_id` migration** (#331 Phase 5,
+  later #381) was **closed without a migration** — both columns coexist
+  on `bb_players` indefinitely by design, not as an unfinished backlog
+  item; see [Design decisions](#design-decisions-and-rationale) above.
 - **Game-plugin API coverage is uneven**: only WoW (Battle.net) and GW2
   have first-class APIs; FFXIV relies on fragile third-party parsers; the
   remaining games have no API path and are roster-managed manually.
@@ -493,11 +512,11 @@ the same pair `CLAUDE.md`'s #354/#377 bugs already came from.
   Brawler/Mariner classes (0 specs assigned yet) all ship with no icon
   art — each is self-documented as a follow-up in its own provider/install
   code, not a silent gap.
-- **A few per-plugin docs/tooling have drifted from the code** and haven't
-  been caught by CI: `bbguildeq`'s README class table doesn't match its
-  installer's actual class_id/armor-type mapping (bbguildeq2's equivalent
-  table is correct); `contrib/cleanup.sql` in `bbguildeq`, `bbguildeq2`,
-  and `bbguildlineage2` still references the pre-2.0.0-b4 underscored
-  package names (`avathar/bbguild_eq` etc.) and would silently no-op.
-  Worth a documentation/tooling audit pass across the family rather than
-  fixing these one at a time as they're noticed.
+- **`bbguildeq`'s README class table doesn't match its installer's actual
+  class_id/armor-type mapping** — the README lists classes alphabetically
+  with re-numbered ids (e.g. Bard shown as id 1/Plate), while
+  `game/eq_installer.php` assigns different ids in a different order with
+  different armor types (Bard is actually id 7/Cloth); `bbguildeq2`'s
+  equivalent table is correct. Not caught by CI since it's a docs-only
+  mismatch. (`contrib/cleanup.sql`'s equivalent staleness across the
+  family, previously noted here, has since been fixed.)
