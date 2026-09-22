@@ -24,13 +24,13 @@ class simple_test extends TestCase
 	{
 		parent::setUp();
 
-		$user = $this->createMock(\phpbb\user::class);
-		$user->method('lang')->willReturnArgument(0);
+		$language = $this->createMock(\phpbb\language\language::class);
+		$language->method('lang')->willReturnArgument(0);
 
 		$this->container = $this->createMock(\Symfony\Component\DependencyInjection\ContainerInterface::class);
-		$this->container->method('get')->willReturnCallback(function ($id) use ($user) {
+		$this->container->method('get')->willReturnCallback(function ($id) use ($language) {
 			return match ($id) {
-				'user' => $user,
+				'language' => $language,
 				default => null,
 			};
 		});

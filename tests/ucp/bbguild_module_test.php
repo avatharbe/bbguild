@@ -53,18 +53,32 @@ class fake_module_auth
 	public function acl_get($opt) { return $this->granted[$opt] ?? true; }
 }
 
+// What: a no-op stand-in for phpBB's language service.
+// Why: fill_addplayer() calls $phpbb_container->get('language')->add_lang()
+// to attach the common/admin language files; the actual translated
+// content isn't under test here.
+class fake_module_language
+{
+	public function add_lang($lang_set, $ext_name = null) {}
+}
+
 // What: a stand-in for phpBB's real service container.
 // Why: fill_addplayer() reads `global $phpbb_container` directly (not
-// through DI) for one table-name parameter, and game_has_api() (called
-// twice from the assign_vars block) tries the container's game_registry
-// service first. Making get() always throw forces game_has_api() down
-// its DB-fallback branch instead, which is simpler to stub than a real
-// registry.
+// through DI) for one table-name parameter and the language service, and
+// game_has_api() (called twice from the assign_vars block) tries the
+// container's game_registry service first. Making get() throw for
+// anything but 'language' forces game_has_api() down its DB-fallback
+// branch instead, which is simpler to stub than a real registry.
 class fake_module_container
 {
 	private $params;
-	public function __construct(array $params) { $this->params = $params; }
-	public function get($id) { throw new \Exception('not stubbed: ' . $id); } // forces registry-lookup fallback paths
+	private $language;
+	public function __construct(array $params) { $this->params = $params; $this->language = new fake_module_language(); }
+	public function get($id)
+	{
+		if ($id === 'language') { return $this->language; }
+		throw new \Exception('not stubbed: ' . $id); // forces registry-lookup fallback paths
+	}
 	public function getParameter($id) { return $this->params[$id] ?? ('bb_' . substr($id, strrpos($id, '.') + 1)); }
 }
 
