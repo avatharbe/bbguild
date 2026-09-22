@@ -256,7 +256,7 @@ class database_handler
 		$sql = 'INSERT INTO ' . $this->modules_table . ' ' . $this->db->sql_build_array('INSERT', $sql_ary);
 		$this->db->sql_query($sql);
 
-		return (int) $this->db->sql_nextid();
+		return (int) $this->db->sql_last_inserted_id();
 	}
 
 	/**
@@ -399,7 +399,7 @@ class database_handler
 		$sql = 'INSERT INTO ' . $this->tabs_table . ' ' . $this->db->sql_build_array('INSERT', $sql_ary);
 		$this->db->sql_query($sql);
 
-		return (int) $this->db->sql_nextid();
+		return (int) $this->db->sql_last_inserted_id();
 	}
 
 	/**

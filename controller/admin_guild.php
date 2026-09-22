@@ -1034,7 +1034,7 @@ class admin_guild
 				$recruit_data['applytemplate_id'] = 0;
 				$sql = 'INSERT INTO ' . $this->bb_recruit_table . ' ' . $this->db->sql_build_array('INSERT', $recruit_data);
 				$this->db->sql_query($sql);
-				$new_id = $this->db->sql_nextid();
+				$new_id = $this->db->sql_last_inserted_id();
 
 				/**
 				 * Fired when a new recruitment posting is created.

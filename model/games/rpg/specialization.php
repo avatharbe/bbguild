@@ -99,7 +99,7 @@ class specialization
 			$sql = 'INSERT INTO ' . $this->bb_specializations_table . ' '
 				. $this->db->sql_build_array('INSERT', $data);
 			$this->db->sql_query($sql);
-			$this->spec_id = (int) $this->db->sql_nextid();
+			$this->spec_id = (int) $this->db->sql_last_inserted_id();
 		}
 
 		$this->cache->destroy('sql', $this->bb_specializations_table);

@@ -51,7 +51,7 @@ class fake_player_db_driver
 	public function sql_fetchfield($field, $rownum = false, $result = false) { return array_shift($this->fetchfield_queue); }
 	public function sql_fetchrow($result = false) { return false; }
 	public function sql_freeresult($result = false) {}
-	public function sql_nextid() { return 501; }
+	public function sql_last_inserted_id() { return 501; }
 }
 
 // What: records every log_insert() call instead of doing anything with

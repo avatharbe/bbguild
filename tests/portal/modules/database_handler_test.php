@@ -186,7 +186,7 @@ class database_handler_test extends TestCase
 	public function test_seed_guild_layout_only_creates_tab_then_returns_when_source_has_no_tab()
 	{
 		$this->db->method('sql_fetchrow')->willReturn(false);
-		$this->db->method('sql_nextid')->willReturn(0);
+		$this->db->method('sql_last_inserted_id')->willReturn(0);
 
 		$this->handler->seed_guild_layout(6);
 
@@ -200,7 +200,7 @@ class database_handler_test extends TestCase
 	public function test_seed_guild_layout_creates_default_tab_when_source_has_no_tab()
 	{
 		$this->db->method('sql_fetchrow')->willReturn(false);
-		$this->db->method('sql_nextid')->willReturn(42);
+		$this->db->method('sql_last_inserted_id')->willReturn(42);
 
 		$this->handler->seed_guild_layout(6);
 
@@ -225,7 +225,7 @@ class database_handler_test extends TestCase
 			['module_classname' => 'motd', 'module_column' => 1, 'module_order' => 1, 'module_name' => 'MOTD', 'module_image_src' => ''],
 			false
 		);
-		$this->db->method('sql_nextid')->willReturn(99);
+		$this->db->method('sql_last_inserted_id')->willReturn(99);
 
 		$this->handler->seed_guild_layout(6);
 

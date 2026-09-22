@@ -1593,7 +1593,7 @@ class player
 
 		$this->db->sql_query('INSERT INTO ' . $this->bb_players_table . $query);
 
-		$this->player_id = $this->db->sql_nextid();
+		$this->player_id = $this->db->sql_last_inserted_id();
 
 		$this->log->log_insert(
 			array(

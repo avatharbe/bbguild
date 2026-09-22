@@ -93,7 +93,7 @@ class specialization_test extends TestCase
 			$capturedSql = $sql;
 			return true;
 		});
-		$this->db->method('sql_nextid')->willReturn(42);
+		$this->db->method('sql_last_inserted_id')->willReturn(42);
 		$this->cache->expects($this->once())->method('destroy')->with('sql', self::TABLE);
 
 		$this->spec->save();
@@ -117,7 +117,7 @@ class specialization_test extends TestCase
 			$capturedSql = $sql;
 			return true;
 		});
-		$this->db->expects($this->never())->method('sql_nextid');
+		$this->db->expects($this->never())->method('sql_last_inserted_id');
 
 		$this->spec->save();
 

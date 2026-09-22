@@ -147,7 +147,7 @@ class release_2_1_0 extends \phpbb\db\migration\container_aware_migration
 			];
 			$sql = 'INSERT INTO ' . $tabs_table . ' ' . $this->db->sql_build_array('INSERT', $sql_ary);
 			$this->db->sql_query($sql);
-			$tab_id = (int) $this->db->sql_nextid();
+			$tab_id = (int) $this->db->sql_last_inserted_id();
 
 			$sql = 'UPDATE ' . $modules_table . '
 				SET module_tab = ' . (int) $tab_id . '
@@ -175,7 +175,7 @@ class release_2_1_0 extends \phpbb\db\migration\container_aware_migration
 			'tab_status' => 1,
 		]);
 		$this->db->sql_query($sql);
-		$tab_id = (int) $this->db->sql_nextid();
+		$tab_id = (int) $this->db->sql_last_inserted_id();
 
 		foreach ($this->default_modules() as $module)
 		{
