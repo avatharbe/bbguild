@@ -279,6 +279,27 @@ class database_handler
 	}
 
 	/**
+	 * Remove every portal tab and module belonging to a guild.
+	 *
+	 * Call this when a guild itself is being deleted (guilds::delete_guild()
+	 * only touches bb_guild/bb_ranks) -- without it, the guild's tabs/modules
+	 * are orphaned, and guild ids are reassigned via MAX(id)+1
+	 * (model/player/guilds.php::make_guild()) rather than true auto-increment,
+	 * so a later guild landing on the same freed id collides with the
+	 * orphaned rows on the (guild_id, tab_slug) unique key (bbguildwow#53).
+	 */
+	public function delete_guild_layout(int $guild_id): void
+	{
+		$sql = 'DELETE FROM ' . $this->modules_table . '
+			WHERE guild_id = ' . (int) $guild_id;
+		$this->db->sql_query($sql);
+
+		$sql = 'DELETE FROM ' . $this->tabs_table . '
+			WHERE guild_id = ' . (int) $guild_id;
+		$this->db->sql_query($sql);
+	}
+
+	/**
 	 * Copy default layout (guild_id=0) to a new guild, including its default tab.
 	 */
 	public function seed_guild_layout(int $guild_id): void

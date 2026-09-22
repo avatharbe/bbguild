@@ -580,6 +580,7 @@ class admin_guild
 		{
 			$deleteguild = $this->makeGuilds($this->request->variable('guildid', 0));
 			$deleteguild->get_guild();
+			$this->portal_db_handler->delete_guild_layout($deleteguild->getGuildid());
 			$deleteguild->delete_guild();
 			$success_message = sprintf($this->user->lang['ADMIN_DELETE_GUILD_SUCCESS'], $deleteguild->getGuildid());
 			trigger_error($success_message . $this->link, E_USER_NOTICE);
