@@ -6,6 +6,8 @@
 
 [![Tests](https://github.com/avatharbe/bbguild/actions/workflows/tests.yml/badge.svg)](https://github.com/avatharbe/bbguild/actions/workflows/tests.yml)
 
+**Documentation:** [avatharbe.github.io/bbguild](https://avatharbe.github.io/bbguild/)
+
 A Guild Management System for [phpBB 3.3](https://www.phpbb.com/). Manage your gaming guild's roster, recruitment, and news directly from your forum.
 
 Originally forked as bbDKP from EQDKP to phpBB 3.0 in 2008, the 2.0 version has been renamed bbGuild and rebuilt for phpBB 3.3 and PHP 8.x.
@@ -83,7 +85,7 @@ Originally forked as bbDKP from EQDKP to phpBB 3.0 in 2008, the 2.0 version has 
 4. In the ACP, go to **Customise > Manage extensions**.
 5. Find **bbGuild** under Disabled Extensions and click **Enable**.
 
-For permission setup, creating your first guild, portal/tab configuration, and troubleshooting, see the full [Installation Guide](contrib/INSTALL.md).
+For permission setup, creating your first guild, portal/tab configuration, and troubleshooting, see the full [Installation Guide](https://avatharbe.github.io/bbguild/INSTALL/).
 
 ### Game Plugins
 
@@ -119,9 +121,9 @@ See the [contributors](https://github.com/avatharbe/bbguild/graphs/contributors)
 1. [Create an issue](https://github.com/avatharbe/bbguild/issues) (unless one already exists).
 2. Submit a pull request.
 
-See `contrib/CHANGELOG.md` for version history.
+See the [Changelog](https://avatharbe.github.io/bbguild/CHANGELOG/) for version history, and the [Architecture](https://avatharbe.github.io/bbguild/architecture/) and [Database Schema](https://avatharbe.github.io/bbguild/database/) pages for how it's built.
 
-For extension developers: custom PHP events and integration details are documented in [contrib/Events.md](contrib/Events.md).
+For extension developers: custom PHP events and integration details are documented in the [Events API](https://avatharbe.github.io/bbguild/Events/) page.
 
 ## License
 
