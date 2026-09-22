@@ -1,0 +1,54 @@
+site_name: bbGuild
+site_description: Guild Management System for phpBB 3.3
+site_url: https://avatharbe.github.io/bbguild/
+repo_url: https://github.com/avatharbe/bbguild
+repo_name: avatharbe/bbguild
+edit_uri: edit/main/contrib/
+
+docs_dir: contrib
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.action.edit
+
+nav:
+  - Home: index.md
+  - Installation: INSTALL.md
+  - Architecture: architecture.md
+  - Database Schema: database.md
+  - Events API: Events.md
+  - Roadmap: roadmap-2.x.md
+  - Changelog: CHANGELOG.md
+
+exclude_docs: |
+  cleanup.sql
+  symphony.graffle
+  archive/
+  flow/
+
+markdown_extensions:
+  - admonition
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.highlight
+  - pymdownx.superfences

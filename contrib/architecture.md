@@ -31,7 +31,7 @@ its schema as a chain of `phpbb\db\migration` classes. `ext.php` extends
 child extensions before core disables (`disable_step()`), since a child's
 `services.yml` references core-defined DI parameters that stop existing
 once core is gone — though its hardcoded child list is currently stale
-(see [Known Gaps](#known-gaps--deliberately-out-of-scope)).
+(see [Known Gaps](#known-gaps-deliberately-out-of-scope)).
 
 **Game plugins** — `bbguildwow`, `bbguildgw2`, `bbguildlotro`, `bbguildeq`,
 `bbguildeq2`, `bbguildffxi`, `bbguildffxiv`, `bbguildswtor`,
@@ -273,7 +273,7 @@ format strings whose first `%s` is always the username resolved from
 | `migrations/` | Schema, seed data, config keys, permissions, and ACP/UCP module registration, as two release-named migration classes — `v200/release_2_0_0.php` and `v210/release_2_1_0.php`, each writing its milestone's full end state directly (see `contrib/database.md`) | phpBB migrator; `v210` `depends_on()` `v200` |
 | `acp/` | ACP module glue: an `*_info.php` (menu registration) + `*_module.php` (mode dispatch) pair per category, delegating the actual work to the matching `controller/admin_*.php` | `controller/`, phpBB `module.manager` |
 | `ucp/` | The single UCP module (`bbguild_module`): character claim/add/update/delete for the logged-in user | `model/player/` |
-| `cron/` | `task/character_sync.php` — the scheduled task described under [character-sync](#character-sync-scheduler-361) below | `model/games/character_sync_registry`, `model/player/player` |
+| `cron/` | `task/character_sync.php` — the scheduled task described under "Character-sync scheduler contract" below | `model/games/character_sync_registry`, `model/player/player` |
 
 Dependency direction is consistently controller/portal/cron → model → phpBB
 core services; `model/` and `portal/` don't call back into `controller/`.
