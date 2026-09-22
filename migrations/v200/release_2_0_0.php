@@ -1,9 +1,15 @@
 <?php
 /**
- * bbGuild Extension — squashed migration for 2.0.0-b3
+ * bbGuild Extension — 2.0.0 squashed migration
  *
- * Combines all schema, data-seeding, config, permissions, and module
- * registration from the former basics/, v200b2/, and v200b3/ migrations.
+ * Combines every 2.0.x-line migration (v200b3 through v200rc4) into the
+ * single final schema/data/permissions/module state 2.0.0 actually
+ * shipped with. Fresh-install-only: existing installs are expected to
+ * clean-install rather than upgrade through the old beta chain, so this
+ * writes the end state directly (e.g. bb_language.language is declared
+ * VCHAR:10 from the start, not CHAR:2 then widened; the ACP "Game
+ * settings" category and its game_module are created in their final
+ * position, not added under "General Settings" and moved afterward).
  *
  * Canonical version lives in ext::BBGUILD_VERSION; not in phpbb_config.
  *
@@ -12,22 +18,40 @@
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU General Public License v2
  */
 
-namespace avathar\bbguild\migrations\v200b3;
+namespace avathar\bbguild\migrations\v200;
 
-class release_2_0_0_b3 extends \phpbb\db\migration\container_aware_migration
+class release_2_0_0 extends \phpbb\db\migration\container_aware_migration
 {
 	public static function depends_on()
 	{
 		return ['\phpbb\db\migration\data\v320\v320'];
 	}
 
+	/**
+	 * ADMINISTRATORS' direct u_charclaim grant is the last distinguishing
+	 * artifact of the whole 2.0.x chain (added by the former rc2 step) —
+	 * checking for it is equivalent to checking the entire chain ran.
+	 */
 	public function effectively_installed()
 	{
-		return $this->db_tools->sql_table_exists($this->table_prefix . 'bb_guild');
+		$sql = 'SELECT ag.group_id
+			FROM ' . $this->table_prefix . 'acl_groups ag
+			JOIN ' . $this->table_prefix . 'groups g ON g.group_id = ag.group_id
+			JOIN ' . $this->table_prefix . 'acl_options ao ON ao.auth_option_id = ag.auth_option_id
+			WHERE g.group_name = \'ADMINISTRATORS\'
+				AND ao.auth_option = \'u_charclaim\'
+				AND ag.forum_id = 0
+				AND ag.auth_role_id = 0
+				AND ag.auth_setting = 1';
+		$result = $this->db->sql_query($sql);
+		$row = $this->db->sql_fetchrow($result);
+		$this->db->sql_freeresult($result);
+
+		return (bool) $row;
 	}
 
 	/* ------------------------------------------------------------------ */
-	/*  SCHEMA — 15 tables                                                 */
+	/*  SCHEMA — 17 tables                                                 */
 	/* ------------------------------------------------------------------ */
 
 	public function update_schema()
@@ -52,13 +76,14 @@ class release_2_0_0_b3 extends \phpbb\db\migration\container_aware_migration
 						'guild_id' => ['INDEX', ['guild_id']],
 					],
 				],
-				/* 2 - language */
+				/* 2 - language (width already 10: was CHAR:2, widened by the
+				   former rc1 for locale codes like es_x_tu) */
 				$this->table_prefix . 'bb_language' => [
 					'COLUMNS' => [
 						'id'                => ['UINT', null, 'auto_increment'],
 						'game_id'           => ['VCHAR:10', ''],
 						'attribute_id'      => ['UINT', 0],
-						'language'          => ['CHAR:2', ''],
+						'language'          => ['VCHAR:10', ''],
 						'attribute'         => ['VCHAR:30', ''],
 						'name'              => ['VCHAR_UNI:255', ''],
 						'name_short'        => ['VCHAR_UNI:255', ''],
@@ -141,7 +166,8 @@ class release_2_0_0_b3 extends \phpbb\db\migration\container_aware_migration
 					],
 					'PRIMARY_KEY' => ['rank_id', 'guild_id'],
 				],
-				/* 8 - players */
+				/* 8 - players (includes player_spec_id, added by the former b4
+				   for issue #331 specialization support) */
 				$this->table_prefix . 'bb_players' => [
 					'COLUMNS' => [
 						'player_id'           => ['UINT', null, 'auto_increment'],
@@ -168,6 +194,7 @@ class release_2_0_0_b3 extends \phpbb\db\migration\container_aware_migration
 						'player_status'       => ['BOOL', 0],
 						'deactivate_reason'   => ['VCHAR_UNI:255', ''],
 						'last_update'         => ['TIMESTAMP', 0],
+						'player_spec_id'      => ['UINT', 0],
 					],
 					'PRIMARY_KEY' => 'player_id',
 					'KEYS'        => ['UQ01' => ['UNIQUE', ['player_guild_id', 'player_name', 'player_realm']]],
@@ -258,7 +285,8 @@ class release_2_0_0_b3 extends \phpbb\db\migration\container_aware_migration
 						'I03' => ['INDEX', 'log_ipaddress'],
 					],
 				],
-				/* 14 - portal modules */
+				/* 14 - portal modules (module_tab is added later by the 2.1.0
+				   squash, alongside bb_portal_tabs) */
 				$this->table_prefix . 'bb_portal_modules' => [
 					'COLUMNS' => [
 						'module_id'           => ['UINT', null, 'auto_increment'],
@@ -289,6 +317,22 @@ class release_2_0_0_b3 extends \phpbb\db\migration\container_aware_migration
 					],
 					'PRIMARY_KEY' => ['config_name', 'guild_id'],
 				],
+				/* 16 - specializations (issue #331, added by the former b4) */
+				$this->table_prefix . 'bb_specializations' => [
+					'COLUMNS' => [
+						'spec_id'    => ['UINT', null, 'auto_increment'],
+						'game_id'    => ['VCHAR:10', ''],
+						'class_id'   => ['USINT', 0],
+						'role_id'    => ['USINT', 0],
+						'spec_name'  => ['VCHAR_UNI:100', ''],
+						'spec_icon'  => ['VCHAR:100', ''],
+						'spec_order' => ['USINT', 0],
+					],
+					'PRIMARY_KEY' => 'spec_id',
+					'KEYS' => [
+						'game_class_idx' => ['INDEX', ['game_id', 'class_id']],
+					],
+				],
 			],
 		];
 	}
@@ -312,12 +356,13 @@ class release_2_0_0_b3 extends \phpbb\db\migration\container_aware_migration
 				$this->table_prefix . 'bb_logs',
 				$this->table_prefix . 'bb_portal_modules',
 				$this->table_prefix . 'bb_portal_config',
+				$this->table_prefix . 'bb_specializations',
 			],
 		];
 	}
 
 	/* ------------------------------------------------------------------ */
-	/*  DATA — config, seed data, permissions, ACP/UCP modules, version    */
+	/*  DATA — config, seed data, permissions, ACP/UCP modules             */
 	/* ------------------------------------------------------------------ */
 
 	public function update_data()
@@ -383,12 +428,22 @@ class release_2_0_0_b3 extends \phpbb\db\migration\container_aware_migration
 			$data[] = ['permission.permission_set', ['ROLE_USER_FULL', ['u_bbguild', 'u_charclaim', 'u_charadd', 'u_chardelete', 'u_charupdate']]];
 		}
 
-		// Guest access to guild pages
+		// Direct per-group grants, for installs that manage u_ permissions via
+		// direct per-group checkboxes instead of the stock role templates
+		// (former rc1/rc2 fixes — role-based grants above never reach these
+		// groups in that case).
 		$data[] = ['permission.permission_set', ['GUESTS', 'u_bbguild', 'group']];
+		$data[] = ['permission.permission_set', ['REGISTERED', ['u_bbguild', 'u_charclaim', 'u_charadd', 'u_chardelete', 'u_charupdate'], 'group']];
+		$data[] = ['permission.permission_set', ['ADMINISTRATORS', ['u_bbguild', 'u_charclaim', 'u_charadd', 'u_chardelete', 'u_charupdate'], 'group']];
+		$data[] = ['permission.permission_set', ['GLOBAL_MODERATORS', 'u_bbguild', 'group']];
 
-		// ACP categories
+		// ACP categories (Game settings sits between General Settings and
+		// Guild & Player — former rc4 added it after MAINPAGE then moved it
+		// up; declaring modules in this order directly gets the same result
+		// without the reorder step)
 		$data[] = ['module.add', ['acp', 0, 'ACP_CAT_BBGUILD']];
 		$data[] = ['module.add', ['acp', 'ACP_CAT_BBGUILD', 'ACP_BBGUILD_MAINPAGE']];
+		$data[] = ['module.add', ['acp', 'ACP_CAT_BBGUILD', 'ACP_BBGUILD_GAMESETTINGS']];
 		$data[] = ['module.add', ['acp', 'ACP_CAT_BBGUILD', 'ACP_BBGUILD_PLAYER']];
 		$data[] = ['module.add', ['ucp', 0, 'UCP_BBGUILD']];
 
@@ -397,7 +452,9 @@ class release_2_0_0_b3 extends \phpbb\db\migration\container_aware_migration
 			'module_basename' => '\avathar\bbguild\acp\main_module',
 			'modes'           => ['panel', 'config', 'logs'],
 		]]];
-		$data[] = ['module.add', ['acp', 'ACP_BBGUILD_MAINPAGE', [
+
+		// ACP modules — game settings
+		$data[] = ['module.add', ['acp', 'ACP_BBGUILD_GAMESETTINGS', [
 			'module_basename' => '\avathar\bbguild\acp\game_module',
 			'modes'           => ['listgames', 'editgames', 'addfaction', 'addrace', 'addclass', 'addrole'],
 		]]];
@@ -424,9 +481,6 @@ class release_2_0_0_b3 extends \phpbb\db\migration\container_aware_migration
 	public function revert_data()
 	{
 		return [
-			// Guest permission
-			['permission.permission_unset', ['GUESTS', 'u_bbguild', 'group']],
-
 			// UCP module
 			['module.remove', ['ucp', 'UCP_BBGUILD', [
 				'module_basename' => '\avathar\bbguild\ucp\bbguild_module',
@@ -439,7 +493,7 @@ class release_2_0_0_b3 extends \phpbb\db\migration\container_aware_migration
 			['module.remove', ['acp', 'ACP_BBGUILD_PLAYER', [
 				'module_basename' => '\avathar\bbguild\acp\guild_module',
 			]]],
-			['module.remove', ['acp', 'ACP_BBGUILD_MAINPAGE', [
+			['module.remove', ['acp', 'ACP_BBGUILD_GAMESETTINGS', [
 				'module_basename' => '\avathar\bbguild\acp\game_module',
 			]]],
 			['module.remove', ['acp', 'ACP_BBGUILD_MAINPAGE', [
@@ -449,8 +503,15 @@ class release_2_0_0_b3 extends \phpbb\db\migration\container_aware_migration
 			// ACP categories
 			['module.remove', ['ucp', 0, 'UCP_BBGUILD']],
 			['module.remove', ['acp', 'ACP_CAT_BBGUILD', 'ACP_BBGUILD_PLAYER']],
+			['module.remove', ['acp', 'ACP_CAT_BBGUILD', 'ACP_BBGUILD_GAMESETTINGS']],
 			['module.remove', ['acp', 'ACP_CAT_BBGUILD', 'ACP_BBGUILD_MAINPAGE']],
 			['module.remove', ['acp', 0, 'ACP_CAT_BBGUILD']],
+
+			// Direct per-group grants
+			['permission.permission_unset', ['GLOBAL_MODERATORS', 'u_bbguild', 'group']],
+			['permission.permission_unset', ['ADMINISTRATORS', ['u_bbguild', 'u_charclaim', 'u_charadd', 'u_chardelete', 'u_charupdate'], 'group']],
+			['permission.permission_unset', ['REGISTERED', ['u_bbguild', 'u_charclaim', 'u_charadd', 'u_chardelete', 'u_charupdate'], 'group']],
+			['permission.permission_unset', ['GUESTS', 'u_bbguild', 'group']],
 
 			// Permissions
 			['permission.remove', ['u_charupdate']],
