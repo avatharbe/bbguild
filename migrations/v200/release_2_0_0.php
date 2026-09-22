@@ -1,15 +1,11 @@
 <?php
 /**
- * bbGuild Extension — 2.0.0 squashed migration
+ * bbGuild Extension — 2.0.0 migration
  *
- * Combines every 2.0.x-line migration (v200b3 through v200rc4) into the
- * single final schema/data/permissions/module state 2.0.0 actually
- * shipped with. Fresh-install-only: existing installs are expected to
- * clean-install rather than upgrade through the old beta chain, so this
- * writes the end state directly (e.g. bb_language.language is declared
- * VCHAR:10 from the start, not CHAR:2 then widened; the ACP "Game
- * settings" category and its game_module are created in their final
- * position, not added under "General Settings" and moved afterward).
+ * Fresh-install-only: writes the full 2.0.0 schema/data/permissions/module
+ * state directly (e.g. bb_language.language is declared VCHAR:10; the ACP
+ * "Game settings" category and its game_module are created in their final
+ * position).
  *
  * Canonical version lives in ext::BBGUILD_VERSION; not in phpbb_config.
  *
@@ -28,9 +24,8 @@ class release_2_0_0 extends \phpbb\db\migration\container_aware_migration
 	}
 
 	/**
-	 * ADMINISTRATORS' direct u_charclaim grant is the last distinguishing
-	 * artifact of the whole 2.0.x chain (added by the former rc2 step) —
-	 * checking for it is equivalent to checking the entire chain ran.
+	 * ADMINISTRATORS' direct u_charclaim grant is used as the
+	 * installed-marker for this migration.
 	 */
 	public function effectively_installed()
 	{
@@ -76,8 +71,7 @@ class release_2_0_0 extends \phpbb\db\migration\container_aware_migration
 						'guild_id' => ['INDEX', ['guild_id']],
 					],
 				],
-				/* 2 - language (width already 10: was CHAR:2, widened by the
-				   former rc1 for locale codes like es_x_tu) */
+				/* 2 - language (width 10, to fit locale codes like es_x_tu) */
 				$this->table_prefix . 'bb_language' => [
 					'COLUMNS' => [
 						'id'                => ['UINT', null, 'auto_increment'],
@@ -166,8 +160,8 @@ class release_2_0_0 extends \phpbb\db\migration\container_aware_migration
 					],
 					'PRIMARY_KEY' => ['rank_id', 'guild_id'],
 				],
-				/* 8 - players (includes player_spec_id, added by the former b4
-				   for issue #331 specialization support) */
+				/* 8 - players (includes player_spec_id, issue #331
+				   specialization support) */
 				$this->table_prefix . 'bb_players' => [
 					'COLUMNS' => [
 						'player_id'           => ['UINT', null, 'auto_increment'],
@@ -285,8 +279,8 @@ class release_2_0_0 extends \phpbb\db\migration\container_aware_migration
 						'I03' => ['INDEX', 'log_ipaddress'],
 					],
 				],
-				/* 14 - portal modules (module_tab is added later by the 2.1.0
-				   squash, alongside bb_portal_tabs) */
+				/* 14 - portal modules (module_tab is added in 2.1.0, alongside
+				   bb_portal_tabs) */
 				$this->table_prefix . 'bb_portal_modules' => [
 					'COLUMNS' => [
 						'module_id'           => ['UINT', null, 'auto_increment'],
@@ -317,7 +311,7 @@ class release_2_0_0 extends \phpbb\db\migration\container_aware_migration
 					],
 					'PRIMARY_KEY' => ['config_name', 'guild_id'],
 				],
-				/* 16 - specializations (issue #331, added by the former b4) */
+				/* 16 - specializations (issue #331) */
 				$this->table_prefix . 'bb_specializations' => [
 					'COLUMNS' => [
 						'spec_id'    => ['UINT', null, 'auto_increment'],
@@ -430,17 +424,14 @@ class release_2_0_0 extends \phpbb\db\migration\container_aware_migration
 
 		// Direct per-group grants, for installs that manage u_ permissions via
 		// direct per-group checkboxes instead of the stock role templates
-		// (former rc1/rc2 fixes — role-based grants above never reach these
-		// groups in that case).
+		// (role-based grants above never reach these groups in that case).
 		$data[] = ['permission.permission_set', ['GUESTS', 'u_bbguild', 'group']];
 		$data[] = ['permission.permission_set', ['REGISTERED', ['u_bbguild', 'u_charclaim', 'u_charadd', 'u_chardelete', 'u_charupdate'], 'group']];
 		$data[] = ['permission.permission_set', ['ADMINISTRATORS', ['u_bbguild', 'u_charclaim', 'u_charadd', 'u_chardelete', 'u_charupdate'], 'group']];
 		$data[] = ['permission.permission_set', ['GLOBAL_MODERATORS', 'u_bbguild', 'group']];
 
 		// ACP categories (Game settings sits between General Settings and
-		// Guild & Player — former rc4 added it after MAINPAGE then moved it
-		// up; declaring modules in this order directly gets the same result
-		// without the reorder step)
+		// Guild & Player)
 		$data[] = ['module.add', ['acp', 0, 'ACP_CAT_BBGUILD']];
 		$data[] = ['module.add', ['acp', 'ACP_CAT_BBGUILD', 'ACP_BBGUILD_MAINPAGE']];
 		$data[] = ['module.add', ['acp', 'ACP_CAT_BBGUILD', 'ACP_BBGUILD_GAMESETTINGS']];
@@ -562,8 +553,9 @@ class release_2_0_0 extends \phpbb\db\migration\container_aware_migration
 	public function insert_sample_data()
 	{
 		$user = $this->container->get('user');
-		$user->add_lang_ext('avathar/bbguild', 'admin');
-		$welcome_message = $this->encode_message($user->lang['MOTD']);
+		$language = $this->container->get('language');
+		$language->add_lang('admin', 'avathar/bbguild');
+		$welcome_message = $this->encode_message($language->lang_raw('MOTD'));
 
 		$games_table    = $this->table_prefix . 'bb_games';
 		$faction_table  = $this->table_prefix . 'bb_factions';
@@ -808,7 +800,7 @@ class release_2_0_0 extends \phpbb\db\migration\container_aware_migration
 			$this->db->sql_multi_insert($motd_table, [
 				[
 					'guild_id'        => 1,
-					'motd_title'      => $user->lang['MOTDGREETING'],
+					'motd_title'      => $language->lang_raw('MOTDGREETING'),
 					'motd_timestamp'  => $now,
 					'motd_msg'        => $welcome_message['text'],
 					'bbcode_uid'      => $welcome_message['uid'],

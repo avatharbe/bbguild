@@ -1,11 +1,9 @@
 <?php
 /**
- * bbGuild Extension — 2.1.0 squashed migration
+ * bbGuild Extension — 2.1.0 migration
  *
- * Combines every 2.1.x-line migration (v210b1 through v210b3) into the
- * single final schema/data state 2.1.0 ships with: character-sync
- * scheduler support (#361), page-level portal tabs (#360), and the
- * guild_id=0 default-template fix (#374).
+ * Adds character-sync scheduler support (#361), page-level portal tabs
+ * (#360), and the guild_id=0 default-template fix (#374).
  *
  * Canonical version lives in ext::BBGUILD_VERSION; not in phpbb_config.
  *
@@ -27,9 +25,8 @@ class release_2_1_0 extends \phpbb\db\migration\container_aware_migration
 	 * Table-existence check only (not a data query): this migration's own
 	 * update_schema() is what creates bb_portal_tabs, so on a genuinely
 	 * fresh install effectively_installed() runs before that table exists
-	 * at all -- querying it here would hard-error instead of returning
-	 * false. (The original chain queried a row in it safely only because
-	 * that check lived in a *separate*, later migration by then.)
+	 * at all -- querying a row in it here would hard-error instead of
+	 * returning false.
 	 */
 	public function effectively_installed()
 	{

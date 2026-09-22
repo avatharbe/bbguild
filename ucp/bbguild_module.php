@@ -201,7 +201,7 @@ class bbguild_module
 		$this->bb_gameroles_table = $phpbb_container->getParameter('avathar.bbguild.tables.bb_gameroles');
 
 		// Attach the language files
-		$this->user->add_lang(array('acp/groups', 'acp/common'));
+		$phpbb_container->get('language')->add_lang(array('acp/groups', 'acp/common'));
 		$guilds = new guilds($this->db, $this->user, $this->config, $this->bbguild_cache, $this->bbguild_log, $this->bb_players_table, $this->bb_ranks_table, $this->bb_classes_table, $this->bb_races_table, $this->bb_language_table, $this->bb_guild_table, $this->bb_factions_table, 0);
 
 		// Build installed games list and regions
@@ -650,7 +650,7 @@ class bbguild_module
 		$players = new player($this->db, $this->config, $this->bbguild_cache, $this->user, $this->bbguild_ext_manager, $this->bbguild_log, $this->bbguild_util, $this->bb_players_table, $this->bb_ranks_table, $this->bb_classes_table, $this->bb_races_table, $this->bb_language_table, $this->bb_guild_table, $this->bb_factions_table, $this->bb_games_table, $this->bbguild_game_registry);
 
 		// Attach the language file
-		$this->user->add_lang_ext('avathar/bbguild', array('common', 'admin'));
+		$phpbb_container->get('language')->add_lang(array('common', 'admin'), 'avathar/bbguild');
 		$show=true;
 
 		if ($player_id == 0)

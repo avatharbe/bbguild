@@ -33,27 +33,27 @@ class ext extends base
 	{
 		$errors = [];
 
-		$user = $this->container->get('user');
-		$user->add_lang_ext('avathar/bbguild', 'common');
+		$language = $this->container->get('language');
+		$language->add_lang('common', 'avathar/bbguild');
 
 		if (version_compare(PHP_VERSION, self::MIN_PHP_VERSION, '<'))
 		{
-			$errors[] = $user->lang('BBGUILD_PHP_VERSION_FAIL', self::MIN_PHP_VERSION, PHP_VERSION);
+			$errors[] = $language->lang('BBGUILD_PHP_VERSION_FAIL', self::MIN_PHP_VERSION, PHP_VERSION);
 		}
 
 		if (phpbb_version_compare(PHPBB_VERSION, self::MIN_PHPBB_VERSION, '<'))
 		{
-			$errors[] = $user->lang('BBGUILD_PHPBB_VERSION_FAIL', self::MIN_PHPBB_VERSION, PHPBB_VERSION);
+			$errors[] = $language->lang('BBGUILD_PHPBB_VERSION_FAIL', self::MIN_PHPBB_VERSION, PHPBB_VERSION);
 		}
 
 		if (!extension_loaded('gd'))
 		{
-			$errors[] = $user->lang('BBGUILD_REQUIRES_GD');
+			$errors[] = $language->lang('BBGUILD_REQUIRES_GD');
 		}
 
 		if (!extension_loaded('curl'))
 		{
-			$errors[] = $user->lang('BBGUILD_REQUIRES_CURL');
+			$errors[] = $language->lang('BBGUILD_REQUIRES_CURL');
 		}
 
 		return empty($errors) ? true : $errors;
