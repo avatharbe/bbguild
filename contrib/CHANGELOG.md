@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased (2.1.0)
+## 2.1.0 22/09/2026
   - [NEW] Portal page-level guild tabs (#360) — `bb_portal_tabs` table + `module_tab` axis on `bb_portal_modules` so a guild's portal page can have more than one tab, each with its own independently column-organized set of modules; renderer resolves the active tab and emits a tab bar between the guild header and the portal grid; ACP tab CRUD; `/guild/{tab}/{guild_id}` route reuses the previously-ignored page-slug segment.
   - [NEW] Guild statistics portal module (#366) — new game-agnostic `portal\modules\statistics` block showing class distribution, race distribution, level distribution, rank/active-member counts, and recent joins/departures for the current guild, all read from core's own `bb_players`/`bb_ranks`/`bb_classes`/`bb_races`/`bb_language` tables. Item level distribution and DKP/raid stats are deliberately out of scope — ilvl only exists for WoW (via bbguildwow's own equipment-sync table, breaking game-agnosticism) and DKP/raid stats are bbDKP v2's territory.
   - [NEW] Character-sync scheduler contract (#361) — core cron task drives per-character syncs through a `character_sync_interface`/registry that game plugins register handlers against (tagged `bbguild.character_sync`); new `player_last_synced` column + `bbguild_sync_last_run` config track sync state, `player::get_stalest_players()`/`update_last_synced()` drive the batch selection, and a `CHARACTER_SYNC_FAILED` admin-log type records failures. bbguildwow's WoW handler is the first real consumer (#362).
