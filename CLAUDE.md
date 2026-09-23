@@ -14,7 +14,7 @@
 | Metric | Value |
 |--------|-------|
 | First commit | May 28, 2010 |
-| Status | 2.1.0 (guild page overhaul) tagged `v2.1.0` 2026-09-22 — migration squash (#383) closed, all 18 issues on the 2.1.0 milestone shipped. No GitHub Release published yet for the tag (release/announcement prep in progress). |
+| Status | 2.1.0 (guild page overhaul) **released 2026-09-22** — tagged `v2.1.0`, GitHub Release published, forum release posts + SEO pass done the same day. Migration squash (#383) closed; all 18 issues on the 2.1.0 milestone shipped, milestone closed with 0 open. Current work is 2.2.0. |
 | Tracking issue | [#303](https://github.com/avatharbe/bbguild/issues/303) |
 
 ## Roadmap (2.x) — planned 2026-07

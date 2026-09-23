@@ -1,6 +1,6 @@
 # bbGuild Family Roadmap (2.x)
 
-*Updated 2026-09-22. Working copy: `ext/avathar/bbguild` (+ plugins). Reconciled with GitHub milestones.*
+*Updated 2026-09-23. Working copy: `ext/avathar/bbguild` (+ plugins). Reconciled with GitHub milestones.*
 
 ## North star
 
@@ -11,7 +11,9 @@ Feature parity, measured against four benchmarks at once:
 3. **The extension family** — bbAccounts, bbDKP v2, bbPoints, and planned events/Gameworld/Discord.
 4. **Guild-hosting sites** — guildsofwow.com as the external bar.
 
-Releases are a **coordinated train** across bbGuild core + all 9 game plugins — shipped together and **pairing-locked** (every plugin hard-requires the current core version). **2.0.0 shipped stable 2026-09-12, publicly released 2026-09-14** (core `v2.0.0`; bbguildwow's pairing bumped to `>=2.0.0` — its own version stays at `2.1.0-b1`, already mid-feature-work; other plugins' 2.0.0 status not yet re-verified as part of this pass). GitHub Releases for [`v2.0.0-rc5`](https://github.com/avatharbe/bbguild/releases/tag/v2.0.0-rc5) and [`v2.0.0`](https://github.com/avatharbe/bbguild/releases/tag/v2.0.0) were published 2026-09-14 (tagged 2026-07-26/2026-09-12 respectively, but sat without a Release object until then) — a forum announcement is still outstanding, see Next steps. **New features are at 2.1.0.** Cadence ~6 weeks.
+Releases are a **coordinated train** across bbGuild core + all 9 game plugins — shipped together and **pairing-locked** (every plugin hard-requires the current core version). **2.0.0 shipped stable 2026-09-12, publicly released 2026-09-14** (core `v2.0.0`; bbguildwow's pairing bumped to `>=2.0.0` — its own version stays at `2.1.0-b1`, already mid-feature-work; other plugins' 2.0.0 status not yet re-verified as part of this pass). GitHub Releases for [`v2.0.0-rc5`](https://github.com/avatharbe/bbguild/releases/tag/v2.0.0-rc5) and [`v2.0.0`](https://github.com/avatharbe/bbguild/releases/tag/v2.0.0) were published 2026-09-14 (tagged 2026-07-26/2026-09-12 respectively, but sat without a Release object until then).
+
+**2.1.0 shipped and was publicly released 2026-09-22** — core [`v2.1.0`](https://github.com/avatharbe/bbguild/releases/tag/v2.1.0) plus a `v2.1.0` Release on all 8 non-WoW plugins and [`v2.1.1`](https://github.com/avatharbe/bbguildwow/releases/tag/v2.1.1) on bbguildwow (a same-day patch for equipment-sync stalls found in manual verification; its own `v2.1.0` tag has no separate Release object, 2.1.1 supersedes it). All 10 repos: milestone closed, CI green on `main`, nothing unpushed. The author published the per-release forum posts and did an SEO pass the same day, which also closes out the 2.0.0 announcement that had been left outstanding. **New features are at 2.2.0.** Cadence ~6 weeks.
 
 **Scope of this document:** the **bbGuild family** — core, game plugins, and guild-facing extensions (events/RSVP, Discord, Gameworld). The **DKP & accounting family** (bbAccounts, bbDKP, raid logging) is a **separate roadmap/topic** — summarized at the bottom for context only.
 
@@ -52,10 +54,10 @@ Status: ✅ have · ◑ partial · ⬜ gap. "Owner" = which repo delivers it.
 **Stabilization only — no new features.**
 - Closed the rc line; bug-bash across roster / UCP / ACP / portal / multi-guild.
 - **#244** unit tests (gated stable) — closed 2026-09-12, scoped to essentials already shipped; remaining migration/CRUD coverage split into #372 (2.1.0).
-- GitHub Releases for `v2.0.0-rc5` and `v2.0.0` published 2026-09-14 (tags existed since 2026-07-26/2026-09-12 but had no Release object until then). Forum announcement still outstanding — see Next steps.
+- GitHub Releases for `v2.0.0-rc5` and `v2.0.0` published 2026-09-14 (tags existed since 2026-07-26/2026-09-12 but had no Release object until then). Forum announcement: covered by the 2026-09-22 release-post push (see 2.1.0). Note `v2.0.0`'s Release object is still flagged **Pre-release** on GitHub while `v2.1.0` is Latest — cosmetic, worth flipping next time the releases page is touched.
 - Coordinated stable release tagged for core + bbguildwow (`avathar/bbguild >=2.0.0` pairing). Other 8 plugins' 2.0.0 status not re-verified in this pass.
 
-### 2.1.0 — guild page overhaul · due 2026-10-15 · **feature-complete, ready to release**
+### 2.1.0 — guild page overhaul · due 2026-10-15 · **shipped, released 2026-09-22**
 Headline: tabbed portal + character experience + stats.
 - **#360** page-level guild tabs (portal foundation) — **shipped** (merged ffeb450d, closed 2026-09-13)
 - **#361** core character-sync scheduler contract + cron — **shipped**
@@ -84,6 +86,7 @@ Headline: tabbed portal + character experience + stats.
 - **#368** profile-field character info (restores pbwowext#10, part 2; companion to #231)
 - **#230** professions
 - **#289** player statistics page
+- **#388** guild activity feed portal module (filed 2026-09-22, after the 2.1.0 release)
 
 ### 2.3.0 — integrations · due 2027-01-15
 - **#370** expose a bbGuild API surface (phpBB events + read API) — the decoupling/integration layer for the whole family; revives the 2012 bbDKP-API idea; Discord/Gameworld are its first consumers
@@ -117,10 +120,10 @@ Gets its own parity matrix + release plan in a separate document.
 ## Cross-repo notes
 - New extensions (events, Discord) are **separate repos** — they need their own milestones/epics; tracked here only as roadmap line items. Discord is an **open question, not decided**.
 - Gameworld is an **existing repo**, not a new one — still the old phpBB 3.0 MOD, needs porting to a 3.3 extension (`Gameworld#16`, milestoned 2.3.0).
-- bbTips (`bonus=` attribute, #363) is a **separate extension** from the 9-plugin train — coordinate its release with 2.1.0.
+- bbTips (`bonus=` attribute, #363) is a **separate extension** from the 9-plugin train. The `bonus=` support the 2.1.0 gear tooltips depend on is committed on bbTips `main` (working toward `2.0.0-rc3`), but bbTips' newest *published* GitHub Release is still `v1.0.7` (2015) — so 2.1.0's tooltips currently rely on an unreleased bbTips. Cutting a bbTips 2.0.0 release is a real follow-up, not just bookkeeping.
 
 ## Next steps
-1. 2.1.0 is feature-complete — every milestoned issue is shipped, parked, or closed (#383's migration squash was the last blocker, closed 2026-09-22). Remaining work before tagging the release: re-verify all 9 plugins' CI is green against core's squashed migrations (confirmed as of this pass), then tag/publish GitHub Releases the same way 2.0.0 was.
-2. GitHub Releases for `v2.0.0-rc5`/`v2.0.0` published 2026-09-14. Still outstanding: a forum announcement for the 2.0.0 stable line, matching the rc1 precedent (last one was 2026-07-24).
-3. Stand up epics/repos for the 2.2.0/2.3.0 new extensions.
+1. **2.1.0 is done and out** — tagged, Released on all 10 repos, milestone closed (0 open), CI green, forum posts + SEO published 2026-09-22. No follow-up work outstanding on this train.
+2. **Icon-art cluster is now the oldest unclaimed work** — 9 plugin bugs, all milestoned 2.2.0, each small and independent: eq#7, eq2#7, ffxiv#4, gw2#7, gw2#8, lineage2#3, lineage2#7, lotro#3, swtor#3. They were queued as 2.0.0 stabilization work back on 2026-09-13, deferred to 2.2.0, and never picked up. Cheapest visible win available and parallelizes cleanly across repos.
+3. Stand up epics/repos for the 2.2.0/2.3.0 new extensions (Events/RSVP first).
 4. GW2 API v2 roster sync (gw2#9) moved to 2.2.0 — re-scoped to roster-only (name/rank/join date), key-linking split off separately; needs its own design pass before work starts.
