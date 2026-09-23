@@ -1,4 +1,4 @@
-<img width="1076" height="393" alt="bbguild" src="https://github.com/user-attachments/assets/86fe5f78-b3dc-4d23-a1f4-aa58e3ac9f86" />
+<img width="500" height="215" alt="bbguild" src="https://github.com/user-attachments/assets/86fe5f78-b3dc-4d23-a1f4-aa58e3ac9f86" />
 
 
 # bbGuild
