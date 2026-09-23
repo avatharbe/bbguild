@@ -1,4 +1,4 @@
-[![bbGuild](https://www.avathar.be/forum/images/site_logo.png)](https://www.avathar.be/forum)
+[![bbGuild](<img width="1076" height="393" alt="bbguild" src="https://github.com/user-attachments/assets/fe5e02ed-b7b4-4573-9f79-3eff72084cb6" />)](https://www.avathar.be/forum)
 
 # bbGuild
 
