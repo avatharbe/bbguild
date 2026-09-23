@@ -7,6 +7,8 @@
 [![Tests](https://github.com/avatharbe/bbguild/actions/workflows/tests.yml/badge.svg)](https://github.com/avatharbe/bbguild/actions/workflows/tests.yml)
 
 **Documentation:** [avatharbe.github.io/bbguild](https://avatharbe.github.io/bbguild/)
+- Support forum: [https://www.avathar.be/forum](https://www.avathar.be/forum/viewforum.php?f=106)
+- phpBB topic: [Extension development](https://www.phpbb.com/community/viewtopic.php?t=2673556)
 
 A Guild Management System for [phpBB 3.3](https://www.phpbb.com/). Manage your gaming guild's roster, recruitment, and news directly from your forum.
 
@@ -108,11 +110,6 @@ Game support is provided by separate extensions. Install them the same way:
 1. In the ACP, go to **Customise > Manage extensions**.
 2. Find **bbGuild** under Enabled Extensions and click **Disable**.
 3. To permanently remove, click **Delete Data** and then delete `ext/avathar/bbguild/`.
-
-## Community
-
-- Support forum: [https://www.avathar.be/forum](https://www.avathar.be/forum/viewforum.php?f=106)
-- phpBB topic: [Extension development](https://www.phpbb.com/community/viewtopic.php?f=456&t=2258141)
 
 ## Contributing
 
