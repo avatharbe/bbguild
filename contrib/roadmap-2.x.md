@@ -120,7 +120,7 @@ Gets its own parity matrix + release plan in a separate document.
 ## Cross-repo notes
 - New extensions (events, Discord) are **separate repos** — they need their own milestones/epics; tracked here only as roadmap line items. Discord is an **open question, not decided**.
 - Gameworld is an **existing repo**, not a new one — still the old phpBB 3.0 MOD, needs porting to a 3.3 extension (`Gameworld#16`, milestoned 2.3.0).
-- bbTips (`bonus=` attribute, #363) is a **separate extension** from the 9-plugin train. The `bonus=` support the 2.1.0 gear tooltips depend on is committed on bbTips `main` (working toward `2.0.0-rc3`), but bbTips' newest *published* GitHub Release is still `v1.0.7` (2015) — so 2.1.0's tooltips currently rely on an unreleased bbTips. Cutting a bbTips 2.0.0 release is a real follow-up, not just bookkeeping.
+- bbTips (`bonus=` attribute, #363) is a **separate extension** from the 9-plugin train. The `bonus=` support the 2.1.0 gear tooltips depend on ships in bbTips **2.0.0-rc3** (tagged `v2.0.0-rc3`, `BBTIPS_VERSION = '2.0.0-rc3'`) — released as an RC, not unreleased. The only gap is bookkeeping: no GitHub Release object exists for `v2.0.0-rc2`/`v2.0.0-rc3`, so the releases page still advertises `v1.0.7` (2015) as latest — the same state core's 2.0.0 tags were in until 2026-09-14. Publishing Release objects for the rc tags is the follow-up; cutting bbTips 2.0.0 stable is its own separate decision.
 
 ## Next steps
 1. **2.1.0 is done and out** — tagged, Released on all 10 repos, milestone closed (0 open), CI green, forum posts + SEO published 2026-09-22. No follow-up work outstanding on this train.
