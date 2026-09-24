@@ -103,9 +103,9 @@
 					{% if S_SHOWACH == 1 %}
 					<td style="text-align: center;">{{ row.ACHIEVPTS }}</td>
 					{% endif %}
-					<td style="text-align: left;"><img src="{{ row.RACE_IMAGE }}" alt="" />&nbsp;{{ row.RACE }}</td>
+					<td style="text-align: left;">{% if row.RACE_IMAGE %}<img src="{{ row.RACE_IMAGE }}" alt="" />&nbsp;{% endif %}{{ row.RACE }}</td>
 					<td style="text-align: left;">
-						<img src="{{ row.CLASS_IMAGE }}" alt="{{ row.CLASS }}" />&nbsp;
+						{% if row.CLASS_IMAGE %}<img src="{{ row.CLASS_IMAGE }}" alt="{{ row.CLASS }}" />&nbsp;{% endif %}
 						<span style="white-space: nowrap; color:{{ row.COLORCODE }}">{{ row.CLASS }}</span>
 					</td>
 					{% if S_SHOWSPEC %}
@@ -137,8 +137,8 @@
 	{# ---- Grid view (grouped by class) ---- #}
 	{% for class in loops.class %}
 	<h2>
-		<img src="{{ class.CLASSIMG }}" style="max-width:100px; max-height:100px;" alt="{{ class.CLASSNAME }}" />
-		&nbsp;
+		{% if class.CLASSIMG %}<img src="{{ class.CLASSIMG }}" style="max-width:100px; max-height:100px;" alt="{{ class.CLASSNAME }}" />
+		&nbsp;{% endif %}
 		<span style="color: {{ class.COLORCODE }};">{{ class.CLASSNAME }}</span>
 	</h2>
 
@@ -160,7 +160,7 @@
 		{% endif %}
 			<td style="text-align:center; width:100;" class="bg1">
 				<a href="{{ players_row.U_PLAYER_DETAIL }}">
-					{% if players_row.PORTRAIT %}<img src="{{ players_row.PORTRAIT }}" alt=" " width="64" height="64" />{% else %}<img src="{{ players_row.CLASS_IMAGE }}" alt="{{ players_row.CLASS }}" width="64" height="64" />{% endif %}</a>
+					{% if players_row.PORTRAIT %}<img src="{{ players_row.PORTRAIT }}" alt=" " width="64" height="64" />{% elseif players_row.CLASS_IMAGE %}<img src="{{ players_row.CLASS_IMAGE }}" alt="{{ players_row.CLASS }}" width="64" height="64" />{% endif %}</a>
 			</td>
 			<td style="text-align:left; width:100" class="bg2">
 				<strong><a style="color: {{ class.COLORCODE }};" href="{{ players_row.U_PLAYER_DETAIL }}">{{ players_row.NAME }}</a></strong>

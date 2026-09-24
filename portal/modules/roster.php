@@ -302,8 +302,8 @@ class roster extends module_base
 				'ARMORY'      => $char['player_armory_url'],
 				'PHPBBUID'    => $char['username'],
 				'ACHIEVPTS'   => $char['player_achiev'],
-				'CLASS_IMAGE' => $ext_path_images . 'class_images/' . basename($char['class_image']),
-				'RACE_IMAGE'  => $ext_path_images . 'race_images/' . basename($char['race_image']),
+				'CLASS_IMAGE' => $this->resolve_game_image($ext_path_images, $this->character_image_candidates('class_images', (string) $char['class_image'])),
+				'RACE_IMAGE'  => $this->resolve_game_image($ext_path_images, $this->character_image_candidates('race_images', (string) $char['race_image'])),
 				'SPEC'        => $spec['name'],
 				'SPEC_ICON'   => $spec['icon'],
 				'U_PLAYER_DETAIL' => $this->helper->route('avathar_bbguild_player', [
@@ -374,7 +374,7 @@ class roster extends module_base
 
 			foreach ($classes as $classid => $class)
 			{
-				$classimgurl = $ext_path_images . 'roster_classes/' . $class['imagename'] . '.png';
+				$classimgurl = $this->resolve_game_image($ext_path_images, $this->class_image_candidates($class['imagename']));
 
 				$this->template->assign_block_vars('class', [
 					'CLASSNAME' => $class['name'],
@@ -402,8 +402,8 @@ class roster extends module_base
 							'SPEC'      => $grid_spec['name'],
 							'SPEC_ICON' => $grid_spec['icon'],
 							'ACHIEVPTS' => $char['player_achiev'],
-							'CLASS_IMAGE' => $ext_path_images . 'class_images/' . basename($char['class_image']),
-							'RACE_IMAGE'  => $ext_path_images . 'race_images/' . basename($char['race_image']),
+							'CLASS_IMAGE' => $this->resolve_game_image($ext_path_images, $this->character_image_candidates('class_images', (string) $char['class_image'])),
+							'RACE_IMAGE'  => $this->resolve_game_image($ext_path_images, $this->character_image_candidates('race_images', (string) $char['race_image'])),
 							'U_PLAYER_DETAIL' => $this->helper->route('avathar_bbguild_player', [
 								'guild_id'  => $this->guild_id,
 								'player_id' => $char['player_id'],
@@ -508,6 +508,113 @@ class roster extends module_base
 						return $this->path_helper->get_web_root_path() . $rel_path;
 					}
 				}
+			}
+		}
+
+		return '';
+	}
+
+	/**
+	 * Ordered candidate paths for a class's roster image, relative to a
+	 * game's images/ directory.
+	 *
+	 * The grid's preferred asset is the large roster_classes/ artwork, but
+	 * the smaller class_images/ detail icon is a better fallback than a
+	 * broken image, and a game's <prefix>_unknown icon is better than
+	 * nothing at all. Plugins name every asset <game>_<thing>, so the
+	 * prefix of the class's own imagename identifies its unknown icon.
+	 *
+	 * @param string $imagename Class imagename as stored in the DB
+	 * @return list<string> Candidate paths, best first; empty if unusable
+	 */
+	protected function class_image_candidates(string $imagename): array
+	{
+		// DB-sourced value used in a path: keep the basename only.
+		$name = basename(trim($imagename));
+
+		if ($name === '' || $name === '.' || $name === '..')
+		{
+			return [];
+		}
+
+		$candidates = [
+			'roster_classes/' . $name . '.png',
+			'class_images/' . $name . '.png',
+		];
+
+		$pos = strpos($name, '_');
+
+		if ($pos !== false && $pos > 0)
+		{
+			$prefix = substr($name, 0, $pos);
+			$candidates[] = 'roster_classes/' . $prefix . '_unknown.png';
+			$candidates[] = 'class_images/' . $prefix . '_unknown.png';
+		}
+
+		return $candidates;
+	}
+
+	/**
+	 * Ordered candidate paths for a character's own class/race image.
+	 *
+	 * Unlike class_image_candidates() the DB already stores a filename with
+	 * its extension here, and there is no second directory to fall back to
+	 * — so the only fallback is the game's unknown icon in the same
+	 * directory, which still beats a broken image.
+	 *
+	 * @param string $dir      Image directory, e.g. class_images
+	 * @param string $filename Filename as stored in the DB, with extension
+	 * @return list<string> Candidate paths, best first; empty if unusable
+	 */
+	protected function character_image_candidates(string $dir, string $filename): array
+	{
+		$name = basename(trim($filename));
+
+		if ($name === '' || $name === '.' || $name === '..')
+		{
+			return [];
+		}
+
+		$candidates = [$dir . '/' . $name];
+
+		$pos = strpos($name, '_');
+
+		if ($pos !== false && $pos > 0)
+		{
+			$candidates[] = $dir . '/' . substr($name, 0, $pos) . '_unknown.png';
+		}
+
+		return $candidates;
+	}
+
+	/**
+	 * First candidate that exists on disk, as a web URL.
+	 *
+	 * $ext_path_images is a web path, so it is re-anchored at its ext/
+	 * segment to test the file on disk — same approach as
+	 * resolve_portrait_with_fallback().
+	 *
+	 * @param string       $ext_path_images Web path to a game's images/
+	 * @param list<string> $rel_candidates  Paths relative to that directory
+	 * @return string Web URL of the first existing file, or ''
+	 */
+	protected function resolve_game_image(string $ext_path_images, array $rel_candidates): string
+	{
+		$pos = strpos($ext_path_images, 'ext/');
+
+		if ($pos === false)
+		{
+			return '';
+		}
+
+		global $phpbb_root_path;
+		$fs_base = $phpbb_root_path . substr($ext_path_images, $pos);
+
+		foreach ($rel_candidates as $candidate)
+		{
+			if (file_exists($fs_base . $candidate))
+			{
+				return $ext_path_images . $candidate;
 			}
 		}
 
