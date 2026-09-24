@@ -1,6 +1,6 @@
 # bbGuild Family Roadmap (2.x)
 
-*Updated 2026-09-24. Working copy: `ext/avathar/bbguild` (+ plugins). Reconciled with GitHub milestones.*
+*Updated 2026-09-24 (artwork sourcing decided). Working copy: `ext/avathar/bbguild` (+ plugins). Reconciled with GitHub milestones.*
 
 ## North star
 
@@ -152,6 +152,24 @@ Gets its own parity matrix + release plan in a separate document.
 ## Open decisions
 - Sync trigger: phpBB cron default + documented system-cron option *(recommended)*.
 - Item data depth: base ID **+ bonus IDs** minimum *(recommended)*.
+- ~~How the remaining icon artwork gets sourced~~ **decided 2026-09-24: community wikis, with attribution** — see Icon artwork sourcing below.
+
+## Icon artwork sourcing (decided 2026-09-24)
+
+Roughly **168 assets** remain unsourced after the 2026-09-24 icon cluster: bbguildlineage2 122 (110 roster portraits + 12 starter classes), bbguildffxi 26 (a whole `roster_classes/` set + 3 class icons), bbguildffxiv 10 (6 race + 4 job), bbguildlotro 5, bbguildeq2 2, bbguildgw2 2, bbguildswtor 1, plus the 9 `<game>_unknown.png` placeholders (#391). No upstream API covers any of them — GW2's render service and XIVAPI, which supplied the 2026-09-24 work, are exhausted.
+
+**Decision: source from the community wikis, with attribution.** Practical, free, and scriptable per plugin; the alternatives considered were commissioning an artist (~168 pieces across 9 visual styles), extracting from game clients, and simply relying on #389's fallback and closing the tickets.
+
+**What this obliges us to get right.** The wikis are a discovery and hosting route, not a licence: a class icon on a fan wiki is almost always the **publisher's** copyrighted game asset, and a wiki's CC-BY-SA text licence does not extend to it. So per plugin, before pulling anything:
+
+1. **Check the publisher's fan-content policy**, which is the actual basis on which a fan extension ships game art — most of the nine publish one (Blizzard's Fan Content Policy, ArenaNet's Content Terms of Use and Square Enix's Materials Usage License are the clearest; verify current terms at the time of use). This is not new ground: the plugins already ship publisher-owned icons today.
+2. **Check the individual wiki's image terms**, which are often stricter or narrower than its text licence.
+3. **Record the provenance.** Each plugin gets an attribution file (suggest `contrib/ATTRIBUTION.md`) naming, per asset batch: the wiki it came from, the publisher who owns it, and the policy relied on. The extensions are GPL-2.0, and third-party art that is not GPL-compatible needs to be identifiable as such rather than silently implied to be covered by the repo licence.
+4. **Prefer authored placeholders where provenance is unclear** — that is the right answer for #391's `<game>_unknown.png` in any case, since no wiki has a "generic unknown class" icon to take.
+
+**Candidate sources per game** (to be verified against 1-2 above, not assumed): LOTRO-Wiki; the EQ2, FFXI and SWTOR wikis; Gamer Escape and Garland Tools for FFXIV; the official Guild Wars 2 Wiki; the Lineage 2 community wikis. FFXIV's remaining 4 job icons are the one case with a non-wiki option already documented (the v2 raw asset range, rejected on tone — see the icon-cluster subsection).
+
+**Sizes and naming are already pinned** by the per-plugin tests added 2026-09-24 (`*_icon_dimensions_test`, `ffxiv_icon_coverage_test`, `gw2_provider_test::test_every_elite_spec_has_an_icon_asset`), so a batch that lands in the wrong size or under the wrong filename fails CI rather than shipping crooked.
 
 ## Cross-repo notes
 - New extensions (events, Discord) are **separate repos** — they need their own milestones/epics; tracked here only as roadmap line items. Discord is an **open question, not decided**.
@@ -161,6 +179,6 @@ Gets its own parity matrix + release plan in a separate document.
 ## Next steps
 1. **2.1.0 is done and out** — tagged, Released on all 10 repos, milestone closed (0 open), CI green, forum posts + SEO published 2026-09-22. No follow-up work outstanding on this train.
 2. **Icon cluster — code half done 2026-09-24**, 8 PRs merged across core + 7 plugins, 3 issues closed, CI green everywhere (see the icon-cluster subsection under Game plugins). Everything still open needs **artwork**: it is now a sourcing/commissioning task, not a coding one, and #389's fallback means none of it renders broken in the meantime. Five new tickets came out of the audit: core #391, bbguildffxiv#8, bbguildffxi#6, bbguildgw2#12, and core #389 (fixed).
-3. **Decide how the remaining icon artwork gets sourced** — the blocker is that Lineage2 (110 + 12), FFXIV (6 race + 4 job), LOTRO (5), EQ2 (2), GW2 (2), SWTOR (1) and FFXI (23 + 3) have no upstream API to pull from, unlike GW2's specs and FFXIV's older jobs. Options are commissioning, extracting from game clients, or shipping authored placeholders.
+3. **Execute the icon artwork sourcing** per the decision above (community wikis, with attribution) — ~168 assets. Suggested order: the 9 `<game>_unknown.png` first (#391: authored, no sourcing needed, and they complete #389's fallback chain), then the small batches that finish a set outright (swtor 1, eq2 2, gw2 2, lotro 5, ffxiv 10), then bbguildffxi's 26, then bbguildlineage2's 122 last since it is the largest and the least visible per asset. Each batch needs its plugin's `contrib/ATTRIBUTION.md` entry in the same PR.
 4. Stand up epics/repos for the 2.2.0/2.3.0 new extensions (Events/RSVP first).
 5. GW2 API v2 roster sync (gw2#9) moved to 2.2.0 — re-scoped to roster-only (name/rank/join date), key-linking split off separately; needs its own design pass before work starts.
