@@ -1,6 +1,6 @@
 # bbGuild Family Roadmap (2.x)
 
-*Updated 2026-09-23. Working copy: `ext/avathar/bbguild` (+ plugins). Reconciled with GitHub milestones.*
+*Updated 2026-09-24. Working copy: `ext/avathar/bbguild` (+ plugins). Reconciled with GitHub milestones.*
 
 ## North star
 
@@ -87,6 +87,8 @@ Headline: tabbed portal + character experience + stats.
 - **#230** professions
 - **#289** player statistics page
 - **#388** guild activity feed portal module (filed 2026-09-22, after the 2.1.0 release)
+- **#389** roster images fell back to nothing when a plugin asset was missing — **shipped** 2026-09-24 (PR #390); the root-cause fix behind the whole icon cluster, see Game plugins below
+- **#391** every game plugin is missing its `<game>_unknown.png` fallback icon — the last step of #389's chain, so it can currently almost never fire. Needs authoring per plugin, no upstream source
 
 ### 2.3.0 — integrations · due 2027-01-15
 - **#370** expose a bbGuild API surface (phpBB events + read API) — the decoupling/integration layer for the whole family; revives the 2012 bbDKP-API idea; Discord/Gameworld are its first consumers
@@ -99,9 +101,43 @@ Headline: tabbed portal + character experience + stats.
 
 All 9 plugins (wow, gw2, lotro, eq, eq2, ffxi, ffxiv, swtor, lineage2) release in lockstep with core and now carry the same milestones (2.0.0–2.3.0, same due dates) — locked to the milestone, not to identical RC numbers (within 2.0.0 stabilisation, core rc5 / WoW rc3 / rest rc2, each plugin hard-requiring core rc5). Per-plugin backlog is allocated as:
 
-- **2.0.0 (stabilization)** — test suites (EPV / unit / functional / smoke / integration) in every plugin, plus roster/class/race **icon fixes** (eq #7, eq2 #7, ffxiv #4, gw2 #7, lineage2 #7/#3, lotro #3, swtor #3, wow #27).
+- **2.0.0 (stabilization)** — test suites (EPV / unit / functional / smoke / integration) in every plugin, plus roster/class/race **icon fixes** (eq #7, eq2 #7, ffxiv #4, gw2 #7, lineage2 #7/#3, lotro #3, swtor #3, wow #27) — deferred to 2.2.0 and **worked 2026-09-24**, see the icon-cluster subsection below.
 - **2.1.0 (features/data)** — **seed specializations** for the 8 non-WoW games (eq #6, eq2 #6, ffxi #5, ffxiv #7, gw2 elite-spec icons #8, lineage2 #6, lotro #6, swtor #6); **LOTRO game-data** update (#7); **WoW** character features — scheduled Battle.net sync (#11, implements core #362) — **shipped**, activity feed (#10) — **shipped**, titles collection (#24) — **closed as won't-do** (compared against real Blizzard armory UI: titles never appear as a collapsible list anywhere, only as a single inline word above the character name — not worth building as originally scoped).
 - **2.2.0** — WoW arena bracket ratings on the player page (#23); **GW2 API v2** roster sync (gw2 #9 — re-scoped to roster-only, name/rank/join-date; moved out of 2.1.0 since it assumed a working API this train never delivered, key-linking split off separately).
+
+### Icon cluster — worked 2026-09-24
+
+An audit of all 9 plugins' `class_images/`, `roster_classes/`, `race_images/` and `spec_icons/` against the `imagename`/`image_male`/`image_female` values their installers actually seed. Two findings reshaped the work:
+
+1. **The tickets understated it.** Missing-asset counts were 1 (swtor), 3 (gw2, eq2), 9 (lotro), 12 (ffxiv, lineage2 class icons) and **110** (lineage2 roster art), plus `<game>_unknown.png` absent in 8 of 9 plugins and bbguildffxi missing its `roster_classes/` directory outright — that plugin had no icon ticket at all.
+2. **Two tickets proposed the wrong fix.** eq2#7 and gw2#7 suggest copying the missing file from `class_images/`. `roster_classes/` is not an icon directory — it holds large character artwork (wow 184x184, eq 125x184, gw2 ~130x180, lineage2 ~100x100, swtor 100x100, lotro 80x80, eq2 ~80x85) — and those sources are 17-30px detail icons. Upscaling them would look wrong beside the rest of the grid.
+
+So the root cause was fixed in core (**#389**, PR #390): every roster image now resolves against the filesystem and falls back roster art → detail icon → the game's unknown icon → omit the `<img>`. That is what makes lineage2's 110 missing portraits a quality gap rather than 110 broken images, and it is the only approach that scales.
+
+**Shipped, merged and CI-green 2026-09-24:**
+
+| Repo | PR | Scope | Issue |
+|---|---|---|---|
+| bbguild | #390 | fallback chain + template guards + 13 tests | #389 **closed** |
+| bbguildgw2 | #11 | 27 elite-spec icons from the official GW2 render API, `spec_catalog()` wired | #8 **closed** |
+| bbguildffxiv | #9 | 7 of 12 missing job icons, both sets | #8 partial |
+| bbguildlotro | #8 | 9 unreachable filenames + sizes normalised to 48x48 | #3 partial |
+| bbguildswtor | #7 | 4 race icons padded to the set's 44x44 | #3 partial |
+| bbguildeq | #8 | Shadow Knight filename mismatch | #7 **closed** |
+| bbguildeq2 | #8 | filename casing + a dead `eq2_Captain.png` | #7 partial |
+| bbguildlineage2 | #8 | stray `.jpg` duplicate | #3 partial |
+
+**Asset provenance, verified rather than assumed** — worth knowing before sourcing more:
+- **GW2** elite-spec icons come from the official API (`/v2/specializations`), native 64x64, normalised to the 56x56 bbguildwow uses. Fully official, no licensing caveat. The API now returns **36** elite specs against the catalog's 27 (gw2#12).
+- **FFXIV** icons are XIVAPI v1 (`/cj/1/<job>.png`) reduced with a **box** filter — measured mean per-pixel difference against the shipped icon at 24x24: box **11.1**, Lanczos 31.0, every raw game-icon range 41+. The `roster_classes/` plate is a horizontally uniform vertical gradient, reconstructable per row from any existing icon.
+- **Undersized icons are padded onto a transparent canvas, not upscaled** — keeps the original pixels crisp and is reversible, accepting that the art still reads smaller than its neighbours.
+
+**What remains is blocked on artwork, not effort** — no upstream source exists for any of it:
+- **bbguildlineage2** #7 (110 roster portraits) and #3 (12 starter-class icons)
+- **bbguildffxiv** #4 (6 race icons — the 6 wrong ones are dark full-body renders where the 10 correct ones are face crops on a light ground, so no compositing or reframing fixes them) and #8's last 4 jobs (Reaper, Sage, Viper, Pictomancer: absent from XIVAPI v1, and v2's raw range has them in a visibly darker tone that breaks the set)
+- **bbguildlotro** #3 (Brawler, Mariner, River-hobbit, `lotro_unknown`, 9 classes with no roster art)
+- **bbguildeq2** #7 (Beastlord, Channeler), **bbguildgw2** #7 (Revenant, Thief), **bbguildswtor** #3 (`swtor_unknown`), **bbguildffxi** #6 (whole `roster_classes/` directory + 3 class icons)
+- **core #391** — `<game>_unknown.png` across all 9 plugins
 
 This mirrors core: tests + display bugs stabilize 2.0.0; spec/data + character features land 2.1.0. WoW's scheduled-sync ticket (#11) is the plugin half of the core sync-scheduler contract (#361/#362).
 
@@ -124,6 +160,7 @@ Gets its own parity matrix + release plan in a separate document.
 
 ## Next steps
 1. **2.1.0 is done and out** — tagged, Released on all 10 repos, milestone closed (0 open), CI green, forum posts + SEO published 2026-09-22. No follow-up work outstanding on this train.
-2. **Icon-art cluster is now the oldest unclaimed work** — 9 plugin bugs, all milestoned 2.2.0, each small and independent: eq#7, eq2#7, ffxiv#4, gw2#7, gw2#8, lineage2#3, lineage2#7, lotro#3, swtor#3. They were queued as 2.0.0 stabilization work back on 2026-09-13, deferred to 2.2.0, and never picked up. Cheapest visible win available and parallelizes cleanly across repos.
-3. Stand up epics/repos for the 2.2.0/2.3.0 new extensions (Events/RSVP first).
-4. GW2 API v2 roster sync (gw2#9) moved to 2.2.0 — re-scoped to roster-only (name/rank/join date), key-linking split off separately; needs its own design pass before work starts.
+2. **Icon cluster — code half done 2026-09-24**, 8 PRs merged across core + 7 plugins, 3 issues closed, CI green everywhere (see the icon-cluster subsection under Game plugins). Everything still open needs **artwork**: it is now a sourcing/commissioning task, not a coding one, and #389's fallback means none of it renders broken in the meantime. Five new tickets came out of the audit: core #391, bbguildffxiv#8, bbguildffxi#6, bbguildgw2#12, and core #389 (fixed).
+3. **Decide how the remaining icon artwork gets sourced** — the blocker is that Lineage2 (110 + 12), FFXIV (6 race + 4 job), LOTRO (5), EQ2 (2), GW2 (2), SWTOR (1) and FFXI (23 + 3) have no upstream API to pull from, unlike GW2's specs and FFXIV's older jobs. Options are commissioning, extracting from game clients, or shipping authored placeholders.
+4. Stand up epics/repos for the 2.2.0/2.3.0 new extensions (Events/RSVP first).
+5. GW2 API v2 roster sync (gw2#9) moved to 2.2.0 — re-scoped to roster-only (name/rank/join date), key-linking split off separately; needs its own design pass before work starts.
