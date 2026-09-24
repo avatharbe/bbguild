@@ -123,6 +123,13 @@ See the [Changelog](https://avatharbe.github.io/bbguild/CHANGELOG/) for version 
 
 For extension developers: custom PHP events and integration details are documented in the [Events API](https://avatharbe.github.io/bbguild/Events/) page.
 
+## Support
+
+- [Support Avathar on Patreon](https://www.patreon.com/cw/avathar/membership) — help fund hosting and ongoing development
+
+[![Donate with PayPal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/donate/?hosted_button_id=FH8YHQN5UVUVW)
+
+
 ## License
 
 [GNU General Public License v2](http://opensource.org/licenses/gpl-2.0.php)
